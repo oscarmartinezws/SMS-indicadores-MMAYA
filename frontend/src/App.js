@@ -801,7 +801,7 @@ function HomeView({ user, siteConfig }) {
             <div style={cardStyle}>
               <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', color: styles.gray700 }}>Indicadores por Entidad</div>
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={dashboardData.por_entidad} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
+                <BarChart data={dashboardData.por_entidad || []} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={styles.gray200} />
                   <XAxis dataKey="nombre" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" interval={0} />
                   <YAxis tick={{ fontSize: 11 }} />
@@ -817,7 +817,7 @@ function HomeView({ user, siteConfig }) {
             <div style={cardStyle}>
               <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', color: styles.gray700 }}>Indicadores por Área</div>
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={dashboardData.por_area.slice(0, 10)} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
+                <BarChart data={(dashboardData.por_area || []).slice(0, 10)} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={styles.gray200} />
                   <XAxis dataKey="nombre" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" interval={0} />
                   <YAxis tick={{ fontSize: 11 }} />
