@@ -843,8 +843,8 @@ function HomeView({ user, siteConfig }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {dashboardData.indicadores.slice(0, 15).map((ind, idx) => (
-                    <tr key={ind.id_indicador} style={{ borderBottom: `1px solid ${styles.gray200}` }}>
+                  {(dashboardData.indicadores || []).slice(0, 15).map((ind, idx) => (
+                    <tr key={ind.id_indicador || idx} style={{ borderBottom: `1px solid ${styles.gray200}` }}>
                       <td style={{ ...rowStyle, textAlign: 'center' }}>{idx + 1}</td>
                       <td style={{ ...rowStyle, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ind.indicador_resultado || '-'}</td>
                       <td style={rowStyle}>{ind.sector || '-'}</td>
