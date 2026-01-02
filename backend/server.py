@@ -727,10 +727,15 @@ async def get_dashboard_summary(
     """Get aggregated dashboard data for charts"""
     pool = await get_pg_pool()
     async with pool.acquire() as conn:
-        # Build filters
+        # Build filters for main query (with rendicion)
         filters = []
         params = []
         param_idx = 1
+        
+        # Filters for matriz_parametro only
+        mp_filters = []
+        mp_params = []
+        mp_param_idx = 1
         
         if year:
             filters.append(f"r.gestion = ${param_idx}")
@@ -741,33 +746,45 @@ async def get_dashboard_summary(
             filters.append(f"mp.id_sector = ${param_idx}")
             params.append(id_sector)
             param_idx += 1
+            mp_filters.append(f"mp.id_sector = ${mp_param_idx}")
+            mp_params.append(id_sector)
+            mp_param_idx += 1
         
         if id_entidad:
             filters.append(f"mp.id_entidad = ${param_idx}")
             params.append(id_entidad)
             param_idx += 1
+            mp_filters.append(f"mp.id_entidad = ${mp_param_idx}")
+            mp_params.append(id_entidad)
+            mp_param_idx += 1
             
         if id_area:
             filters.append(f"mp.id_area = ${param_idx}")
             params.append(id_area)
             param_idx += 1
+            mp_filters.append(f"mp.id_area = ${mp_param_idx}")
+            mp_params.append(id_area)
+            mp_param_idx += 1
         
         # Non-admin users can only see their area data
         if user.get('rol') != 'ADMINISTRADOR' and user.get('id_area'):
             filters.append(f"mp.id_area = ${param_idx}")
             params.append(user.get('id_area'))
             param_idx += 1
+            mp_filters.append(f"mp.id_area = ${mp_param_idx}")
+            mp_params.append(user.get('id_area'))
+            mp_param_idx += 1
         
         where_clause = " AND ".join(filters) if filters else "1=1"
+        mp_where_clause = " AND ".join(mp_filters) if mp_filters else "1=1"
         
-        # Get total indicators count
+        # Get total indicators count (without year filter)
         total_query = f"""
             SELECT COUNT(DISTINCT mp.id_indicador) as total
             FROM matriz_parametro mp
-            LEFT JOIN rendicion r ON mp.id_indicador = r.id_indicador
-            WHERE {where_clause.replace('r.gestion', 'COALESCE(r.gestion, 0) >= 0')}
+            WHERE {mp_where_clause}
         """
-        total_row = await conn.fetchrow(total_query, *[p for p in params if 'gestion' not in str(p)])
+        total_row = await conn.fetchrow(total_query, *mp_params)
         
         # Get indicators with rendition data
         data_query = f"""
