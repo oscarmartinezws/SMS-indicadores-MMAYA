@@ -729,25 +729,25 @@ function HomeView({ user, siteConfig }) {
           <div style={{ fontSize: '1.2rem', marginBottom: 10 }}>📊</div>
           <div style={{ color: styles.gray600 }}>Cargando datos del dashboard...</div>
         </div>
-      ) : dashboardData ? (
+      ) : dashboardData && dashboardData.general ? (
         <>
           {/* KPI Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 20 }}>
             <div style={{ ...cardStyle, borderLeft: `4px solid ${styles.black}` }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>Total Indicadores</div>
-              <div style={{ fontSize: '2rem', fontWeight: 700 }}>{dashboardData.general.total_indicadores}</div>
+              <div style={{ fontSize: '2rem', fontWeight: 700 }}>{dashboardData.general.total_indicadores || 0}</div>
             </div>
             <div style={{ ...cardStyle, borderLeft: `4px solid ${styles.green}` }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>Con Avance</div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: styles.green }}>{dashboardData.general.con_avance}</div>
+              <div style={{ fontSize: '2rem', fontWeight: 700, color: styles.green }}>{dashboardData.general.con_avance || 0}</div>
             </div>
             <div style={{ ...cardStyle, borderLeft: `4px solid ${styles.red}` }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>Sin Avance</div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: styles.red }}>{dashboardData.general.sin_avance}</div>
+              <div style={{ fontSize: '2rem', fontWeight: 700, color: styles.red }}>{dashboardData.general.sin_avance || 0}</div>
             </div>
             <div style={{ ...cardStyle, borderLeft: `4px solid ${styles.blue}` }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>% Avance General</div>
-              <div style={{ fontSize: '2rem', fontWeight: 700, color: styles.blue }}>{dashboardData.general.porcentaje_avance}%</div>
+              <div style={{ fontSize: '2rem', fontWeight: 700, color: styles.blue }}>{dashboardData.general.porcentaje_avance || 0}%</div>
             </div>
           </div>
 
@@ -757,7 +757,7 @@ function HomeView({ user, siteConfig }) {
             <div style={cardStyle}>
               <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', color: styles.gray700 }}>Indicadores por Sector</div>
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={dashboardData.por_sector} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
+                <BarChart data={dashboardData.por_sector || []} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={styles.gray200} />
                   <XAxis dataKey="nombre" tick={{ fontSize: 10 }} angle={-45} textAnchor="end" interval={0} />
                   <YAxis tick={{ fontSize: 11 }} />
