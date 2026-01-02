@@ -669,9 +669,9 @@ function HomeView({ user, siteConfig }) {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const pieData = dashboardData ? [
-    { name: 'Con Avance', value: dashboardData.general.con_avance },
-    { name: 'Sin Avance', value: dashboardData.general.sin_avance }
+  const pieData = dashboardData && dashboardData.general ? [
+    { name: 'Con Avance', value: dashboardData.general.con_avance || 0 },
+    { name: 'Sin Avance', value: dashboardData.general.sin_avance || 0 }
   ] : [];
 
   const cardStyle = { background: styles.white, borderRadius: 8, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' };
