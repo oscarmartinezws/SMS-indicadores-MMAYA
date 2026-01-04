@@ -522,7 +522,7 @@ app.put('/api/sms/usuarios/:id/clave', async (req, res) => {
 app.get('/api/sms/roles', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM rol ORDER BY id_rol');
-    res.json(result.rows.map(r => ({ id: r.id_rol, nombre: r.rol, estado: r.estado || 'ACTIVO' })));
+    res.json(result.rows.map(r => ({ id: r.id_rol, id_rol: r.id_rol, nombre: r.rol, rol: r.rol, estado: r.estado || 'ACTIVO' })));
   } catch (err) {
     res.status(500).json({ detail: 'Error al obtener roles' });
   }
