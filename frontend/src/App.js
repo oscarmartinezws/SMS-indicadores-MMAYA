@@ -536,19 +536,22 @@ function SeguimientoView({ user, siteConfig }) {
       container.innerHTML = htmlContent;
       container.style.position = 'absolute';
       container.style.left = '-9999px';
+      container.style.width = '297mm'; // A4 landscape width
       document.body.appendChild(container);
+      
+      const element = container.querySelector('#pdf-content');
       
       // Configure PDF options
       const opt = {
         margin: [5, 5, 5, 5],
         filename: `Rendicion_${gestion}_${contexto.area || 'Usuario'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 1.5, useCORS: true, logging: false },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
       };
       
       // Generate and download PDF
-      await html2pdf().set(opt).from(container.firstChild).save();
+      await html2pdf().set(opt).from(element).save();
       
       // Cleanup
       document.body.removeChild(container);
