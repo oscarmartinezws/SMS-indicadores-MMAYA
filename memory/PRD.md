@@ -51,6 +51,10 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - [x] Descripción cualitativa del avance
 - [x] Modificaciones
 - [x] Archivos adjuntos (upload y URL)
+- [x] **Exportación de datos (COMPLETADO)**:
+  - Exportar a CSV (todos los indicadores del usuario)
+  - Exportar a PDF (reporte formateado para impresión)
+  - Incluye datos vacíos si no hay registros
 
 ### Configuración del Sistema
 - [x] Período del plan (año inicio/fin)
