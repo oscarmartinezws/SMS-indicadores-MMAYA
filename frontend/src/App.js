@@ -614,7 +614,7 @@ function SeguimientoView({ user, siteConfig }) {
       <div style={{ background: styles.white, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
         <div style={darkHeader}>SELECCIÓN DE INDICADOR</div>
         <div style={{ padding: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 16, alignItems: 'end' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'end' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>INDICADOR</label>
               <select value={selectedIndicador?.id_indicador || ''} onChange={(e) => setSelectedIndicador(indicadores.find(i => i.id_indicador === parseInt(e.target.value)))}
@@ -622,9 +622,28 @@ function SeguimientoView({ user, siteConfig }) {
                 {indicadores.map(ind => <option key={ind.id_indicador} value={ind.id_indicador}>{ind.codi} - {ind.indicador_resultado?.substring(0, 80)}...</option>)}
               </select>
             </div>
-            <button onClick={saveRendicion} style={{ padding: '12px 24px', background: styles.black, color: styles.white, border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>
+            <button onClick={saveRendicion} data-testid="btn-guardar" style={{ padding: '12px 24px', background: styles.black, color: styles.white, border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>
               💾 Guardar
             </button>
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => setShowExportMenu(!showExportMenu)} data-testid="btn-exportar" style={{ padding: '12px 24px', background: styles.green, color: styles.white, border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                📥 Exportar ▾
+              </button>
+              {showExportMenu && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: styles.white, borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 100, minWidth: 180, overflow: 'hidden' }}>
+                  <button onClick={() => { exportToCSV(); setShowExportMenu(false); }} data-testid="btn-export-csv" style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10, borderBottom: `1px solid ${styles.gray200}` }}
+                    onMouseEnter={(e) => e.target.style.background = styles.gray100}
+                    onMouseLeave={(e) => e.target.style.background = 'transparent'}>
+                    📊 Exportar a CSV
+                  </button>
+                  <button onClick={() => { exportToPDF(); setShowExportMenu(false); }} data-testid="btn-export-pdf" style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10 }}
+                    onMouseEnter={(e) => e.target.style.background = styles.gray100}
+                    onMouseLeave={(e) => e.target.style.background = 'transparent'}>
+                    📄 Exportar a PDF
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           
           {selectedIndicador && (
