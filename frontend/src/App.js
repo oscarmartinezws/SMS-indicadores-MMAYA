@@ -988,85 +988,90 @@ function ConfiguracionView({ siteConfig, onConfigChange }) {
         </div>
       </div>
 
-      {/* Logo and Favicon - File Upload */}
+      {/* Logo and Favicon - File Upload OR URL */}
       <div style={cardStyle}>
         <div style={darkHeader}>🖼️ Logo y Favicon</div>
         <div style={{ padding: 20 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-            {/* Favicon Upload */}
+            {/* Favicon */}
             <div>
               <label style={labelStyle}>Favicon del Sitio</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input 
-                  type="file" 
-                  accept=".ico,.png,.jpg,.jpeg,.svg"
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const formData = new FormData();
-                      formData.append('file', file);
-                      try {
-                        const res = await fetch(`${API_URL}/api/sms/configuracion/upload/favicon`, {
-                          method: 'POST',
-                          body: formData
-                        });
-                        if (res.ok) {
-                          const data = await res.json();
-                          handleChange('favicon_url', data.url);
-                          setMessage('✅ Favicon subido correctamente');
-                        } else {
-                          setMessage('❌ Error al subir el favicon');
-                        }
-                      } catch (err) {
-                        setMessage('❌ Error de conexión');
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                  <button 
+                    onClick={() => document.getElementById('favicon-file').click()}
+                    style={{ padding: '8px 12px', background: styles.black, color: '#FFF', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>
+                    📁 Subir Archivo
+                  </button>
+                  <input id="favicon-file" type="file" accept=".ico,.png,.jpg,.jpeg,.svg" style={{ display: 'none' }}
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        try {
+                          const res = await fetch(`${API_URL}/api/sms/configuracion/upload/favicon`, { method: 'POST', body: formData });
+                          if (res.ok) {
+                            const data = await res.json();
+                            handleChange('favicon_url', data.url);
+                            setMessage('✅ Favicon subido correctamente');
+                          } else { setMessage('❌ Error al subir el favicon'); }
+                        } catch (err) { setMessage('❌ Error de conexión'); }
                       }
-                    }
-                  }}
-                  style={{ fontSize: '0.8rem' }}
-                />
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input type="url" placeholder="O ingrese URL del favicon" value={config.favicon_url || ''} 
+                    onChange={(e) => handleChange('favicon_url', e.target.value)} 
+                    style={{ ...inputStyle, flex: 1 }} />
+                </div>
               </div>
-              <p style={{ fontSize: '0.7rem', color: styles.gray500, marginTop: 6 }}>Formato: .ico, .png (32x32 recomendado)</p>
+              <p style={{ fontSize: '0.65rem', color: styles.gray500 }}>Formato: .ico, .png (32x32 recomendado)</p>
               {config.favicon_url && (
                 <div style={{ marginTop: 8, padding: 8, background: styles.gray100, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <img src={config.favicon_url.startsWith('/') ? API_URL + config.favicon_url : config.favicon_url} alt="Favicon" style={{ width: 24, height: 24 }} onError={(e) => { e.target.style.display = 'none'; }} />
                   <span style={{ fontSize: '0.7rem', color: styles.gray600 }}>Favicon actual</span>
+                  <button onClick={() => handleChange('favicon_url', '')} style={{ marginLeft: 'auto', padding: '2px 8px', background: styles.red, color: '#FFF', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.65rem' }}>✕</button>
                 </div>
               )}
             </div>
             
-            {/* Logo Upload */}
+            {/* Logo */}
             <div>
               <label style={labelStyle}>Logo Principal</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input 
-                  type="file" 
-                  accept=".png,.jpg,.jpeg,.svg,.gif"
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const formData = new FormData();
-                      formData.append('file', file);
-                      try {
-                        const res = await fetch(`${API_URL}/api/sms/configuracion/upload/logo`, {
-                          method: 'POST',
-                          body: formData
-                        });
-                        if (res.ok) {
-                          const data = await res.json();
-                          handleChange('logo_url', data.url);
-                          setMessage('✅ Logo subido correctamente');
-                        } else {
-                          setMessage('❌ Error al subir el logo');
-                        }
-                      } catch (err) {
-                        setMessage('❌ Error de conexión');
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                  <button 
+                    onClick={() => document.getElementById('logo-file').click()}
+                    style={{ padding: '8px 12px', background: styles.black, color: '#FFF', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>
+                    📁 Subir Archivo
+                  </button>
+                  <input id="logo-file" type="file" accept=".png,.jpg,.jpeg,.svg,.gif" style={{ display: 'none' }}
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        try {
+                          const res = await fetch(`${API_URL}/api/sms/configuracion/upload/logo`, { method: 'POST', body: formData });
+                          if (res.ok) {
+                            const data = await res.json();
+                            handleChange('logo_url', data.url);
+                            setMessage('✅ Logo subido correctamente');
+                          } else { setMessage('❌ Error al subir el logo'); }
+                        } catch (err) { setMessage('❌ Error de conexión'); }
                       }
-                    }
-                  }}
-                  style={{ fontSize: '0.8rem' }}
-                />
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input type="url" placeholder="O ingrese URL del logo" value={config.logo_url || ''} 
+                    onChange={(e) => handleChange('logo_url', e.target.value)} 
+                    style={{ ...inputStyle, flex: 1 }} />
+                </div>
               </div>
-              <p style={{ fontSize: '0.7rem', color: styles.gray500, marginTop: 6 }}>Formato: .png, .jpg, .svg</p>
+              <p style={{ fontSize: '0.65rem', color: styles.gray500 }}>Formato: .png, .jpg, .svg</p>
             </div>
           </div>
           
