@@ -925,8 +925,8 @@ app.get('/api/sms/configuracion/years', async (req, res) => {
 app.post('/api/sms/configuracion/upload/:tipo', upload.single('file'), async (req, res) => {
   try {
     const { tipo } = req.params;
-    if (!['favicon', 'logo'].includes(tipo)) {
-      return res.status(400).json({ detail: "Tipo debe ser 'favicon' o 'logo'" });
+    if (!['favicon', 'logo', 'adjunto'].includes(tipo)) {
+      return res.status(400).json({ detail: "Tipo debe ser 'favicon', 'logo' o 'adjunto'" });
     }
     
     if (!req.file) {
@@ -935,12 +935,15 @@ app.post('/api/sms/configuracion/upload/:tipo', upload.single('file'), async (re
     
     const fileUrl = `/api/sms/uploads/${req.file.filename}`;
     
-    await pool.query(
-      `INSERT INTO configuracion_sistema (clave, valor, fecha_modificacion) 
-       VALUES ($1, $2, CURRENT_TIMESTAMP)
-       ON CONFLICT (clave) DO UPDATE SET valor = $2, fecha_modificacion = CURRENT_TIMESTAMP`,
-      [`${tipo}_url`, fileUrl]
-    );
+    // Only update config for favicon and logo
+    if (tipo !== 'adjunto') {
+      await pool.query(
+        `INSERT INTO configuracion_sistema (clave, valor, fecha_modificacion) 
+         VALUES ($1, $2, CURRENT_TIMESTAMP)
+         ON CONFLICT (clave) DO UPDATE SET valor = $2, fecha_modificacion = CURRENT_TIMESTAMP`,
+        [`${tipo}_url`, fileUrl]
+      );
+    }
     
     res.json({ message: `${tipo} subido correctamente`, url: fileUrl, filename: req.file.filename });
   } catch (err) {
