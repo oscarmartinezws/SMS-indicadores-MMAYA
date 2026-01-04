@@ -53,8 +53,12 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - [x] Archivos adjuntos (upload y URL)
 - [x] **Exportación de datos (COMPLETADO)**:
   - Exportar a CSV (todos los indicadores del usuario)
-  - Exportar a PDF (reporte formateado para impresión)
-  - Incluye datos vacíos si no hay registros
+  - **Exportar a PDF mejorado**:
+    - Descarga automática (sin ventana de impresión)
+    - Descripción completa del indicador (múltiples líneas)
+    - 3 sub-filas por indicador: EJEC, %EJEC, ACUM
+    - Colores diferenciados por tipo de dato
+    - Formato A4 landscape
 
 ### Configuración del Sistema
 - [x] Período del plan (año inicio/fin)
