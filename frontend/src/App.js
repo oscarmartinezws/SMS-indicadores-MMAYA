@@ -325,11 +325,40 @@ function SeguimientoView({ user, siteConfig }) {
   const saveRendicion = async () => {
     if (!selectedIndicador) return;
     try {
+      const mesesCortos = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      const programado = parseFloat(rendicion.programado) || parseFloat(selectedIndicador?.logro) || 0;
+      
+      // Calculate % EJEC and ACUMULADO for all months
+      const dataToSave = { ...rendicion };
+      let acumuladoTotal = 0;
+      
+      mesesCortos.forEach((m, i) => {
+        const ejecutado = parseFloat(rendicion[`ejecutado_${m}`]) || 0;
+        
+        // Calculate % EJEC
+        const procEjec = programado > 0 ? (ejecutado / programado) : 0;
+        dataToSave[`proc_ejecutado_${m}`] = procEjec;
+        
+        // Calculate ACUMULADO (cumulative sum)
+        acumuladoTotal += ejecutado;
+        dataToSave[`acumulado_${m}`] = acumuladoTotal;
+      });
+      
+      // Set logrado as total acumulado
+      dataToSave.logrado = acumuladoTotal;
+      
       const res = await fetch(`${API_URL}/api/sms/rendicion`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_indicador: selectedIndicador.id_indicador, gestion, ...rendicion })
+        body: JSON.stringify({ id_indicador: selectedIndicador.id_indicador, gestion, id_area: user?.id_area, ...dataToSave })
       });
-      if (res.ok) alert('Rendición guardada exitosamente');
+      if (res.ok) {
+        alert('Rendición guardada exitosamente');
+        // Reload data to show updated values
+        const reloadRes = await fetch(`${API_URL}/api/sms/rendicion/${selectedIndicador.id_indicador}/${gestion}`);
+        if (reloadRes.ok) {
+          setRendicion(await reloadRes.json());
+        }
+      }
     } catch (e) { console.error(e); alert('Error al guardar'); }
   };
 
