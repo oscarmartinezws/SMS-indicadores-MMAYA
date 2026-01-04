@@ -441,7 +441,7 @@ function SeguimientoView({ user, siteConfig }) {
     }
   };
 
-  // Export to PDF
+  // Export to PDF - Auto download with 3 sub-rows per indicator
   const exportToPDF = async () => {
     try {
       const mesesCortos = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -460,31 +460,13 @@ function SeguimientoView({ user, siteConfig }) {
         })
       );
       
-      // Build HTML content for PDF
-      let htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>Rendición de Indicadores ${gestion}</title>
-          <style>
-            body { font-family: Arial, sans-serif; font-size: 10px; margin: 20px; }
-            h1 { font-size: 16px; text-align: center; margin-bottom: 5px; }
-            h2 { font-size: 12px; text-align: center; color: #666; margin-bottom: 20px; }
-            .info { margin-bottom: 15px; padding: 10px; background: #f5f5f5; border-radius: 5px; }
-            .info span { margin-right: 20px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; page-break-inside: avoid; }
-            th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: center; font-size: 9px; }
-            th { background: #333; color: white; }
-            .indicator-name { text-align: left; max-width: 200px; word-wrap: break-word; }
-            .section-header { background: #666; color: white; }
-            @media print { body { margin: 10px; } }
-          </style>
-        </head>
-        <body>
-          <h1>RENDICIÓN DE INDICADORES - GESTIÓN ${gestion}</h1>
-          <h2>Sistema de Monitoreo Sectorial</h2>
-          <div class="info">
+      // Build HTML content for PDF with 3 sub-rows per indicator
+      const htmlContent = `
+        <div id="pdf-content" style="font-family: Arial, sans-serif; font-size: 9px; padding: 15px; width: 100%;">
+          <h1 style="font-size: 16px; text-align: center; margin-bottom: 5px; color: #333;">RENDICIÓN DE INDICADORES - GESTIÓN ${gestion}</h1>
+          <h2 style="font-size: 11px; text-align: center; color: #666; margin-bottom: 15px;">Sistema de Monitoreo Sectorial</h2>
+          
+          <div style="margin-bottom: 15px; padding: 10px; background: #f5f5f5; border-radius: 5px; display: flex; flex-wrap: wrap; gap: 15px;">
             <span><strong>Entidad:</strong> ${contexto.entidad || '-'}</span>
             <span><strong>Área:</strong> ${contexto.area || '-'}</span>
             <span><strong>Sector:</strong> ${contexto.sector || '-'}</span>
@@ -492,90 +474,90 @@ function SeguimientoView({ user, siteConfig }) {
             <span><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</span>
           </div>
           
-          <table>
+          <table style="width: 100%; border-collapse: collapse; font-size: 8px;">
             <thead>
               <tr>
-                <th rowspan="2">CÓDIGO</th>
-                <th rowspan="2" class="indicator-name">INDICADOR</th>
-                <th colspan="12" class="section-header">EJECUCIÓN MENSUAL</th>
-                <th rowspan="2">PROGRAMADO</th>
-                <th rowspan="2">LOGRADO</th>
-              </tr>
-              <tr>
-                ${mesesHeaders.map(m => `<th>${m}</th>`).join('')}
+                <th style="background: #1a1a1a; color: white; padding: 6px 4px; border: 1px solid #333; width: 60px;">CÓDIGO</th>
+                <th style="background: #1a1a1a; color: white; padding: 6px 4px; border: 1px solid #333; text-align: left; min-width: 180px;">INDICADOR</th>
+                <th style="background: #1a1a1a; color: white; padding: 6px 4px; border: 1px solid #333; width: 45px;">TIPO</th>
+                ${mesesHeaders.map(m => `<th style="background: #1a1a1a; color: white; padding: 6px 2px; border: 1px solid #333; width: 38px;">${m}</th>`).join('')}
+                <th style="background: #0066cc; color: white; padding: 6px 4px; border: 1px solid #333; width: 55px;">PROG.</th>
+                <th style="background: #cc0000; color: white; padding: 6px 4px; border: 1px solid #333; width: 55px;">LOGRADO</th>
               </tr>
             </thead>
             <tbody>
-      `;
-      
-      allData.forEach(({ indicador, rendicion }) => {
-        htmlContent += `
-          <tr>
-            <td>${indicador.codi || ''}</td>
-            <td class="indicator-name">${(indicador.indicador_resultado || '').substring(0, 60)}${(indicador.indicador_resultado || '').length > 60 ? '...' : ''}</td>
-            ${mesesCortos.map(m => `<td>${rendicion[`ejecutado_${m}`] || ''}</td>`).join('')}
-            <td>${rendicion.programado || indicador.logro || ''}</td>
-            <td><strong>${rendicion.logrado || ''}</strong></td>
-          </tr>
-        `;
-      });
-      
-      htmlContent += `
+              ${allData.map(({ indicador, rendicion }, idx) => {
+                const programado = rendicion.programado || indicador.logro || '';
+                const logrado = rendicion.logrado || '';
+                
+                return `
+                  <!-- Indicator group ${idx + 1} -->
+                  <!-- Row 1: EJECUTADO -->
+                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9f9f9'};">
+                    <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: center; vertical-align: middle; font-weight: bold;">${indicador.codi || ''}</td>
+                    <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: left; vertical-align: top; line-height: 1.3;">${indicador.indicador_resultado || ''}</td>
+                    <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e8f5e9; font-weight: 600; font-size: 7px;">EJEC</td>
+                    ${mesesCortos.map(m => {
+                      const val = rendicion[\`ejecutado_\${m}\`];
+                      return `<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e8f5e9;">${val ? parseFloat(val).toFixed(2) : ''}</td>`;
+                    }).join('')}
+                    <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: center; vertical-align: middle; background: #e3f2fd; font-weight: bold;">${programado}</td>
+                    <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: center; vertical-align: middle; background: #ffebee; font-weight: bold; color: #c00;">${logrado}</td>
+                  </tr>
+                  <!-- Row 2: % EJEC -->
+                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9f9f9'};">
+                    <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #fff3e0; font-weight: 600; font-size: 7px;">%EJEC</td>
+                    ${mesesCortos.map(m => {
+                      const val = rendicion[\`proc_ejecutado_\${m}\`];
+                      return `<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #fff3e0;">${val ? (parseFloat(val) * 100).toFixed(1) + '%' : ''}</td>`;
+                    }).join('')}
+                  </tr>
+                  <!-- Row 3: ACUMULADO -->
+                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9f9f9'}; border-bottom: 2px solid #999;">
+                    <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e1f5fe; font-weight: 600; font-size: 7px;">ACUM</td>
+                    ${mesesCortos.map(m => {
+                      const val = rendicion[\`acumulado_\${m}\`];
+                      return `<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e1f5fe;">${val ? parseFloat(val).toFixed(2) : ''}</td>`;
+                    }).join('')}
+                  </tr>
+                `;
+              }).join('')}
             </tbody>
           </table>
           
-          <table>
-            <thead>
-              <tr>
-                <th>CÓDIGO</th>
-                <th class="indicator-name">INDICADOR</th>
-                <th colspan="12" class="section-header">% EJECUCIÓN MENSUAL</th>
-              </tr>
-              <tr>
-                <th></th>
-                <th></th>
-                ${mesesHeaders.map(m => `<th>${m}</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-      `;
-      
-      allData.forEach(({ indicador, rendicion }) => {
-        htmlContent += `
-          <tr>
-            <td>${indicador.codi || ''}</td>
-            <td class="indicator-name">${(indicador.indicador_resultado || '').substring(0, 40)}...</td>
-            ${mesesCortos.map(m => {
-              const val = rendicion[`proc_ejecutado_${m}`];
-              return `<td>${val ? (parseFloat(val) * 100).toFixed(1) + '%' : ''}</td>`;
-            }).join('')}
-          </tr>
-        `;
-      });
-      
-      htmlContent += `
-            </tbody>
-          </table>
-          
-          <p style="text-align: center; color: #999; margin-top: 30px;">
+          <p style="text-align: center; color: #999; margin-top: 20px; font-size: 8px;">
             Total de indicadores: ${allData.length} | Generado el ${new Date().toLocaleString()}
           </p>
-        </body>
-        </html>
+        </div>
       `;
       
-      // Open print dialog
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      printWindow.focus();
-      setTimeout(() => {
-        printWindow.print();
-      }, 500);
+      // Create temporary container
+      const container = document.createElement('div');
+      container.innerHTML = htmlContent;
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      document.body.appendChild(container);
+      
+      // Configure PDF options
+      const opt = {
+        margin: [5, 5, 5, 5],
+        filename: `Rendicion_${gestion}_${contexto.area || 'Usuario'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      
+      // Generate and download PDF
+      await html2pdf().set(opt).from(container.firstChild).save();
+      
+      // Cleanup
+      document.body.removeChild(container);
+      
+      alert(`PDF generado exitosamente: ${allData.length} indicadores`);
       
     } catch (e) {
       console.error(e);
-      alert('Error al generar PDF');
+      alert('Error al generar PDF: ' + e.message);
     }
   };
 
