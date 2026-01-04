@@ -273,6 +273,9 @@ function SeguimientoView({ user, siteConfig }) {
   const [loading, setLoading] = useState(true);
   const [contexto, setContexto] = useState({});
   const [configYears, setConfigYears] = useState([]);
+  const [showFileModal, setShowFileModal] = useState(false);
+  const [adjuntos, setAdjuntos] = useState([]);
+  const [newFile, setNewFile] = useState({ nombre: '', descripcion: '', url: '', file: null });
 
   const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
   const mesesCortos = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
