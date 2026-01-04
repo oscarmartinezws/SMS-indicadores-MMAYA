@@ -103,6 +103,11 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - `ACUMULADO` como suma acumulativa
   - Campos de solo lectura
   - Persistencia en PostgreSQL
+- ✅ **Botón de Exportación agregado**:
+  - Exportar a CSV: genera archivo con todos los indicadores del usuario
+  - Exportar a PDF: abre ventana de impresión con reporte formateado
+  - Incluye: CÓDIGO, INDICADOR, EJECUCIÓN mensual, % EJEC, ACUMULADO, PROGRAMADO, LOGRADO
+  - Campos sin datos se muestran vacíos
 - ✅ Testing completo con testing agent (100% éxito)
 
 ## Backlog (Tareas Futuras)
