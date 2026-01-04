@@ -407,38 +407,81 @@ function SeguimientoView({ user, siteConfig }) {
               </tr>
             </thead>
             <tbody>
-              {[{ key: 'ejecutado', label: 'EJECUCIÓN' }, { key: 'proc_ejecutado', label: '% EJEC' }, { key: 'acumulado', label: 'ACUMULADO' }].map(row => (
-                <tr key={row.key} style={{ borderBottom: `1px solid ${styles.gray200}` }}>
-                  <td style={{ ...rowStyle, fontWeight: 600, background: styles.gray100 }}>{row.label}</td>
-                  {mesesCortos.map((m, i) => {
-                    const isSelected = i === mesSeleccionadoIndex;
-                    const fieldName = `${row.key}_${m.toLowerCase()}`;
-                    return (
-                      <td key={m} style={{ ...rowStyle, padding: 4, background: isSelected ? '#D1FAE5' : 'transparent' }}>
-                        {isSelected ? (
-                          <input 
-                            type="number" 
-                            step={row.key === 'proc_ejecutado' ? '0.001' : '1'} 
-                            value={rendicion[fieldName] || ''} 
-                            onChange={(e) => handleChange(fieldName, e.target.value)} 
-                            style={cellInput} 
-                          />
-                        ) : (
-                          <span style={{ display: 'block', textAlign: 'center', fontSize: '0.75rem', color: styles.gray600 }}>
-                            {rendicion[fieldName] || ''}
-                          </span>
-                        )}
-                      </td>
-                    );
-                  })}
-                  <td style={{ ...rowStyle, textAlign: 'center', background: '#DBEAFE', fontWeight: 600, color: styles.blue }}>
-                    {row.key === 'ejecutado' ? (selectedIndicador?.logro || '-') : ''}
-                  </td>
-                  <td style={{ ...rowStyle, textAlign: 'center', background: '#FEE2E2', fontWeight: 600, color: styles.red }}>
-                    {row.key === 'ejecutado' ? (rendicion.logrado || '-') : ''}
-                  </td>
-                </tr>
-              ))}
+              {/* Row EJECUCIÓN - Editable */}
+              <tr style={{ borderBottom: `1px solid ${styles.gray200}` }}>
+                <td style={{ ...rowStyle, fontWeight: 600, background: styles.gray100 }}>EJECUCIÓN</td>
+                {mesesCortos.map((m, i) => {
+                  const isSelected = i === mesSeleccionadoIndex;
+                  const fieldName = `ejecutado_${m.toLowerCase()}`;
+                  return (
+                    <td key={m} style={{ ...rowStyle, padding: 4, background: isSelected ? '#D1FAE5' : 'transparent' }}>
+                      {isSelected ? (
+                        <input type="number" step="0.001" value={rendicion[fieldName] || ''} 
+                          onChange={(e) => handleChange(fieldName, e.target.value)} style={cellInput} />
+                      ) : (
+                        <span style={{ display: 'block', textAlign: 'center', fontSize: '0.75rem', color: styles.gray600 }}>
+                          {rendicion[fieldName] || ''}
+                        </span>
+                      )}
+                    </td>
+                  );
+                })}
+                <td style={{ ...rowStyle, textAlign: 'center', background: '#DBEAFE', fontWeight: 600, color: styles.blue }}>
+                  {rendicion.programado || selectedIndicador?.logro || '-'}
+                </td>
+                <td style={{ ...rowStyle, textAlign: 'center', background: '#FEE2E2', fontWeight: 600, color: styles.red }}>
+                  {rendicion.logrado || '-'}
+                </td>
+              </tr>
+              
+              {/* Row % EJEC - Calculated, Read-only */}
+              <tr style={{ borderBottom: `1px solid ${styles.gray200}` }}>
+                <td style={{ ...rowStyle, fontWeight: 600, background: styles.gray100 }}>% EJEC</td>
+                {mesesCortos.map((m, i) => {
+                  const isSelected = i === mesSeleccionadoIndex;
+                  const ejecutado = parseFloat(rendicion[`ejecutado_${m.toLowerCase()}`]) || 0;
+                  const programado = parseFloat(rendicion.programado) || parseFloat(selectedIndicador?.logro) || 1;
+                  const porcentaje = programado > 0 ? ((ejecutado / programado) * 100).toFixed(2) : '0.00';
+                  return (
+                    <td key={m} style={{ ...rowStyle, padding: 4, background: isSelected ? '#D1FAE5' : 'transparent', textAlign: 'center' }}>
+                      <span style={{ display: 'block', fontSize: '0.75rem', color: styles.gray700, fontWeight: isSelected ? 600 : 400 }}>
+                        {ejecutado > 0 ? `${porcentaje}%` : ''}
+                      </span>
+                    </td>
+                  );
+                })}
+                <td style={{ ...rowStyle, textAlign: 'center', background: '#DBEAFE' }}></td>
+                <td style={{ ...rowStyle, textAlign: 'center', background: '#FEE2E2' }}></td>
+              </tr>
+              
+              {/* Row ACUMULADO - Calculated, Read-only */}
+              <tr style={{ borderBottom: `1px solid ${styles.gray200}` }}>
+                <td style={{ ...rowStyle, fontWeight: 600, background: styles.gray100 }}>ACUMULADO</td>
+                {mesesCortos.map((m, i) => {
+                  const isSelected = i === mesSeleccionadoIndex;
+                  // Calculate cumulative sum from ENE to current month
+                  let acumulado = 0;
+                  for (let j = 0; j <= i; j++) {
+                    acumulado += parseFloat(rendicion[`ejecutado_${mesesCortos[j].toLowerCase()}`]) || 0;
+                  }
+                  return (
+                    <td key={m} style={{ ...rowStyle, padding: 4, background: isSelected ? '#D1FAE5' : 'transparent', textAlign: 'center' }}>
+                      <span style={{ display: 'block', fontSize: '0.75rem', color: styles.gray700, fontWeight: isSelected ? 600 : 400 }}>
+                        {acumulado > 0 ? acumulado.toFixed(3) : ''}
+                      </span>
+                    </td>
+                  );
+                })}
+                <td style={{ ...rowStyle, textAlign: 'center', background: '#DBEAFE' }}></td>
+                <td style={{ ...rowStyle, textAlign: 'center', background: '#FEE2E2' }}>
+                  {(() => {
+                    // Total accumulated
+                    let total = 0;
+                    mesesCortos.forEach(m => { total += parseFloat(rendicion[`ejecutado_${m.toLowerCase()}`]) || 0; });
+                    return total > 0 ? <span style={{ fontWeight: 600, color: styles.red }}>{total.toFixed(3)}</span> : '';
+                  })()}
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
