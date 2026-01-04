@@ -468,15 +468,99 @@ function SeguimientoView({ user, siteConfig }) {
       <div style={{ background: styles.white, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
         <div style={{ ...darkHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>ARCHIVOS ADJUNTOS</span>
-          <button style={{ padding: '6px 12px', background: styles.white, color: styles.black, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.7rem' }}>+ Agregar archivo</button>
+          <button onClick={() => setShowFileModal(true)} style={{ padding: '6px 12px', background: styles.white, color: styles.black, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.7rem' }}>+ Agregar archivo</button>
         </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead><tr>{['NOMBRE', 'DESCRIPCIÓN', 'TAMAÑO', 'ACCIONES'].map(h => <th key={h} style={headerStyle}>{h}</th>)}</tr></thead>
           <tbody>
-            <tr><td colSpan={4} style={{ ...rowStyle, textAlign: 'center', color: styles.gray500, padding: 24 }}>No hay archivos adjuntos</td></tr>
+            {adjuntos.length === 0 ? (
+              <tr><td colSpan={4} style={{ ...rowStyle, textAlign: 'center', color: styles.gray500, padding: 24 }}>No hay archivos adjuntos</td></tr>
+            ) : (
+              adjuntos.map((adj, idx) => (
+                <tr key={idx} style={{ borderBottom: `1px solid ${styles.gray200}` }}>
+                  <td style={rowStyle}>{adj.nombre}</td>
+                  <td style={rowStyle}>{adj.descripcion || '-'}</td>
+                  <td style={rowStyle}>{adj.size || '-'}</td>
+                  <td style={{ ...rowStyle, textAlign: 'center' }}>
+                    <a href={adj.url} target="_blank" rel="noopener noreferrer" style={{ color: styles.blue, marginRight: 8 }}>⬇️</a>
+                    <button onClick={() => setAdjuntos(prev => prev.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: styles.red, cursor: 'pointer' }}>🗑️</button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
+
+      {/* File Upload Modal */}
+      {showFileModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
+          <div style={{ background: styles.white, borderRadius: 12, width: 500, maxWidth: '90%', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
+            <div style={{ ...darkHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>AGREGAR ARCHIVO</span>
+              <button onClick={() => { setShowFileModal(false); setNewFile({ nombre: '', descripcion: '', url: '', file: null }); }} style={{ background: 'none', border: 'none', color: '#FFF', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+            </div>
+            <div style={{ padding: 20 }}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: styles.gray600, textTransform: 'uppercase', marginBottom: 6 }}>Nombre del archivo</label>
+                <input type="text" value={newFile.nombre} onChange={(e) => setNewFile(prev => ({ ...prev, nombre: e.target.value }))} 
+                  style={{ width: '100%', padding: '10px 12px', border: `2px solid ${styles.gray300}`, borderRadius: 6, fontSize: '0.85rem', boxSizing: 'border-box' }} 
+                  placeholder="Ej: documento.pdf" />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: styles.gray600, textTransform: 'uppercase', marginBottom: 6 }}>Descripción</label>
+                <input type="text" value={newFile.descripcion} onChange={(e) => setNewFile(prev => ({ ...prev, descripcion: e.target.value }))} 
+                  style={{ width: '100%', padding: '10px 12px', border: `2px solid ${styles.gray300}`, borderRadius: 6, fontSize: '0.85rem', boxSizing: 'border-box' }} 
+                  placeholder="Descripción del archivo" />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: styles.gray600, textTransform: 'uppercase', marginBottom: 6 }}>Subir archivo</label>
+                <input type="file" onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setNewFile(prev => ({ ...prev, file, nombre: prev.nombre || file.name, size: `${(file.size / 1024).toFixed(1)} KB` }));
+                  }
+                }} style={{ fontSize: '0.85rem' }} />
+              </div>
+              <div style={{ marginBottom: 16, textAlign: 'center', color: styles.gray500, fontSize: '0.8rem' }}>— O —</div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: styles.gray600, textTransform: 'uppercase', marginBottom: 6 }}>URL del archivo</label>
+                <input type="url" value={newFile.url} onChange={(e) => setNewFile(prev => ({ ...prev, url: e.target.value }))} 
+                  style={{ width: '100%', padding: '10px 12px', border: `2px solid ${styles.gray300}`, borderRadius: 6, fontSize: '0.85rem', boxSizing: 'border-box' }} 
+                  placeholder="https://ejemplo.com/archivo.pdf" />
+              </div>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                <button onClick={() => { setShowFileModal(false); setNewFile({ nombre: '', descripcion: '', url: '', file: null }); }} 
+                  style={{ padding: '10px 20px', background: styles.gray200, color: styles.gray700, border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}>Cancelar</button>
+                <button onClick={async () => {
+                  if (!newFile.nombre) { alert('Ingrese un nombre para el archivo'); return; }
+                  let fileUrl = newFile.url;
+                  if (newFile.file && !newFile.url) {
+                    // Upload file
+                    const formData = new FormData();
+                    formData.append('file', newFile.file);
+                    try {
+                      const res = await fetch(`${API_URL}/api/sms/configuracion/upload/adjunto`, { method: 'POST', body: formData });
+                      if (res.ok) {
+                        const data = await res.json();
+                        fileUrl = data.url;
+                      }
+                    } catch (err) { console.error(err); }
+                  }
+                  if (fileUrl || newFile.url) {
+                    setAdjuntos(prev => [...prev, { nombre: newFile.nombre, descripcion: newFile.descripcion, url: fileUrl || newFile.url, size: newFile.size || '-' }]);
+                    setShowFileModal(false);
+                    setNewFile({ nombre: '', descripcion: '', url: '', file: null });
+                  } else {
+                    alert('Seleccione un archivo o ingrese una URL');
+                  }
+                }} 
+                  style={{ padding: '10px 20px', background: styles.black, color: '#FFF', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}>Guardar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
