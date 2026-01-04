@@ -595,14 +595,15 @@ app.put('/api/sms/opciones/:id', async (req, res) => {
 app.get('/api/sms/menu_admin', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT m.id_menu, m.id_rol, m.id_opcion, m.estado,
-              o.nombre_opcion as opcion, o.url as enlace, o.tipo_opcion, o.id_padre
+      `SELECT m.id_menu, m.opcion, m.enlace, m.tipo_opcion, m.id_padre, m.estado,
+              o.id_opcion, o.id_rol, o.estado as opcion_estado
        FROM menu m
-       JOIN opciones o ON m.id_opcion = o.id_opcion
+       LEFT JOIN opciones o ON m.id_menu = o.id_menu
        ORDER BY m.id_menu`
     );
     res.json(result.rows);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ detail: 'Error al obtener menú admin' });
   }
 });
@@ -610,19 +611,19 @@ app.get('/api/sms/menu_admin', async (req, res) => {
 app.post('/api/sms/menu', async (req, res) => {
   try {
     const { opcion, enlace, tipo_opcion, id_padre } = req.body;
-    const opResult = await pool.query(
-      'INSERT INTO opciones (nombre_opcion, url, tipo_opcion, id_padre) VALUES ($1, $2, $3, $4) RETURNING *',
+    const menuResult = await pool.query(
+      'INSERT INTO menu (opcion, enlace, tipo_opcion, id_padre) VALUES ($1, $2, $3, $4) RETURNING *',
       [opcion, enlace, tipo_opcion, id_padre]
     );
-    const newOpcionId = opResult.rows[0].id_opcion;
+    const newMenuId = menuResult.rows[0].id_menu;
     
-    // Create menu entries for all roles
+    // Create opciones entries for all roles
     const roles = await pool.query('SELECT id_rol FROM rol');
     for (const rol of roles.rows) {
-      await pool.query('INSERT INTO menu (id_rol, id_opcion, estado) VALUES ($1, $2, $3)', [rol.id_rol, newOpcionId, 'INACTIVO']);
+      await pool.query('INSERT INTO opciones (id_rol, id_menu, estado) VALUES ($1, $2, $3)', [rol.id_rol, newMenuId, 'INACTIVO']);
     }
     
-    res.json({ id_opcion: newOpcionId, opcion, enlace, tipo_opcion, id_padre });
+    res.json({ id_menu: newMenuId, opcion, enlace, tipo_opcion, id_padre });
   } catch (err) {
     console.error(err);
     res.status(500).json({ detail: 'Error al crear menú' });
@@ -633,11 +634,12 @@ app.put('/api/sms/menu/:id', async (req, res) => {
   try {
     const { opcion, enlace, tipo_opcion, id_padre } = req.body;
     await pool.query(
-      'UPDATE opciones SET nombre_opcion = $1, url = $2, tipo_opcion = $3, id_padre = $4 WHERE id_opcion = $5',
+      'UPDATE menu SET opcion = $1, enlace = $2, tipo_opcion = $3, id_padre = $4 WHERE id_menu = $5',
       [opcion, enlace, tipo_opcion, id_padre, req.params.id]
     );
     res.json({ message: 'Menú actualizado' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ detail: 'Error al actualizar menú' });
   }
 });
