@@ -534,10 +534,10 @@ app.post('/api/sms/roles', async (req, res) => {
     const result = await pool.query('INSERT INTO rol (rol, estado) VALUES ($1, $2) RETURNING *', [nombre, estado || 'ACTIVO']);
     const newRolId = result.rows[0].id_rol;
     
-    // Create menu entries for new role
-    const opciones = await pool.query('SELECT id_opcion FROM opciones');
-    for (const op of opciones.rows) {
-      await pool.query('INSERT INTO menu (id_rol, id_opcion, estado) VALUES ($1, $2, $3)', [newRolId, op.id_opcion, 'INACTIVO']);
+    // Create opciones entries for new role (for all menu items)
+    const menus = await pool.query('SELECT id_menu FROM menu');
+    for (const menu of menus.rows) {
+      await pool.query('INSERT INTO opciones (id_rol, id_menu, estado) VALUES ($1, $2, $3)', [newRolId, menu.id_menu, 'INACTIVO']);
     }
     
     res.json({ id: newRolId, nombre: result.rows[0].rol, estado: result.rows[0].estado });
