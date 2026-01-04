@@ -362,6 +362,224 @@ function SeguimientoView({ user, siteConfig }) {
     } catch (e) { console.error(e); alert('Error al guardar'); }
   };
 
+  // Export all indicators to CSV
+  const exportToCSV = async () => {
+    try {
+      const mesesCortos = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      const mesesHeaders = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+      
+      // Fetch rendicion data for all indicators
+      const allData = await Promise.all(
+        indicadores.map(async (ind) => {
+          try {
+            const res = await fetch(`${API_URL}/api/sms/rendicion/${ind.id_indicador}/${gestion}`);
+            const rendData = res.ok ? await res.json() : {};
+            return { indicador: ind, rendicion: rendData };
+          } catch (e) {
+            return { indicador: ind, rendicion: {} };
+          }
+        })
+      );
+      
+      // Build CSV content
+      let csvContent = '\uFEFF'; // BOM for Excel UTF-8
+      
+      // Header row
+      csvContent += 'CÓDIGO,INDICADOR,AÑO BASE,LÍNEA BASE,AÑO LOGRO,LOGRO PROGRAMADO,';
+      mesesHeaders.forEach(m => csvContent += `EJEC_${m},`);
+      mesesHeaders.forEach(m => csvContent += `%EJEC_${m},`);
+      mesesHeaders.forEach(m => csvContent += `ACUM_${m},`);
+      csvContent += 'PROGRAMADO,LOGRADO,DESCRIPCIÓN CUALITATIVA,MODIFICACIONES\n';
+      
+      // Data rows
+      allData.forEach(({ indicador, rendicion }) => {
+        const row = [];
+        row.push(`"${indicador.codi || ''}"`);
+        row.push(`"${(indicador.indicador_resultado || '').replace(/"/g, '""')}"`);
+        row.push(indicador.anio_base || '');
+        row.push(indicador.linea_base || '');
+        row.push(indicador.anio_logro || '');
+        row.push(indicador.logro || '');
+        
+        // EJECUCIÓN values
+        mesesCortos.forEach(m => {
+          row.push(rendicion[`ejecutado_${m}`] || '');
+        });
+        
+        // % EJEC values
+        mesesCortos.forEach(m => {
+          const val = rendicion[`proc_ejecutado_${m}`];
+          row.push(val ? (parseFloat(val) * 100).toFixed(2) + '%' : '');
+        });
+        
+        // ACUMULADO values
+        mesesCortos.forEach(m => {
+          row.push(rendicion[`acumulado_${m}`] || '');
+        });
+        
+        row.push(rendicion.programado || indicador.logro || '');
+        row.push(rendicion.logrado || '');
+        row.push(`"${(rendicion.descripcion_cualitativa || '').replace(/"/g, '""')}"`);
+        row.push(`"${(rendicion.modificaciones || '').replace(/"/g, '""')}"`);
+        
+        csvContent += row.join(',') + '\n';
+      });
+      
+      // Download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Rendicion_${gestion}_${contexto.area || 'Usuario'}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      
+      alert(`Exportación exitosa: ${allData.length} indicadores`);
+    } catch (e) {
+      console.error(e);
+      alert('Error al exportar');
+    }
+  };
+
+  // Export to PDF
+  const exportToPDF = async () => {
+    try {
+      const mesesCortos = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      const mesesHeaders = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+      
+      // Fetch rendicion data for all indicators
+      const allData = await Promise.all(
+        indicadores.map(async (ind) => {
+          try {
+            const res = await fetch(`${API_URL}/api/sms/rendicion/${ind.id_indicador}/${gestion}`);
+            const rendData = res.ok ? await res.json() : {};
+            return { indicador: ind, rendicion: rendData };
+          } catch (e) {
+            return { indicador: ind, rendicion: {} };
+          }
+        })
+      );
+      
+      // Build HTML content for PDF
+      let htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Rendición de Indicadores ${gestion}</title>
+          <style>
+            body { font-family: Arial, sans-serif; font-size: 10px; margin: 20px; }
+            h1 { font-size: 16px; text-align: center; margin-bottom: 5px; }
+            h2 { font-size: 12px; text-align: center; color: #666; margin-bottom: 20px; }
+            .info { margin-bottom: 15px; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+            .info span { margin-right: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; page-break-inside: avoid; }
+            th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: center; font-size: 9px; }
+            th { background: #333; color: white; }
+            .indicator-name { text-align: left; max-width: 200px; word-wrap: break-word; }
+            .section-header { background: #666; color: white; }
+            @media print { body { margin: 10px; } }
+          </style>
+        </head>
+        <body>
+          <h1>RENDICIÓN DE INDICADORES - GESTIÓN ${gestion}</h1>
+          <h2>Sistema de Monitoreo Sectorial</h2>
+          <div class="info">
+            <span><strong>Entidad:</strong> ${contexto.entidad || '-'}</span>
+            <span><strong>Área:</strong> ${contexto.area || '-'}</span>
+            <span><strong>Sector:</strong> ${contexto.sector || '-'}</span>
+            <span><strong>Usuario:</strong> ${user?.nombre || '-'}</span>
+            <span><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</span>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th rowspan="2">CÓDIGO</th>
+                <th rowspan="2" class="indicator-name">INDICADOR</th>
+                <th colspan="12" class="section-header">EJECUCIÓN MENSUAL</th>
+                <th rowspan="2">PROGRAMADO</th>
+                <th rowspan="2">LOGRADO</th>
+              </tr>
+              <tr>
+                ${mesesHeaders.map(m => `<th>${m}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      allData.forEach(({ indicador, rendicion }) => {
+        htmlContent += `
+          <tr>
+            <td>${indicador.codi || ''}</td>
+            <td class="indicator-name">${(indicador.indicador_resultado || '').substring(0, 60)}${(indicador.indicador_resultado || '').length > 60 ? '...' : ''}</td>
+            ${mesesCortos.map(m => `<td>${rendicion[`ejecutado_${m}`] || ''}</td>`).join('')}
+            <td>${rendicion.programado || indicador.logro || ''}</td>
+            <td><strong>${rendicion.logrado || ''}</strong></td>
+          </tr>
+        `;
+      });
+      
+      htmlContent += `
+            </tbody>
+          </table>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>CÓDIGO</th>
+                <th class="indicator-name">INDICADOR</th>
+                <th colspan="12" class="section-header">% EJECUCIÓN MENSUAL</th>
+              </tr>
+              <tr>
+                <th></th>
+                <th></th>
+                ${mesesHeaders.map(m => `<th>${m}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      allData.forEach(({ indicador, rendicion }) => {
+        htmlContent += `
+          <tr>
+            <td>${indicador.codi || ''}</td>
+            <td class="indicator-name">${(indicador.indicador_resultado || '').substring(0, 40)}...</td>
+            ${mesesCortos.map(m => {
+              const val = rendicion[`proc_ejecutado_${m}`];
+              return `<td>${val ? (parseFloat(val) * 100).toFixed(1) + '%' : ''}</td>`;
+            }).join('')}
+          </tr>
+        `;
+      });
+      
+      htmlContent += `
+            </tbody>
+          </table>
+          
+          <p style="text-align: center; color: #999; margin-top: 30px;">
+            Total de indicadores: ${allData.length} | Generado el ${new Date().toLocaleString()}
+          </p>
+        </body>
+        </html>
+      `;
+      
+      // Open print dialog
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
+      
+    } catch (e) {
+      console.error(e);
+      alert('Error al generar PDF');
+    }
+  };
+
+  const [showExportMenu, setShowExportMenu] = useState(false);
+
   if (loading) return <div style={{ textAlign: 'center', padding: 40 }}>Cargando...</div>;
 
   const cellInput = { width: '100%', padding: '4px 6px', fontSize: '0.75rem', border: `1px solid ${styles.gray300}`, borderRadius: 4, textAlign: 'center', boxSizing: 'border-box' };
