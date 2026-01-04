@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import html2pdf from 'html2pdf.js';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
