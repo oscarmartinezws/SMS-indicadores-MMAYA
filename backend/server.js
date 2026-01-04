@@ -79,7 +79,7 @@ app.post('/api/sms/login', async (req, res) => {
     const result = await pool.query(
       `SELECT u.*, r.rol FROM usuario u 
        LEFT JOIN rol r ON u.id_rol = r.id_rol 
-       WHERE u.usuario = $1`, [username]
+       WHERE u.username = $1`, [username]
     );
     
     if (result.rows.length === 0) {
@@ -90,7 +90,7 @@ app.post('/api/sms/login', async (req, res) => {
     
     // Check password (bcrypt or plain)
     let validPassword = false;
-    if (user.clave.startsWith('$2')) {
+    if (user.clave && user.clave.startsWith('$2')) {
       validPassword = await bcrypt.compare(password, user.clave);
     } else {
       validPassword = user.clave === password;
@@ -102,7 +102,7 @@ app.post('/api/sms/login', async (req, res) => {
     
     const tokenData = {
       id_usuario: user.id_usuario,
-      username: user.usuario,
+      username: user.username,
       nombre: user.nombre,
       id_rol: user.id_rol,
       rol: user.rol,
