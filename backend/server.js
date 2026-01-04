@@ -647,16 +647,38 @@ app.put('/api/sms/menu/:id', async (req, res) => {
 // ========== Contexto Usuario ==========
 app.get('/api/sms/contexto_usuario/:id_area', async (req, res) => {
   try {
+    const idArea = parseInt(req.params.id_area);
+    if (isNaN(idArea)) {
+      return res.json({ area: '-', entidad: '-', sector: '-' });
+    }
+    
+    // Get context from matriz_parametro which has all the relationships
     const result = await pool.query(
-      `SELECT a.area_organizacional as area, e.entidad, s.sector
-       FROM area a
-       LEFT JOIN entidad e ON a.id_entidad = e.id_entidad
-       LEFT JOIN sector s ON e.id_sector = s.id_sector
-       WHERE a.id_area = $1`, [req.params.id_area]
+      `SELECT DISTINCT a.area_organizacional as area, e.entidad, s.sector
+       FROM matriz_parametro mp
+       LEFT JOIN area a ON mp.id_area = a.id_area
+       LEFT JOIN entidad e ON mp.id_entidad = e.id_entidad
+       LEFT JOIN sector s ON mp.id_sector = s.id_sector
+       WHERE mp.id_area = $1
+       LIMIT 1`, [idArea]
     );
-    res.json(result.rows[0] || {});
+    
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      // Fallback to just area name
+      const areaResult = await pool.query(
+        'SELECT area_organizacional as area FROM area WHERE id_area = $1', [idArea]
+      );
+      res.json({
+        area: areaResult.rows[0]?.area || '-',
+        entidad: '-',
+        sector: '-'
+      });
+    }
   } catch (err) {
-    res.status(500).json({ detail: 'Error al obtener contexto' });
+    console.error('Contexto error:', err);
+    res.json({ area: '-', entidad: '-', sector: '-' });
   }
 });
 
