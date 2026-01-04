@@ -130,9 +130,10 @@ app.get('/api/sms/verify-token', authenticateToken, (req, res) => {
 app.get('/api/sms/menu/:id_rol', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT o.*, m.estado FROM opciones o 
-       LEFT JOIN menu m ON o.id_opcion = m.id_opcion AND m.id_rol = $1 
-       ORDER BY o.id_opcion`, [req.params.id_rol]
+      `SELECT m.*, o.estado as opcion_estado 
+       FROM menu m 
+       LEFT JOIN opciones o ON m.id_menu = o.id_menu AND o.id_rol = $1 
+       ORDER BY m.id_menu`, [req.params.id_rol]
     );
     res.json(result.rows);
   } catch (err) {
