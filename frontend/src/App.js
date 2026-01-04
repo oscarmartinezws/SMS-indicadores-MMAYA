@@ -498,8 +498,8 @@ function SeguimientoView({ user, siteConfig }) {
                     <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: left; vertical-align: top; line-height: 1.3;">${indicador.indicador_resultado || ''}</td>
                     <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e8f5e9; font-weight: 600; font-size: 7px;">EJEC</td>
                     ${mesesCortos.map(m => {
-                      const val = rendicion[\`ejecutado_\${m}\`];
-                      return `<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e8f5e9;">${val ? parseFloat(val).toFixed(2) : ''}</td>`;
+                      const val = rendicion['ejecutado_' + m];
+                      return '<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e8f5e9;">' + (val ? parseFloat(val).toFixed(2) : '') + '</td>';
                     }).join('')}
                     <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: center; vertical-align: middle; background: #e3f2fd; font-weight: bold;">${programado}</td>
                     <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: center; vertical-align: middle; background: #ffebee; font-weight: bold; color: #c00;">${logrado}</td>
@@ -508,16 +508,16 @@ function SeguimientoView({ user, siteConfig }) {
                   <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9f9f9'};">
                     <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #fff3e0; font-weight: 600; font-size: 7px;">%EJEC</td>
                     ${mesesCortos.map(m => {
-                      const val = rendicion[\`proc_ejecutado_\${m}\`];
-                      return `<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #fff3e0;">${val ? (parseFloat(val) * 100).toFixed(1) + '%' : ''}</td>`;
+                      const val = rendicion['proc_ejecutado_' + m];
+                      return '<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #fff3e0;">' + (val ? (parseFloat(val) * 100).toFixed(1) + '%' : '') + '</td>';
                     }).join('')}
                   </tr>
                   <!-- Row 3: ACUMULADO -->
                   <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9f9f9'}; border-bottom: 2px solid #999;">
                     <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e1f5fe; font-weight: 600; font-size: 7px;">ACUM</td>
                     ${mesesCortos.map(m => {
-                      const val = rendicion[\`acumulado_\${m}\`];
-                      return `<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e1f5fe;">${val ? parseFloat(val).toFixed(2) : ''}</td>`;
+                      const val = rendicion['acumulado_' + m];
+                      return '<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e1f5fe;">' + (val ? parseFloat(val).toFixed(2) : '') + '</td>';
                     }).join('')}
                   </tr>
                 `;
