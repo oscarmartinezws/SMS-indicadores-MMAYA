@@ -561,14 +561,15 @@ app.put('/api/sms/roles/:id', async (req, res) => {
 app.get('/api/sms/opciones/:id_rol', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT o.id_opcion, o.nombre_opcion as opcion, o.url as enlace, o.tipo_opcion, o.id_padre, 
-              m.id_menu, m.estado
-       FROM opciones o
-       LEFT JOIN menu m ON o.id_opcion = m.id_opcion AND m.id_rol = $1
-       ORDER BY o.id_opcion`, [req.params.id_rol]
+      `SELECT m.id_menu, m.opcion, m.enlace, m.tipo_opcion, m.id_padre, 
+              o.id_opcion, o.estado
+       FROM menu m
+       LEFT JOIN opciones o ON m.id_menu = o.id_menu AND o.id_rol = $1
+       ORDER BY m.id_menu`, [req.params.id_rol]
     );
     res.json(result.rows);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ detail: 'Error al obtener opciones' });
   }
 });
@@ -576,9 +577,16 @@ app.get('/api/sms/opciones/:id_rol', async (req, res) => {
 app.put('/api/sms/opciones/:id', async (req, res) => {
   try {
     const { estado, id_rol } = req.body;
-    await pool.query('UPDATE menu SET estado = $1 WHERE id_menu = $2', [estado, req.params.id]);
+    // Check if exists
+    const existing = await pool.query(
+      'SELECT id_opcion FROM opciones WHERE id_opcion = $1', [req.params.id]
+    );
+    if (existing.rows.length > 0) {
+      await pool.query('UPDATE opciones SET estado = $1 WHERE id_opcion = $2', [estado, req.params.id]);
+    }
     res.json({ message: 'Opción actualizada' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ detail: 'Error al actualizar opción' });
   }
 });
