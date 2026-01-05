@@ -876,6 +876,20 @@ app.get('/api/sms/dashboard/years', async (req, res) => {
 });
 
 // ========== Rendicion ==========
+// Get sum of PROGRAMADO for an indicator across all years - MUST be before parameterized routes
+app.get('/api/sms/rendicion/suma_programado/:id_indicador', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT COALESCE(SUM(programado), 0) as suma_programado FROM rendicion WHERE id_indicador = $1',
+      [req.params.id_indicador]
+    );
+    res.json({ suma_programado: parseFloat(result.rows[0].suma_programado) || 0 });
+  } catch (err) {
+    console.error('Error getting suma programado:', err);
+    res.status(500).json({ detail: 'Error al obtener suma programado' });
+  }
+});
+
 app.get('/api/sms/rendicion/:id_indicador/:gestion', async (req, res) => {
   try {
     const result = await pool.query(
