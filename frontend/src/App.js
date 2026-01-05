@@ -218,6 +218,7 @@ function IndicadoresView({ user }) {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [viewOnly, setViewOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
     id_entidad: '', id_area: '', id_sector: '', id_pilar: '', id_eje: '',
@@ -226,14 +227,14 @@ function IndicadoresView({ user }) {
     linea_base: '', anio_logro: '', logro: '', estado: 'ACTIVO'
   });
   
-  // Catalogs for dropdowns (loaded only when opening modal for admin)
+  // Catalogs for dropdowns
   const [catalogs, setCatalogs] = useState(null);
   const [loadingCatalogs, setLoadingCatalogs] = useState(false);
   
   const isAdmin = user?.rol === 'ADMINISTRADOR';
   const PAGE_SIZE = 10;
 
-  // Fetch only basic data for grid (optimized endpoint)
+  // Fetch only basic data for grid
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -248,9 +249,9 @@ function IndicadoresView({ user }) {
     fetchData();
   }, []);
 
-  // Load catalogs only when admin opens modal
+  // Load catalogs when opening modal
   const loadCatalogs = async () => {
-    if (catalogs) return; // Already loaded
+    if (catalogs) return;
     setLoadingCatalogs(true);
     try {
       const [entRes, areaRes, secRes, pilRes, ejeRes, metaRes, resRes, accRes] = await Promise.all([
@@ -277,9 +278,10 @@ function IndicadoresView({ user }) {
     finally { setLoadingCatalogs(false); }
   };
 
-  const openModal = async (item = null) => {
-    if (!isAdmin) return;
+  // Open modal for edit (admin) or view (user)
+  const openModal = async (item, isViewMode = false) => {
     await loadCatalogs();
+    setViewOnly(isViewMode);
     if (item) {
       setEditingItem(item);
       setFormData({
@@ -298,6 +300,44 @@ function IndicadoresView({ user }) {
         linea_base: item.linea_base || '',
         anio_logro: item.anio_logro || '',
         logro: item.logro || '',
+        estado: item.estado || 'ACTIVO'
+      });
+    } else {
+      setEditingItem(null);
+      setFormData({
+        id_entidad: '', id_area: '', id_sector: '', id_pilar: '', id_eje: '',
+        codi_meta: '', codi_resultado: '', codi_accion: '', codi: '',
+        indicador_resultado: '', formula_indicador: '', anio_base: '',
+        linea_base: '', anio_logro: '', logro: '', estado: 'ACTIVO'
+      });
+    }
+    setShowModal(true);
+  };
+
+  // Helper to get catalog name by id
+  const getCatalogName = (catalogList, id, idField = 'id', nameField = 'nombre') => {
+    if (!catalogList || !id) return '-';
+    const item = catalogList.find(c => String(c[idField]) === String(id));
+    return item ? item[nameField] : '-';
+  };
+
+  const getMetaName = (codigo) => {
+    if (!catalogs?.metas || !codigo) return '-';
+    const item = catalogs.metas.find(m => m.codigo === codigo);
+    return item ? item.nombre : '-';
+  };
+
+  const getResultadoName = (codigo) => {
+    if (!catalogs?.resultados || !codigo) return '-';
+    const item = catalogs.resultados.find(r => r.codigo === codigo);
+    return item ? item.nombre : '-';
+  };
+
+  const getAccionName = (codigo) => {
+    if (!catalogs?.acciones || !codigo) return '-';
+    const item = catalogs.acciones.find(a => a.codigo === codigo);
+    return item ? item.nombre : '-';
+  };
         estado: item.estado || 'ACTIVO'
       });
     } else {
