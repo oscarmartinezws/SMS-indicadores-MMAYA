@@ -403,28 +403,28 @@ function IndicadoresView({ user }) {
                     <label style={labelStyle}>Entidad</label>
                     <select value={formData.id_entidad} onChange={(e) => setFormData({...formData, id_entidad: e.target.value})} style={inputStyle}>
                       <option value="">-- Seleccionar --</option>
-                      {entidades.map(e => <option key={e.id_entidad} value={e.id_entidad}>{e.entidad}</option>)}
+                      {entidades.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
                     </select>
                   </div>
                   <div>
                     <label style={labelStyle}>Área Organizacional</label>
                     <select value={formData.id_area} onChange={(e) => setFormData({...formData, id_area: e.target.value})} style={inputStyle}>
                       <option value="">-- Seleccionar --</option>
-                      {areas.map(a => <option key={a.id_area} value={a.id_area}>{a.area_organizacional}</option>)}
+                      {areas.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
                     </select>
                   </div>
                   <div>
                     <label style={labelStyle}>Sector</label>
                     <select value={formData.id_sector} onChange={(e) => setFormData({...formData, id_sector: e.target.value})} style={inputStyle}>
                       <option value="">-- Seleccionar --</option>
-                      {sectores.map(s => <option key={s.id_sector} value={s.id_sector}>{s.sector}</option>)}
+                      {sectores.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
                     </select>
                   </div>
                   <div>
                     <label style={labelStyle}>Pilar</label>
                     <select value={formData.id_pilar} onChange={(e) => setFormData({...formData, id_pilar: e.target.value})} style={inputStyle}>
                       <option value="">-- Seleccionar --</option>
-                      {pilares.map(p => <option key={p.id_pilar} value={p.id_pilar}>{p.pilar}</option>)}
+                      {pilares.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
                     </select>
                   </div>
                   <div>
