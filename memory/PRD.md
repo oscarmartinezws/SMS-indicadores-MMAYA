@@ -43,11 +43,16 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - [x] Grid optimizado con solo códigos (sin descripciones largas)
 - [x] **Paginación** de 10 registros por página con navegación
 - [x] **Control de acceso por rol**:
-  - ADMINISTRADOR: puede crear/editar indicadores
-  - USUARIO: solo visualización (sin botones de acción)
+  - ADMINISTRADOR: puede crear/editar indicadores (botón "✏️ Editar")
+  - USUARIO: solo visualización (botón "👁 Ver")
+- [x] **Modal de solo lectura** para usuarios:
+  - Muestra descripciones completas (no cortadas)
+  - Campos de solo lectura (fondo gris)
+  - Solo botón "Cerrar"
+- [x] **Modal de edición** para admin:
+  - Combos ampliados con descripciones completas
+  - Botones "Volver" y "💾 Grabar"
 - [x] Catálogos cargados solo al abrir modal (mejor rendimiento)
-- [x] Modal de edición con dos columnas
-- [x] Columnas: #, ENTIDAD, ÁREA, SECTOR, PILAR, EJE, META, RESULTADO, ACCIÓN, CÓDIGO, INDICADOR, ESTADO, [ACCIONES solo admin]
 
 ### Seguimiento de Indicadores
 - [x] Selección de indicador
