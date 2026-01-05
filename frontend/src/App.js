@@ -431,21 +431,21 @@ function IndicadoresView({ user }) {
                     <label style={labelStyle}>Eje</label>
                     <select value={formData.id_eje} onChange={(e) => setFormData({...formData, id_eje: e.target.value})} style={inputStyle}>
                       <option value="">-- Seleccionar --</option>
-                      {ejes.map(ej => <option key={ej.id_eje} value={ej.id_eje}>{ej.eje}</option>)}
+                      {ejes.map(ej => <option key={ej.id} value={ej.id}>{ej.nombre}</option>)}
                     </select>
                   </div>
                   <div>
                     <label style={labelStyle}>Meta</label>
                     <select value={formData.codi_meta} onChange={(e) => setFormData({...formData, codi_meta: e.target.value})} style={inputStyle}>
                       <option value="">-- Seleccionar --</option>
-                      {metas.map(m => <option key={m.id_meta} value={m.codi_meta}>{m.codi_meta} - {(m.meta || '').substring(0, 60)}...</option>)}
+                      {metas.map(m => <option key={m.id} value={m.codigo}>{m.codigo} - {(m.nombre || '').substring(0, 60)}...</option>)}
                     </select>
                   </div>
                   <div>
                     <label style={labelStyle}>Resultado</label>
                     <select value={formData.codi_resultado} onChange={(e) => setFormData({...formData, codi_resultado: e.target.value})} style={inputStyle}>
                       <option value="">-- Seleccionar --</option>
-                      {resultados.map(r => <option key={r.id_resultado} value={r.codi_resultado}>{r.codi_resultado} - {(r.resultado || '').substring(0, 60)}...</option>)}
+                      {resultados.map(r => <option key={r.id} value={r.codigo}>{r.codigo} - {(r.nombre || '').substring(0, 60)}...</option>)}
                     </select>
                   </div>
                   <div>
@@ -456,7 +456,7 @@ function IndicadoresView({ user }) {
                     <label style={labelStyle}>Acción</label>
                     <select value={formData.codi_accion} onChange={(e) => setFormData({...formData, codi_accion: e.target.value})} style={inputStyle}>
                       <option value="">-- Seleccionar --</option>
-                      {acciones.map(a => <option key={a.id_accion} value={a.codi_accion}>{a.codi_accion} - {(a.accion || '').substring(0, 60)}...</option>)}
+                      {acciones.map(a => <option key={a.id} value={a.codigo}>{a.codigo} - {(a.nombre || '').substring(0, 60)}...</option>)}
                     </select>
                   </div>
                 </div>
