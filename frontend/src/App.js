@@ -974,8 +974,9 @@ function SeguimientoView({ user, siteConfig }) {
     if (selectedIndicador) {
       fetch(`${API_URL}/api/sms/rendicion/${selectedIndicador.id_indicador}/${gestion}`)
         .then(r => r.json()).then(data => setRendicion(data || {})).catch(console.error);
-      // Also fetch the sum of all programado values for this indicator
+      // Also fetch the sum of all programado and logrado values for this indicator
       fetchSumaProgramado(selectedIndicador.id_indicador);
+      fetchSumaLogrado(selectedIndicador.id_indicador);
     }
   }, [selectedIndicador, gestion]);
 
