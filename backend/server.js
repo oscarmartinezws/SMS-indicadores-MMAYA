@@ -532,13 +532,13 @@ app.get('/api/sms/usuarios', async (req, res) => {
 
 app.post('/api/sms/usuarios', async (req, res) => {
   try {
-    const { usuario, nombre, clave, id_rol, id_area, estado } = req.body;
+    const { username, nombre, clave, nro_documento, id_rol, id_area, estado } = req.body;
     const hashedPassword = await bcrypt.hash(clave, 10);
     const result = await pool.query(
-      'INSERT INTO usuario (username, nombre, clave, id_rol, id_area, estado) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [usuario, nombre, hashedPassword, id_rol, id_area, estado || 'ACTIVO']
+      'INSERT INTO usuario (username, nombre, clave, nro_documento, id_rol, id_area, estado, fecha_creacion) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *',
+      [username, nombre, hashedPassword, nro_documento, id_rol, id_area, estado || 'ACTIVO']
     );
-    res.json({ id: result.rows[0].id_usuario, usuario: result.rows[0].username, nombre: result.rows[0].nombre });
+    res.json({ id_usuario: result.rows[0].id_usuario, username: result.rows[0].username, nombre: result.rows[0].nombre });
   } catch (err) {
     console.error(err);
     res.status(500).json({ detail: 'Error al crear usuario' });
@@ -547,13 +547,20 @@ app.post('/api/sms/usuarios', async (req, res) => {
 
 app.put('/api/sms/usuarios/:id', async (req, res) => {
   try {
-    const { usuario, nombre, id_rol, id_area, estado } = req.body;
+    const { username, nombre, nro_documento, id_rol, id_area, estado, clave } = req.body;
+    // Update user data
     await pool.query(
-      'UPDATE usuario SET username = $1, nombre = $2, id_rol = $3, id_area = $4, estado = $5 WHERE id_usuario = $6',
-      [usuario, nombre, id_rol, id_area, estado, req.params.id]
+      'UPDATE usuario SET username = $1, nombre = $2, nro_documento = $3, id_rol = $4, id_area = $5, estado = $6 WHERE id_usuario = $7',
+      [username, nombre, nro_documento, id_rol, id_area, estado, req.params.id]
     );
+    // Update password if provided
+    if (clave && clave.trim() !== '') {
+      const hashedPassword = await bcrypt.hash(clave, 10);
+      await pool.query('UPDATE usuario SET clave = $1 WHERE id_usuario = $2', [hashedPassword, req.params.id]);
+    }
     res.json({ message: 'Usuario actualizado' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ detail: 'Error al actualizar usuario' });
   }
 });
