@@ -72,6 +72,16 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - Se guarda en tabla `rendicion.programado`
   - % EJEC en columna LOGRADO (roja) = LOGRADO/PROGRAMADO * 100
   - Usuarios normales solo pueden ver el valor
+- [x] **PROGRAMADO con validación y suma global (NUEVO - 2025-01-05)**:
+  - Muestra "SUMA PROGRAMADO (TODOS LOS AÑOS)" junto a "LOGRO PROGRAMADO (META)"
+  - Formato: `suma / meta` con color verde si cumple, rojo si excede
+  - Modal de edición muestra:
+    - Meta global del indicador
+    - Suma de programados de todos los años
+    - Disponible para programar
+  - Validación: no permite guardar si la suma excedería la meta global
+  - Endpoint nuevo: `GET /api/sms/rendicion/suma_programado/:id_indicador`
+  - Permite guardar PROGRAMADO incluso sin datos mensuales
 - [x] **Exportación de datos (COMPLETADO)**:
   - Exportar a CSV (todos los indicadores del usuario)
   - **Exportar a PDF mejorado**:
