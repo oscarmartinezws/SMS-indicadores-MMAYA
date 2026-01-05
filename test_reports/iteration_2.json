@@ -1,0 +1,75 @@
+{
+  "summary": "Completed testing of PROGRAMADO features in SMS Seguimiento view. All 5 requested features are working correctly: 1) SUMA PROGRAMADO displayed alongside META, 2) Edit modal shows meta global, suma, and disponible, 3) Validation prevents exceeding meta, 4) Backend endpoint returns correct sum, 5) Can save PROGRAMADO within limits.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/tests/test_programado_features.py",
+    "/app/test_reports/pytest/pytest_results_programado.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/tests/test_programado_features.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "admin_user": {"username": "omartinez", "password": "P1c0l0c0"}
+  },
+  "seed_data_creation": "None - used existing data in PostgreSQL database",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All PROGRAMADO features tested and working. Test data modified: Indicator 8.5.2.1 PROGRAMADO changed from 51 to 40 for year 2025. The validation correctly prevents values that would make suma_programado exceed meta global.",
+  "test_results": {
+    "backend_tests": {
+      "test_admin_login": "PASSED",
+      "test_suma_programado_returns_correct_structure": "PASSED",
+      "test_suma_programado_for_nonexistent_indicator": "PASSED",
+      "test_save_programado_without_monthly_data": "PASSED",
+      "test_save_programado_creates_rendicion_record": "PASSED",
+      "test_suma_programado_reflects_saved_values": "PASSED",
+      "test_meta_global_available_for_validation": "PASSED",
+      "test_suma_programado_for_validation": "PASSED",
+      "test_get_rendicion_by_indicator_and_year": "PASSED"
+    },
+    "frontend_tests": {
+      "login_as_admin": "PASSED",
+      "navigate_to_seguimiento": "PASSED",
+      "suma_programado_displayed": "PASSED - Shows 'SUMA PROGRAMADO (TODOS LOS AÑOS)' with value/meta format",
+      "edit_programado_modal": "PASSED - Modal shows: meta global, suma de programados, disponible para programar",
+      "validation_exceeds_meta": "PASSED - Alert shows when value exceeds meta global",
+      "save_valid_programado": "PASSED - Successfully saved value within limit"
+    }
+  },
+  "features_verified": {
+    "suma_programado_display": {
+      "status": "PASSED",
+      "details": "SUMA PROGRAMADO (TODOS LOS AÑOS) displayed next to LOGRO PROGRAMADO (META) with format 'suma / meta'. Color changes to red when suma exceeds meta."
+    },
+    "edit_modal_info": {
+      "status": "PASSED",
+      "details": "Modal shows: Meta global del indicador, Suma de programados (todos los años), Disponible para programar"
+    },
+    "validation_against_meta": {
+      "status": "PASSED",
+      "details": "Alert prevents saving when new total would exceed meta global. Shows detailed message with meta, current suma, and maximum allowed value."
+    },
+    "suma_programado_endpoint": {
+      "status": "PASSED",
+      "details": "GET /api/sms/rendicion/suma_programado/:id_indicador returns correct sum of all PROGRAMADO values across years"
+    },
+    "save_programado_within_limit": {
+      "status": "PASSED",
+      "details": "POST /api/sms/rendicion/programado successfully saves value when within limit, even without monthly data"
+    }
+  }
+}
