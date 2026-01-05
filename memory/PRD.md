@@ -66,6 +66,12 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - [x] Descripción cualitativa del avance
 - [x] Modificaciones
 - [x] Archivos adjuntos (upload y URL)
+- [x] **PROGRAMADO editable (solo ADMIN)**:
+  - Botón ✏️ al lado del valor PROGRAMADO (columna azul)
+  - Modal para editar el PROGRAMADO del año
+  - Se guarda en tabla `rendicion.programado`
+  - % EJEC en columna LOGRADO (roja) = LOGRADO/PROGRAMADO * 100
+  - Usuarios normales solo pueden ver el valor
 - [x] **Exportación de datos (COMPLETADO)**:
   - Exportar a CSV (todos los indicadores del usuario)
   - **Exportar a PDF mejorado**:
