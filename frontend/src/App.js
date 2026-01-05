@@ -909,6 +909,7 @@ function SeguimientoView({ user, siteConfig }) {
   const [showProgramadoModal, setShowProgramadoModal] = useState(false);
   const [programadoTemp, setProgramadoTemp] = useState('');
   const [sumaProgramado, setSumaProgramado] = useState(0);
+  const [sumaLogrado, setSumaLogrado] = useState(0);
 
   const isAdmin = user?.rol === 'ADMINISTRADOR';
   const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
@@ -921,6 +922,17 @@ function SeguimientoView({ user, siteConfig }) {
       if (res.ok) {
         const data = await res.json();
         setSumaProgramado(data.suma_programado || 0);
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  // Fetch suma logrado for selected indicator
+  const fetchSumaLogrado = async (id_indicador) => {
+    try {
+      const res = await fetch(`${API_URL}/api/sms/rendicion/suma_logrado/${id_indicador}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSumaLogrado(data.suma_logrado || 0);
       }
     } catch (err) { console.error(err); }
   };
