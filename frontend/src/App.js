@@ -1609,8 +1609,12 @@ function SeguimientoView({ user, siteConfig }) {
                   placeholder="Ingrese el valor programado"
                 />
               </div>
-              <div style={{ fontSize: '0.75rem', color: styles.gray500, marginBottom: 16 }}>
-                Logro global del indicador: {selectedIndicador?.logro || '-'}
+              <div style={{ fontSize: '0.75rem', color: styles.gray500, marginBottom: 16, padding: 12, background: styles.gray100, borderRadius: 6 }}>
+                <div style={{ marginBottom: 6 }}><strong>Meta global del indicador:</strong> {selectedIndicador?.logro || '-'}</div>
+                <div style={{ marginBottom: 6 }}><strong>Suma de programados (todos los años):</strong> {sumaProgramado.toFixed(3)}</div>
+                <div style={{ color: (parseFloat(selectedIndicador?.logro) || 0) > 0 ? ((sumaProgramado <= (parseFloat(selectedIndicador?.logro) || 0)) ? styles.green : styles.red) : styles.gray600 }}>
+                  <strong>Disponible para programar:</strong> {((parseFloat(selectedIndicador?.logro) || 0) - sumaProgramado + (parseFloat(rendicion.programado) || 0)).toFixed(3)}
+                </div>
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button onClick={() => setShowProgramadoModal(false)} style={{ flex: 1, padding: 12, border: `2px solid ${styles.gray300}`, background: 'transparent', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
