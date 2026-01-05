@@ -475,120 +475,188 @@ function IndicadoresView({ user }) {
         </div>
       )}
 
-      {/* Modal - Only for Admin */}
-      {showModal && isAdmin && (
+      {/* Modal - Edit for Admin, View for Users */}
+      {showModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: styles.white, borderRadius: 8, width: '90%', maxWidth: 900, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
-            <div style={{ background: styles.black, color: styles.white, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>{editingItem ? 'Editar Indicador' : 'Nuevo Indicador'}</h3>
+          <div style={{ background: styles.white, borderRadius: 8, width: '95%', maxWidth: 1100, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
+            <div style={{ background: viewOnly ? styles.gray700 : styles.black, color: styles.white, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>
+                {viewOnly ? '👁 Ver Indicador' : (editingItem ? '✏️ Editar Indicador' : '➕ Nuevo Indicador')}
+              </h3>
               <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', color: styles.white, fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
             
             {loadingCatalogs ? (
-              <div style={{ padding: 40, textAlign: 'center' }}>Cargando catálogos...</div>
+              <div style={{ padding: 40, textAlign: 'center' }}>Cargando datos...</div>
             ) : catalogs && (
               <div style={{ padding: 20 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                   {/* Left Column */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     <div>
                       <label style={labelStyle}>Entidad</label>
-                      <select value={formData.id_entidad} onChange={(e) => setFormData({...formData, id_entidad: e.target.value})} style={inputStyle}>
-                        <option value="">-- Seleccionar --</option>
-                        {catalogs.entidades.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
-                      </select>
+                      {viewOnly ? (
+                        <div style={readOnlyStyle}>{getCatalogName(catalogs.entidades, formData.id_entidad)}</div>
+                      ) : (
+                        <select value={formData.id_entidad} onChange={(e) => setFormData({...formData, id_entidad: e.target.value})} style={{ ...inputStyle, minHeight: 42 }}>
+                          <option value="">-- Seleccionar --</option>
+                          {catalogs.entidades.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
+                        </select>
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Área Organizacional</label>
-                      <select value={formData.id_area} onChange={(e) => setFormData({...formData, id_area: e.target.value})} style={inputStyle}>
-                        <option value="">-- Seleccionar --</option>
-                        {catalogs.areas.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
-                      </select>
+                      {viewOnly ? (
+                        <div style={readOnlyStyle}>{getCatalogName(catalogs.areas, formData.id_area)}</div>
+                      ) : (
+                        <select value={formData.id_area} onChange={(e) => setFormData({...formData, id_area: e.target.value})} style={{ ...inputStyle, minHeight: 42 }}>
+                          <option value="">-- Seleccionar --</option>
+                          {catalogs.areas.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
+                        </select>
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Sector</label>
-                      <select value={formData.id_sector} onChange={(e) => setFormData({...formData, id_sector: e.target.value})} style={inputStyle}>
-                        <option value="">-- Seleccionar --</option>
-                        {catalogs.sectores.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
-                      </select>
+                      {viewOnly ? (
+                        <div style={readOnlyStyle}>{getCatalogName(catalogs.sectores, formData.id_sector)}</div>
+                      ) : (
+                        <select value={formData.id_sector} onChange={(e) => setFormData({...formData, id_sector: e.target.value})} style={{ ...inputStyle, minHeight: 42 }}>
+                          <option value="">-- Seleccionar --</option>
+                          {catalogs.sectores.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
+                        </select>
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Pilar</label>
-                      <select value={formData.id_pilar} onChange={(e) => setFormData({...formData, id_pilar: e.target.value})} style={inputStyle}>
-                        <option value="">-- Seleccionar --</option>
-                        {catalogs.pilares.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                      </select>
+                      {viewOnly ? (
+                        <div style={{ ...readOnlyStyle, whiteSpace: 'pre-wrap', minHeight: 60 }}>{getCatalogName(catalogs.pilares, formData.id_pilar)}</div>
+                      ) : (
+                        <select value={formData.id_pilar} onChange={(e) => setFormData({...formData, id_pilar: e.target.value})} style={{ ...inputStyle, minHeight: 60 }}>
+                          <option value="">-- Seleccionar --</option>
+                          {catalogs.pilares.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                        </select>
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Eje</label>
-                      <select value={formData.id_eje} onChange={(e) => setFormData({...formData, id_eje: e.target.value})} style={inputStyle}>
-                        <option value="">-- Seleccionar --</option>
-                        {catalogs.ejes.map(ej => <option key={ej.id} value={ej.id}>{ej.nombre}</option>)}
-                      </select>
+                      {viewOnly ? (
+                        <div style={{ ...readOnlyStyle, whiteSpace: 'pre-wrap', minHeight: 60 }}>{getCatalogName(catalogs.ejes, formData.id_eje)}</div>
+                      ) : (
+                        <select value={formData.id_eje} onChange={(e) => setFormData({...formData, id_eje: e.target.value})} style={{ ...inputStyle, minHeight: 60 }}>
+                          <option value="">-- Seleccionar --</option>
+                          {catalogs.ejes.map(ej => <option key={ej.id} value={ej.id}>{ej.nombre}</option>)}
+                        </select>
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Meta</label>
-                      <select value={formData.codi_meta} onChange={(e) => setFormData({...formData, codi_meta: e.target.value})} style={inputStyle}>
-                        <option value="">-- Seleccionar --</option>
-                        {catalogs.metas.map(m => <option key={m.id} value={m.codigo}>{m.codigo} - {(m.nombre || '').substring(0, 50)}...</option>)}
-                      </select>
+                      {viewOnly ? (
+                        <div style={{ ...readOnlyStyle, whiteSpace: 'pre-wrap', minHeight: 80 }}><strong>{formData.codi_meta}</strong> - {getMetaName(formData.codi_meta)}</div>
+                      ) : (
+                        <select value={formData.codi_meta} onChange={(e) => setFormData({...formData, codi_meta: e.target.value})} style={{ ...inputStyle, minHeight: 60 }}>
+                          <option value="">-- Seleccionar --</option>
+                          {catalogs.metas.map(m => <option key={m.id} value={m.codigo}>{m.codigo} - {m.nombre}</option>)}
+                        </select>
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Resultado</label>
-                      <select value={formData.codi_resultado} onChange={(e) => setFormData({...formData, codi_resultado: e.target.value})} style={inputStyle}>
-                        <option value="">-- Seleccionar --</option>
-                        {catalogs.resultados.map(r => <option key={r.id} value={r.codigo}>{r.codigo} - {(r.nombre || '').substring(0, 50)}...</option>)}
-                      </select>
+                      {viewOnly ? (
+                        <div style={{ ...readOnlyStyle, whiteSpace: 'pre-wrap', minHeight: 80 }}><strong>{formData.codi_resultado}</strong> - {getResultadoName(formData.codi_resultado)}</div>
+                      ) : (
+                        <select value={formData.codi_resultado} onChange={(e) => setFormData({...formData, codi_resultado: e.target.value})} style={{ ...inputStyle, minHeight: 60 }}>
+                          <option value="">-- Seleccionar --</option>
+                          {catalogs.resultados.map(r => <option key={r.id} value={r.codigo}>{r.codigo} - {r.nombre}</option>)}
+                        </select>
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Acción</label>
-                      <select value={formData.codi_accion} onChange={(e) => setFormData({...formData, codi_accion: e.target.value})} style={inputStyle}>
-                        <option value="">-- Seleccionar --</option>
-                        {catalogs.acciones.map(a => <option key={a.id} value={a.codigo}>{a.codigo} - {(a.nombre || '').substring(0, 50)}...</option>)}
-                      </select>
+                      {viewOnly ? (
+                        <div style={{ ...readOnlyStyle, whiteSpace: 'pre-wrap', minHeight: 80 }}><strong>{formData.codi_accion}</strong> - {getAccionName(formData.codi_accion)}</div>
+                      ) : (
+                        <select value={formData.codi_accion} onChange={(e) => setFormData({...formData, codi_accion: e.target.value})} style={{ ...inputStyle, minHeight: 60 }}>
+                          <option value="">-- Seleccionar --</option>
+                          {catalogs.acciones.map(a => <option key={a.id} value={a.codigo}>{a.codigo} - {a.nombre}</option>)}
+                        </select>
+                      )}
                     </div>
                   </div>
 
                   {/* Right Column */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     <div>
                       <label style={labelStyle}>Código</label>
-                      <input type="text" value={formData.codi} onChange={(e) => setFormData({...formData, codi: e.target.value})} style={inputStyle} placeholder="Ej: IND-001" />
+                      {viewOnly ? (
+                        <div style={{ ...readOnlyStyle, fontWeight: 600, fontSize: '1rem' }}>{formData.codi}</div>
+                      ) : (
+                        <input type="text" value={formData.codi} onChange={(e) => setFormData({...formData, codi: e.target.value})} style={inputStyle} placeholder="Ej: IND-001" />
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Indicador</label>
-                      <textarea value={formData.indicador_resultado} onChange={(e) => setFormData({...formData, indicador_resultado: e.target.value})} style={{ ...inputStyle, minHeight: 80, resize: 'vertical' }} placeholder="Descripción del indicador" />
+                      {viewOnly ? (
+                        <div style={{ ...readOnlyStyle, whiteSpace: 'pre-wrap', minHeight: 100 }}>{formData.indicador_resultado}</div>
+                      ) : (
+                        <textarea value={formData.indicador_resultado} onChange={(e) => setFormData({...formData, indicador_resultado: e.target.value})} style={{ ...inputStyle, minHeight: 100, resize: 'vertical' }} placeholder="Descripción del indicador" />
+                      )}
                     </div>
                     <div>
                       <label style={labelStyle}>Fórmula</label>
-                      <textarea value={formData.formula_indicador} onChange={(e) => setFormData({...formData, formula_indicador: e.target.value})} style={{ ...inputStyle, minHeight: 60, resize: 'vertical' }} placeholder="Fórmula del indicador" />
+                      {viewOnly ? (
+                        <div style={{ ...readOnlyStyle, whiteSpace: 'pre-wrap', minHeight: 80 }}>{formData.formula_indicador}</div>
+                      ) : (
+                        <textarea value={formData.formula_indicador} onChange={(e) => setFormData({...formData, formula_indicador: e.target.value})} style={{ ...inputStyle, minHeight: 80, resize: 'vertical' }} placeholder="Fórmula del indicador" />
+                      )}
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                       <div>
                         <label style={labelStyle}>Año Base</label>
-                        <input type="number" value={formData.anio_base} onChange={(e) => setFormData({...formData, anio_base: e.target.value})} style={inputStyle} placeholder="2020" />
+                        {viewOnly ? (
+                          <div style={readOnlyStyle}>{formData.anio_base}</div>
+                        ) : (
+                          <input type="number" value={formData.anio_base} onChange={(e) => setFormData({...formData, anio_base: e.target.value})} style={inputStyle} placeholder="2020" />
+                        )}
                       </div>
                       <div>
                         <label style={labelStyle}>Línea Base</label>
-                        <input type="number" step="0.01" value={formData.linea_base} onChange={(e) => setFormData({...formData, linea_base: e.target.value})} style={inputStyle} placeholder="0.00" />
+                        {viewOnly ? (
+                          <div style={readOnlyStyle}>{formData.linea_base}</div>
+                        ) : (
+                          <input type="number" step="0.01" value={formData.linea_base} onChange={(e) => setFormData({...formData, linea_base: e.target.value})} style={inputStyle} placeholder="0.00" />
+                        )}
                       </div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                       <div>
                         <label style={labelStyle}>Año Logro</label>
-                        <input type="number" value={formData.anio_logro} onChange={(e) => setFormData({...formData, anio_logro: e.target.value})} style={inputStyle} placeholder="2025" />
+                        {viewOnly ? (
+                          <div style={readOnlyStyle}>{formData.anio_logro}</div>
+                        ) : (
+                          <input type="number" value={formData.anio_logro} onChange={(e) => setFormData({...formData, anio_logro: e.target.value})} style={inputStyle} placeholder="2025" />
+                        )}
                       </div>
                       <div>
                         <label style={labelStyle}>Logro</label>
-                        <input type="number" step="0.01" value={formData.logro} onChange={(e) => setFormData({...formData, logro: e.target.value})} style={inputStyle} placeholder="0.00" />
+                        {viewOnly ? (
+                          <div style={readOnlyStyle}>{formData.logro}</div>
+                        ) : (
+                          <input type="number" step="0.01" value={formData.logro} onChange={(e) => setFormData({...formData, logro: e.target.value})} style={inputStyle} placeholder="0.00" />
+                        )}
                       </div>
                     </div>
                     <div>
                       <label style={labelStyle}>Estado</label>
-                      <select value={formData.estado} onChange={(e) => setFormData({...formData, estado: e.target.value})} style={inputStyle}>
-                        <option value="ACTIVO">ACTIVO</option>
-                        <option value="INACTIVO">INACTIVO</option>
-                      </select>
+                      {viewOnly ? (
+                        <div style={readOnlyStyle}>
+                          <span style={{ padding: '4px 12px', borderRadius: 12, fontSize: '0.8rem', fontWeight: 600, background: formData.estado === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: formData.estado === 'ACTIVO' ? styles.green : styles.red }}>{formData.estado}</span>
+                        </div>
+                      ) : (
+                        <select value={formData.estado} onChange={(e) => setFormData({...formData, estado: e.target.value})} style={inputStyle}>
+                          <option value="ACTIVO">ACTIVO</option>
+                          <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -596,11 +664,13 @@ function IndicadoresView({ user }) {
                 {/* Action Buttons */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 16, borderTop: `1px solid ${styles.gray200}` }}>
                   <button onClick={() => setShowModal(false)} style={{ padding: '10px 24px', background: styles.gray200, color: styles.gray700, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
-                    Volver
+                    {viewOnly ? 'Cerrar' : 'Volver'}
                   </button>
-                  <button onClick={handleSave} data-testid="btn-grabar-indicador" style={{ padding: '10px 24px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
-                    💾 Grabar
-                  </button>
+                  {!viewOnly && (
+                    <button onClick={handleSave} data-testid="btn-grabar-indicador" style={{ padding: '10px 24px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
+                      💾 Grabar
+                    </button>
+                  )}
                 </div>
               </div>
             )}
