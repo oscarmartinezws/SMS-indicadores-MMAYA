@@ -299,6 +299,31 @@ function IndicadoresView({ user }) {
   };
 
   const handleSave = async () => {
+    // Validate required fields
+    const requiredFields = [
+      { field: 'id_entidad', label: 'Entidad' },
+      { field: 'id_area', label: 'Área Organizacional' },
+      { field: 'id_sector', label: 'Sector' },
+      { field: 'id_pilar', label: 'Pilar' },
+      { field: 'id_eje', label: 'Eje' },
+      { field: 'codi_meta', label: 'Meta' },
+      { field: 'codi_resultado', label: 'Resultado' },
+      { field: 'codi_accion', label: 'Acción' },
+      { field: 'codi', label: 'Código' },
+      { field: 'indicador_resultado', label: 'Indicador' },
+      { field: 'formula_indicador', label: 'Fórmula' },
+      { field: 'anio_base', label: 'Año Base' },
+      { field: 'linea_base', label: 'Línea Base' },
+      { field: 'anio_logro', label: 'Año Logro' },
+      { field: 'logro', label: 'Logro' }
+    ];
+    
+    const missing = requiredFields.filter(r => !formData[r.field] || formData[r.field] === '');
+    if (missing.length > 0) {
+      alert(`Campos requeridos faltantes:\n${missing.map(m => '• ' + m.label).join('\n')}`);
+      return;
+    }
+    
     try {
       const payload = { ...formData };
       // Convert empty strings to null for numeric fields
@@ -326,7 +351,8 @@ function IndicadoresView({ user }) {
         const indRes = await fetch(`${API_URL}/api/sms/indicadores_full`);
         setData(await indRes.json());
       } else {
-        alert('Error al guardar');
+        const errData = await res.json().catch(() => ({}));
+        alert('Error al guardar: ' + (errData.detail || 'Error desconocido'));
       }
     } catch (err) {
       console.error(err);
