@@ -143,6 +143,10 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - Nuevo endpoint: `GET /api/sms/rendicion/suma_programado/:id`
   - Arreglado bug de ruta (endpoint movido antes de rutas parametrizadas)
   - Testing completo con testing agent (100% éxito - 9/9 pruebas)
+- ✅ **% LOGRO GLOBAL (nuevo)**:
+  - Campo calculado: SUMA LOGRADO (todos los años) / LOGRO PROGRAMADO (META) * 100
+  - Colores: Verde >=100%, Naranja >=50%, Rojo <50%
+  - Nuevo endpoint: `GET /api/sms/rendicion/suma_logrado/:id`
 
 ### 2025-01-04
 - ✅ Implementación de campos calculados en vista Seguimiento
