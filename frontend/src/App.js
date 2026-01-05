@@ -216,50 +216,308 @@ function CrudTable({ title, endpoint, columns, formFields, idField = 'id' }) {
 function IndicadoresView({ user }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [formData, setFormData] = useState({
+    id_entidad: '', id_area: '', id_sector: '', id_pilar: '', id_eje: '',
+    codi_meta: '', codi_resultado: '', codi_accion: '', codi: '',
+    indicador_resultado: '', formula_indicador: '', anio_base: '',
+    linea_base: '', anio_logro: '', logro: '', estado: 'ACTIVO'
+  });
+  
+  // Catalogs for dropdowns
+  const [entidades, setEntidades] = useState([]);
+  const [areas, setAreas] = useState([]);
+  const [sectores, setSectores] = useState([]);
+  const [pilares, setPilares] = useState([]);
+  const [ejes, setEjes] = useState([]);
+  const [metas, setMetas] = useState([]);
+  const [resultados, setResultados] = useState([]);
+  const [acciones, setAcciones] = useState([]);
 
+  // Fetch data
   useEffect(() => {
-    const fetchIndicadores = async () => {
+    const fetchData = async () => {
       try {
-        const token = localStorage.getItem('sms_token');
-        // Use the main endpoint that handles filtering based on user role
-        const res = await fetch(`${API_URL}/api/sms/matriz_parametros`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        setData(await res.json());
+        const [indRes, entRes, areaRes, secRes, pilRes, ejeRes, metaRes, resRes, accRes] = await Promise.all([
+          fetch(`${API_URL}/api/sms/indicadores_full`),
+          fetch(`${API_URL}/api/sms/entidades`),
+          fetch(`${API_URL}/api/sms/areas`),
+          fetch(`${API_URL}/api/sms/sectores`),
+          fetch(`${API_URL}/api/sms/pilares`),
+          fetch(`${API_URL}/api/sms/ejes`),
+          fetch(`${API_URL}/api/sms/metas`),
+          fetch(`${API_URL}/api/sms/resultados`),
+          fetch(`${API_URL}/api/sms/acciones`)
+        ]);
+        setData(await indRes.json());
+        setEntidades(await entRes.json());
+        setAreas(await areaRes.json());
+        setSectores(await secRes.json());
+        setPilares(await pilRes.json());
+        setEjes(await ejeRes.json());
+        setMetas(await metaRes.json());
+        setResultados(await resRes.json());
+        setAcciones(await accRes.json());
       } catch (err) { console.error(err); }
       finally { setLoading(false); }
     };
-    fetchIndicadores();
-  }, [user]);
+    fetchData();
+  }, []);
+
+  const openModal = (item = null) => {
+    if (item) {
+      setEditingItem(item);
+      setFormData({
+        id_entidad: item.id_entidad || '',
+        id_area: item.id_area || '',
+        id_sector: item.id_sector || '',
+        id_pilar: item.id_pilar || '',
+        id_eje: item.id_eje || '',
+        codi_meta: item.codi_meta || '',
+        codi_resultado: item.codi_resultado || '',
+        codi_accion: item.codi_accion || '',
+        codi: item.codi || '',
+        indicador_resultado: item.indicador_resultado || '',
+        formula_indicador: item.formula_indicador || '',
+        anio_base: item.anio_base || '',
+        linea_base: item.linea_base || '',
+        anio_logro: item.anio_logro || '',
+        logro: item.logro || '',
+        estado: item.estado || 'ACTIVO'
+      });
+    } else {
+      setEditingItem(null);
+      setFormData({
+        id_entidad: '', id_area: '', id_sector: '', id_pilar: '', id_eje: '',
+        codi_meta: '', codi_resultado: '', codi_accion: '', codi: '',
+        indicador_resultado: '', formula_indicador: '', anio_base: '',
+        linea_base: '', anio_logro: '', logro: '', estado: 'ACTIVO'
+      });
+    }
+    setShowModal(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      const payload = { ...formData };
+      // Convert empty strings to null for numeric fields
+      ['id_entidad', 'id_area', 'id_sector', 'id_pilar', 'id_eje', 'anio_base', 'anio_logro'].forEach(f => {
+        payload[f] = payload[f] === '' ? null : parseInt(payload[f]);
+      });
+      ['linea_base', 'logro'].forEach(f => {
+        payload[f] = payload[f] === '' ? null : parseFloat(payload[f]);
+      });
+
+      const url = editingItem 
+        ? `${API_URL}/api/sms/matriz_parametros/${editingItem.id_indicador}`
+        : `${API_URL}/api/sms/matriz_parametros`;
+      
+      const res = await fetch(url, {
+        method: editingItem ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (res.ok) {
+        alert(editingItem ? 'Indicador actualizado' : 'Indicador creado');
+        setShowModal(false);
+        // Refresh data
+        const indRes = await fetch(`${API_URL}/api/sms/indicadores_full`);
+        setData(await indRes.json());
+      } else {
+        alert('Error al guardar');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error al guardar');
+    }
+  };
 
   if (loading) return <div style={{ textAlign: 'center', padding: 24 }}>Cargando...</div>;
 
+  const inputStyle = { width: '100%', padding: '8px 10px', border: `1px solid ${styles.gray300}`, borderRadius: 4, fontSize: '0.85rem' };
+  const labelStyle = { display: 'block', fontSize: '0.7rem', fontWeight: 600, color: styles.gray600, marginBottom: 4, textTransform: 'uppercase' };
+
   return (
     <div>
-      <h2 style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: 12 }}>Banco de Indicadores</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 style={{ fontWeight: 700, fontSize: '1.2rem', margin: 0 }}>Mantenedor de Indicadores</h2>
+        <button onClick={() => openModal()} data-testid="btn-adicionar-indicador" style={{ padding: '10px 20px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+          ➕ Adicionar
+        </button>
+      </div>
+
+      {/* Grid */}
       <div style={{ background: styles.white, borderRadius: 6, overflow: 'auto', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
-          <thead><tr>{['ID', 'CÓDIGO', 'INDICADOR', 'META', 'RESULTADO', 'ACCIÓN', 'AÑO BASE', 'L. BASE', 'LOGRO', 'ESTADO'].map(h => <th key={h} style={headerStyle}>{h}</th>)}</tr></thead>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 1400, fontSize: '0.75rem' }}>
+          <thead>
+            <tr style={{ background: styles.black, color: styles.white }}>
+              {['#', 'ENTIDAD', 'ÁREA', 'SECTOR', 'PILAR', 'EJE', 'META', 'RESULTADO', 'ACCIÓN', 'CÓDIGO', 'INDICADOR', 'ESTADO', 'ACCIONES'].map(h => (
+                <th key={h} style={{ padding: '10px 6px', textAlign: 'left', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
           <tbody>
             {data.length === 0 ? (
-              <tr><td colSpan={10} style={{ ...rowStyle, textAlign: 'center', color: styles.gray500, padding: 24 }}>No hay indicadores asignados a su área</td></tr>
-            ) : data.map(item => (
-              <tr key={item.id_indicador} style={{ borderBottom: `1px solid ${styles.gray200}` }}>
-                <td style={{ ...rowStyle, textAlign: 'center' }}>{item.id_indicador}</td>
-                <td style={rowStyle}>{item.codi}</td>
-                <td style={{ ...rowStyle, maxWidth: 240 }}>{item.indicador_resultado}</td>
-                <td style={rowStyle}>{item.codi_meta}</td>
-                <td style={rowStyle}>{item.codi_resultado}</td>
-                <td style={rowStyle}>{item.codi_accion}</td>
-                <td style={{ ...rowStyle, textAlign: 'center' }}>{item.anio_base}</td>
-                <td style={rowStyle}>{item.linea_base}</td>
-                <td style={rowStyle}>{item.logro}</td>
-                <td style={{ ...rowStyle, textAlign: 'center' }}><span style={{ padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 600, background: item.estado === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: item.estado === 'ACTIVO' ? styles.green : styles.red }}>{item.estado}</span></td>
+              <tr><td colSpan={13} style={{ textAlign: 'center', padding: 24, color: styles.gray500 }}>No hay indicadores registrados</td></tr>
+            ) : data.map((item, idx) => (
+              <tr key={item.id_indicador} style={{ borderBottom: `1px solid ${styles.gray200}`, background: idx % 2 === 0 ? styles.white : styles.gray50 }}>
+                <td style={{ padding: '8px 6px', textAlign: 'center' }}>{idx + 1}</td>
+                <td style={{ padding: '8px 6px', maxWidth: 100 }} title={item.entidad}>{(item.entidad || '').substring(0, 15)}{(item.entidad || '').length > 15 ? '...' : ''}</td>
+                <td style={{ padding: '8px 6px', maxWidth: 80 }} title={item.area_organizacional}>{(item.area_organizacional || '').substring(0, 10)}{(item.area_organizacional || '').length > 10 ? '...' : ''}</td>
+                <td style={{ padding: '8px 6px', maxWidth: 100 }} title={item.sector}>{(item.sector || '').substring(0, 15)}{(item.sector || '').length > 15 ? '...' : ''}</td>
+                <td style={{ padding: '8px 6px', maxWidth: 100 }} title={item.pilar}>{(item.pilar || '').substring(0, 15)}{(item.pilar || '').length > 15 ? '...' : ''}</td>
+                <td style={{ padding: '8px 6px', maxWidth: 100 }} title={item.eje}>{(item.eje || '').substring(0, 15)}{(item.eje || '').length > 15 ? '...' : ''}</td>
+                <td style={{ padding: '8px 6px' }}>{item.codi_meta}</td>
+                <td style={{ padding: '8px 6px' }}>{item.codi_resultado}</td>
+                <td style={{ padding: '8px 6px' }}>{item.codi_accion}</td>
+                <td style={{ padding: '8px 6px', fontWeight: 600 }}>{item.codi}</td>
+                <td style={{ padding: '8px 6px', maxWidth: 200 }} title={item.indicador_resultado}>{(item.indicador_resultado || '').substring(0, 40)}{(item.indicador_resultado || '').length > 40 ? '...' : ''}</td>
+                <td style={{ padding: '8px 6px', textAlign: 'center' }}>
+                  <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 600, background: item.estado === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: item.estado === 'ACTIVO' ? styles.green : styles.red }}>{item.estado}</span>
+                </td>
+                <td style={{ padding: '8px 6px', textAlign: 'center' }}>
+                  <button onClick={() => openModal(item)} data-testid={`btn-edit-${item.id_indicador}`} style={{ padding: '4px 10px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}>✏️ Editar</button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: styles.white, borderRadius: 8, width: '90%', maxWidth: 900, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
+            <div style={{ background: styles.black, color: styles.white, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>{editingItem ? 'Editar Indicador' : 'Nuevo Indicador'}</h3>
+              <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', color: styles.white, fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+            </div>
+            
+            <div style={{ padding: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                {/* Left Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div>
+                    <label style={labelStyle}>Entidad</label>
+                    <select value={formData.id_entidad} onChange={(e) => setFormData({...formData, id_entidad: e.target.value})} style={inputStyle}>
+                      <option value="">-- Seleccionar --</option>
+                      {entidades.map(e => <option key={e.id_entidad} value={e.id_entidad}>{e.entidad}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Área Organizacional</label>
+                    <select value={formData.id_area} onChange={(e) => setFormData({...formData, id_area: e.target.value})} style={inputStyle}>
+                      <option value="">-- Seleccionar --</option>
+                      {areas.map(a => <option key={a.id_area} value={a.id_area}>{a.area_organizacional}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Sector</label>
+                    <select value={formData.id_sector} onChange={(e) => setFormData({...formData, id_sector: e.target.value})} style={inputStyle}>
+                      <option value="">-- Seleccionar --</option>
+                      {sectores.map(s => <option key={s.id_sector} value={s.id_sector}>{s.sector}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Pilar</label>
+                    <select value={formData.id_pilar} onChange={(e) => setFormData({...formData, id_pilar: e.target.value})} style={inputStyle}>
+                      <option value="">-- Seleccionar --</option>
+                      {pilares.map(p => <option key={p.id_pilar} value={p.id_pilar}>{p.pilar}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Eje</label>
+                    <select value={formData.id_eje} onChange={(e) => setFormData({...formData, id_eje: e.target.value})} style={inputStyle}>
+                      <option value="">-- Seleccionar --</option>
+                      {ejes.map(ej => <option key={ej.id_eje} value={ej.id_eje}>{ej.eje}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Meta</label>
+                    <select value={formData.codi_meta} onChange={(e) => setFormData({...formData, codi_meta: e.target.value})} style={inputStyle}>
+                      <option value="">-- Seleccionar --</option>
+                      {metas.map(m => <option key={m.id_meta} value={m.codi_meta}>{m.codi_meta} - {(m.meta || '').substring(0, 60)}...</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Resultado</label>
+                    <select value={formData.codi_resultado} onChange={(e) => setFormData({...formData, codi_resultado: e.target.value})} style={inputStyle}>
+                      <option value="">-- Seleccionar --</option>
+                      {resultados.map(r => <option key={r.id_resultado} value={r.codi_resultado}>{r.codi_resultado} - {(r.resultado || '').substring(0, 60)}...</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Código Acción</label>
+                    <input type="text" value={formData.codi_accion} onChange={(e) => setFormData({...formData, codi_accion: e.target.value})} style={inputStyle} placeholder="Ingrese código" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Acción</label>
+                    <select value={formData.codi_accion} onChange={(e) => setFormData({...formData, codi_accion: e.target.value})} style={inputStyle}>
+                      <option value="">-- Seleccionar --</option>
+                      {acciones.map(a => <option key={a.id_accion} value={a.codi_accion}>{a.codi_accion} - {(a.accion || '').substring(0, 60)}...</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div>
+                    <label style={labelStyle}>Código</label>
+                    <input type="text" value={formData.codi} onChange={(e) => setFormData({...formData, codi: e.target.value})} style={inputStyle} placeholder="Ej: IND-001" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Indicador</label>
+                    <textarea value={formData.indicador_resultado} onChange={(e) => setFormData({...formData, indicador_resultado: e.target.value})} style={{ ...inputStyle, minHeight: 80, resize: 'vertical' }} placeholder="Descripción del indicador" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Fórmula</label>
+                    <textarea value={formData.formula_indicador} onChange={(e) => setFormData({...formData, formula_indicador: e.target.value})} style={{ ...inputStyle, minHeight: 60, resize: 'vertical' }} placeholder="Fórmula del indicador" />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={labelStyle}>Año Base</label>
+                      <input type="number" value={formData.anio_base} onChange={(e) => setFormData({...formData, anio_base: e.target.value})} style={inputStyle} placeholder="2020" />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Línea Base</label>
+                      <input type="number" step="0.01" value={formData.linea_base} onChange={(e) => setFormData({...formData, linea_base: e.target.value})} style={inputStyle} placeholder="0.00" />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={labelStyle}>Año Logro</label>
+                      <input type="number" value={formData.anio_logro} onChange={(e) => setFormData({...formData, anio_logro: e.target.value})} style={inputStyle} placeholder="2025" />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Logro</label>
+                      <input type="number" step="0.01" value={formData.logro} onChange={(e) => setFormData({...formData, logro: e.target.value})} style={inputStyle} placeholder="0.00" />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Estado</label>
+                    <select value={formData.estado} onChange={(e) => setFormData({...formData, estado: e.target.value})} style={inputStyle}>
+                      <option value="ACTIVO">ACTIVO</option>
+                      <option value="INACTIVO">INACTIVO</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 16, borderTop: `1px solid ${styles.gray200}` }}>
+                <button onClick={() => setShowModal(false)} style={{ padding: '10px 24px', background: styles.gray200, color: styles.gray700, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
+                  Volver
+                </button>
+                <button onClick={handleSave} data-testid="btn-grabar-indicador" style={{ padding: '10px 24px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
+                  💾 Grabar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
