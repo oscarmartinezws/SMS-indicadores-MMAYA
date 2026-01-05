@@ -908,10 +908,22 @@ function SeguimientoView({ user, siteConfig }) {
   const [newFile, setNewFile] = useState({ nombre: '', descripcion: '', url: '', file: null });
   const [showProgramadoModal, setShowProgramadoModal] = useState(false);
   const [programadoTemp, setProgramadoTemp] = useState('');
+  const [sumaProgramado, setSumaProgramado] = useState(0);
 
   const isAdmin = user?.rol === 'ADMINISTRADOR';
   const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
   const mesesCortos = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+
+  // Fetch suma programado for selected indicator
+  const fetchSumaProgramado = async (id_indicador) => {
+    try {
+      const res = await fetch(`${API_URL}/api/sms/rendicion/suma_programado/${id_indicador}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSumaProgramado(data.suma_programado || 0);
+      }
+    } catch (err) { console.error(err); }
+  };
 
   useEffect(() => {
     // Load years from config
