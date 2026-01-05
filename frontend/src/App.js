@@ -962,6 +962,8 @@ function SeguimientoView({ user, siteConfig }) {
     if (selectedIndicador) {
       fetch(`${API_URL}/api/sms/rendicion/${selectedIndicador.id_indicador}/${gestion}`)
         .then(r => r.json()).then(data => setRendicion(data || {})).catch(console.error);
+      // Also fetch the sum of all programado values for this indicator
+      fetchSumaProgramado(selectedIndicador.id_indicador);
     }
   }, [selectedIndicador, gestion]);
 
@@ -973,11 +975,24 @@ function SeguimientoView({ user, siteConfig }) {
     setShowProgramadoModal(true);
   };
 
-  // Save programado
+  // Save programado with validation against global goal
   const saveProgramado = async () => {
     if (!selectedIndicador) return;
     try {
       const newProgramado = parseFloat(programadoTemp) || 0;
+      const globalGoal = parseFloat(selectedIndicador?.logro) || 0;
+      const currentProgramado = parseFloat(rendicion.programado) || 0;
+      
+      // Calculate what the new total would be
+      // sumaProgramado includes the current year's programado, so we need to subtract it and add the new value
+      const newSumaTotal = sumaProgramado - currentProgramado + newProgramado;
+      
+      // Validation: new total cannot exceed global goal
+      if (globalGoal > 0 && newSumaTotal > globalGoal) {
+        alert(`⚠️ El valor programado excede la meta global.\n\nMeta global: ${globalGoal}\nSuma actual de programados: ${sumaProgramado}\nNuevo total sería: ${newSumaTotal.toFixed(3)}\n\nPor favor ingrese un valor menor o igual a ${(globalGoal - sumaProgramado + currentProgramado).toFixed(3)}`);
+        return;
+      }
+      
       const res = await fetch(`${API_URL}/api/sms/rendicion/programado`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -989,6 +1004,8 @@ function SeguimientoView({ user, siteConfig }) {
       });
       if (res.ok) {
         setRendicion(prev => ({ ...prev, programado: newProgramado }));
+        // Update suma programado to reflect the change
+        setSumaProgramado(newSumaTotal);
         setShowProgramadoModal(false);
         alert('Programado guardado exitosamente');
       } else {
