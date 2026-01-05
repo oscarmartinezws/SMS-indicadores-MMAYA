@@ -1327,11 +1327,17 @@ function SeguimientoView({ user, siteConfig }) {
           </div>
           
           {selectedIndicador && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginTop: 16, paddingTop: 16, borderTop: `1px solid ${styles.gray200}` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16, marginTop: 16, paddingTop: 16, borderTop: `1px solid ${styles.gray200}` }}>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>AÑO BASE</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.anio_base || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LÍNEA BASE</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.linea_base || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>AÑO LOGRO</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.anio_logro || '-'}</div></div>
-              <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LOGRO PROGRAMADO</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.logro || '-'}</div></div>
+              <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LOGRO PROGRAMADO (META)</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.logro || '-'}</div></div>
+              <div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>SUMA PROGRAMADO (TODOS LOS AÑOS)</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: sumaProgramado > (parseFloat(selectedIndicador.logro) || 0) ? styles.red : styles.green }}>
+                  {sumaProgramado.toFixed(3)} / {selectedIndicador.logro || '-'}
+                </div>
+              </div>
             </div>
           )}
         </div>
