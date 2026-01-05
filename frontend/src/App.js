@@ -906,7 +906,10 @@ function SeguimientoView({ user, siteConfig }) {
   const [showFileModal, setShowFileModal] = useState(false);
   const [adjuntos, setAdjuntos] = useState([]);
   const [newFile, setNewFile] = useState({ nombre: '', descripcion: '', url: '', file: null });
+  const [showProgramadoModal, setShowProgramadoModal] = useState(false);
+  const [programadoTemp, setProgramadoTemp] = useState('');
 
+  const isAdmin = user?.rol === 'ADMINISTRADOR';
   const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
   const mesesCortos = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 
