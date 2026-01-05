@@ -244,6 +244,16 @@ app.get('/api/sms/entidades/:id/areas', async (req, res) => {
   }
 });
 
+// Alias for areas by entidad
+app.get('/api/sms/areas_by_entidad/:id', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM area WHERE id_entidad = $1 ORDER BY id_area', [req.params.id]);
+    res.json(result.rows.map(r => ({ id: r.id_area, nombre: r.area_organizacional, estado: r.estado || 'ACTIVO' })));
+  } catch (err) {
+    res.status(500).json({ detail: 'Error al obtener áreas' });
+  }
+});
+
 app.post('/api/sms/areas', async (req, res) => {
   try {
     const { nombre, id_entidad, estado } = req.body;
