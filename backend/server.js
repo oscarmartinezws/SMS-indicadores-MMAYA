@@ -514,7 +514,16 @@ app.get('/api/sms/usuarios', async (req, res) => {
        ORDER BY u.id_usuario`
     );
     res.json(result.rows.map(r => ({
-      id: r.id_usuario, usuario: r.username, nombre: r.nombre, id_rol: r.id_rol, rol: r.rol, id_area: r.id_area, area: r.area, estado: r.estado || 'ACTIVO'
+      id_usuario: r.id_usuario, 
+      nro_documento: r.nro_documento,
+      username: r.username, 
+      nombre: r.nombre, 
+      id_rol: r.id_rol, 
+      rol: r.rol, 
+      id_area: r.id_area, 
+      area: r.area, 
+      estado: r.estado || 'ACTIVO',
+      fecha_creacion: r.fecha_creacion
     })));
   } catch (err) {
     res.status(500).json({ detail: 'Error al obtener usuarios' });
