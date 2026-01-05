@@ -1340,11 +1340,25 @@ function SeguimientoView({ user, siteConfig }) {
           </div>
           
           {selectedIndicador && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16, marginTop: 16, paddingTop: 16, borderTop: `1px solid ${styles.gray200}` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, marginTop: 16, paddingTop: 16, borderTop: `1px solid ${styles.gray200}` }}>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>AÑO BASE</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.anio_base || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LÍNEA BASE</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.linea_base || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>AÑO LOGRO</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.anio_logro || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LOGRO PROGRAMADO (META)</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.logro || '-'}</div></div>
+              <div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: (() => {
+                  const meta = parseFloat(selectedIndicador.logro) || 0;
+                  const porcentaje = meta > 0 ? (sumaLogrado / meta) * 100 : 0;
+                  return porcentaje >= 100 ? styles.green : (porcentaje >= 50 ? '#F59E0B' : styles.red);
+                })() }}>
+                  {(() => {
+                    const meta = parseFloat(selectedIndicador.logro) || 0;
+                    const porcentaje = meta > 0 ? (sumaLogrado / meta) * 100 : 0;
+                    return `${porcentaje.toFixed(2)}%`;
+                  })()}
+                </div>
+              </div>
               <div>
                 <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>SUMA PROGRAMADO (TODOS LOS AÑOS)</div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 600, color: sumaProgramado > (parseFloat(selectedIndicador.logro) || 0) ? styles.red : styles.green }}>
