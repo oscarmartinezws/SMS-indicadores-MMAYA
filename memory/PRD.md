@@ -84,8 +84,10 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 
 ### Catálogos (CRUD)
 - [x] Sectores
-- [x] Entidades
-- [x] Áreas
+- [x] **Entidades con Áreas** (vista dual):
+  - Sección izquierda: Grid de entidades con botones editar y ver áreas
+  - Sección derecha: Áreas organizacionales de la entidad seleccionada
+  - Relación 1:N entre entidad y áreas
 - [x] Pilares
 - [x] Ejes
 - [x] Metas
