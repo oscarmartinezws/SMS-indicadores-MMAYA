@@ -205,5 +205,7 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - `GET /api/sms/matriz_parametros` - Indicadores (filtrado por rol)
 - `GET /api/sms/rendicion/:id/:gestion` - Obtener rendición
 - `POST /api/sms/rendicion` - Guardar rendición
+- `POST /api/sms/rendicion/programado` - Guardar solo PROGRAMADO anual
+- `GET /api/sms/rendicion/suma_programado/:id` - Suma de todos los PROGRAMADO
 - `GET /api/sms/dashboard/summary` - Datos del dashboard
 - `GET/POST /api/sms/configuracion` - Configuración del sistema
