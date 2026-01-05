@@ -338,19 +338,6 @@ function IndicadoresView({ user }) {
     const item = catalogs.acciones.find(a => a.codigo === codigo);
     return item ? item.nombre : '-';
   };
-        estado: item.estado || 'ACTIVO'
-      });
-    } else {
-      setEditingItem(null);
-      setFormData({
-        id_entidad: '', id_area: '', id_sector: '', id_pilar: '', id_eje: '',
-        codi_meta: '', codi_resultado: '', codi_accion: '', codi: '',
-        indicador_resultado: '', formula_indicador: '', anio_base: '',
-        linea_base: '', anio_logro: '', logro: '', estado: 'ACTIVO'
-      });
-    }
-    setShowModal(true);
-  };
 
   const handleSave = async () => {
     const requiredFields = [
