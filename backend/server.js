@@ -921,6 +921,38 @@ app.post('/api/sms/rendicion', async (req, res) => {
   }
 });
 
+// Update only PROGRAMADO for a specific indicator and year
+app.post('/api/sms/rendicion/programado', async (req, res) => {
+  try {
+    const { id_indicador, gestion, programado } = req.body;
+    
+    // Check if rendicion exists
+    const existing = await pool.query(
+      'SELECT id_rendicion FROM rendicion WHERE id_indicador = $1 AND gestion = $2',
+      [id_indicador, gestion]
+    );
+    
+    if (existing.rows.length > 0) {
+      // Update only programado
+      await pool.query(
+        'UPDATE rendicion SET programado = $1 WHERE id_indicador = $2 AND gestion = $3',
+        [programado, id_indicador, gestion]
+      );
+    } else {
+      // Insert new record with programado
+      await pool.query(
+        'INSERT INTO rendicion (id_indicador, gestion, programado) VALUES ($1, $2, $3)',
+        [id_indicador, gestion, programado]
+      );
+    }
+    
+    res.json({ message: 'Programado guardado', programado });
+  } catch (err) {
+    console.error('Error saving programado:', err);
+    res.status(500).json({ detail: 'Error al guardar programado' });
+  }
+});
+
 // ========== Configuracion ==========
 app.get('/api/sms/configuracion', async (req, res) => {
   try {
