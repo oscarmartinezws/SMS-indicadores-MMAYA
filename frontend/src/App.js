@@ -955,6 +955,39 @@ function SeguimientoView({ user, siteConfig }) {
 
   const handleChange = (field, value) => setRendicion(prev => ({ ...prev, [field]: value }));
 
+  // Open programado modal
+  const openProgramadoModal = () => {
+    setProgramadoTemp(rendicion.programado || selectedIndicador?.logro || '');
+    setShowProgramadoModal(true);
+  };
+
+  // Save programado
+  const saveProgramado = async () => {
+    if (!selectedIndicador) return;
+    try {
+      const newProgramado = parseFloat(programadoTemp) || 0;
+      const res = await fetch(`${API_URL}/api/sms/rendicion/programado`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          id_indicador: selectedIndicador.id_indicador, 
+          gestion, 
+          programado: newProgramado 
+        })
+      });
+      if (res.ok) {
+        setRendicion(prev => ({ ...prev, programado: newProgramado }));
+        setShowProgramadoModal(false);
+        alert('Programado guardado exitosamente');
+      } else {
+        alert('Error al guardar el programado');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error al guardar el programado');
+    }
+  };
+
   const saveRendicion = async () => {
     if (!selectedIndicador) return;
     try {
