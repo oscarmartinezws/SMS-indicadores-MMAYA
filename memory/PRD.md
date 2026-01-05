@@ -211,5 +211,6 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - `POST /api/sms/rendicion` - Guardar rendición
 - `POST /api/sms/rendicion/programado` - Guardar solo PROGRAMADO anual
 - `GET /api/sms/rendicion/suma_programado/:id` - Suma de todos los PROGRAMADO
+- `GET /api/sms/rendicion/suma_logrado/:id` - Suma de todos los LOGRADO
 - `GET /api/sms/dashboard/summary` - Datos del dashboard
 - `GET/POST /api/sms/configuracion` - Configuración del sistema
