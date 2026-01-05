@@ -926,6 +926,18 @@ app.post('/api/sms/rendicion/programado', async (req, res) => {
   try {
     const { id_indicador, gestion, programado } = req.body;
     
+    // Get id_area from the indicator
+    const indicador = await pool.query(
+      'SELECT id_area FROM matriz_parametro WHERE id_indicador = $1',
+      [id_indicador]
+    );
+    
+    if (indicador.rows.length === 0) {
+      return res.status(404).json({ detail: 'Indicador no encontrado' });
+    }
+    
+    const id_area = indicador.rows[0].id_area;
+    
     // Check if rendicion exists
     const existing = await pool.query(
       'SELECT id_rendicion FROM rendicion WHERE id_indicador = $1 AND gestion = $2',
@@ -939,10 +951,10 @@ app.post('/api/sms/rendicion/programado', async (req, res) => {
         [programado, id_indicador, gestion]
       );
     } else {
-      // Insert new record with programado
+      // Insert new record with programado and id_area
       await pool.query(
-        'INSERT INTO rendicion (id_indicador, gestion, programado) VALUES ($1, $2, $3)',
-        [id_indicador, gestion, programado]
+        'INSERT INTO rendicion (id_indicador, gestion, programado, id_area, estado_indicador) VALUES ($1, $2, $3, $4, $5)',
+        [id_indicador, gestion, programado, id_area, 'PENDIENTE']
       );
     }
     
