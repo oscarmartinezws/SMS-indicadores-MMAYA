@@ -1373,7 +1373,20 @@ function SeguimientoView({ user, siteConfig }) {
                   );
                 })}
                 <td style={{ ...rowStyle, textAlign: 'center', background: '#DBEAFE' }}></td>
-                <td style={{ ...rowStyle, textAlign: 'center', background: '#FEE2E2' }}></td>
+                <td style={{ ...rowStyle, textAlign: 'center', background: '#FEE2E2', fontWeight: 600, color: styles.red }}>
+                  {(() => {
+                    // Calculate total LOGRADO / PROGRAMADO * 100
+                    let totalLogrado = 0;
+                    mesesCortos.forEach(m => {
+                      totalLogrado += parseFloat(rendicion[`ejecutado_${m.toLowerCase()}`]) || 0;
+                    });
+                    const programado = parseFloat(rendicion.programado) || parseFloat(selectedIndicador?.logro) || 0;
+                    if (programado > 0 && totalLogrado > 0) {
+                      return `${((totalLogrado / programado) * 100).toFixed(2)}%`;
+                    }
+                    return '';
+                  })()}
+                </td>
               </tr>
               
               {/* Row ACUMULADO - Calculated, Read-only */}
