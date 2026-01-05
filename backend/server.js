@@ -890,6 +890,20 @@ app.get('/api/sms/rendicion/suma_programado/:id_indicador', async (req, res) => 
   }
 });
 
+// Get sum of LOGRADO for an indicator across all years
+app.get('/api/sms/rendicion/suma_logrado/:id_indicador', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT COALESCE(SUM(logrado), 0) as suma_logrado FROM rendicion WHERE id_indicador = $1',
+      [req.params.id_indicador]
+    );
+    res.json({ suma_logrado: parseFloat(result.rows[0].suma_logrado) || 0 });
+  } catch (err) {
+    console.error('Error getting suma logrado:', err);
+    res.status(500).json({ detail: 'Error al obtener suma logrado' });
+  }
+});
+
 app.get('/api/sms/rendicion/:id_indicador/:gestion', async (req, res) => {
   try {
     const result = await pool.query(
