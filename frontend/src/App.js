@@ -1539,6 +1539,56 @@ function SeguimientoView({ user, siteConfig }) {
           </div>
         </div>
       )}
+
+      {/* Modal for editing PROGRAMADO - Only Admin */}
+      {showProgramadoModal && isAdmin && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
+          <div style={{ background: styles.white, borderRadius: 10, padding: 0, maxWidth: 400, width: '90%', overflow: 'hidden' }}>
+            <div style={{ background: styles.blue, color: styles.white, padding: '16px 20px' }}>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Editar PROGRAMADO del Año</h3>
+            </div>
+            <div style={{ padding: 20 }}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: '0.8rem', color: styles.gray700 }}>
+                  Indicador: {selectedIndicador?.codi}
+                </label>
+                <div style={{ fontSize: '0.85rem', color: styles.gray600, marginBottom: 12 }}>
+                  {selectedIndicador?.indicador_resultado?.substring(0, 100)}...
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: '0.8rem', color: styles.gray700 }}>
+                  Año de Gestión: {gestion}
+                </label>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: '0.8rem', color: styles.gray700 }}>
+                  PROGRAMADO
+                </label>
+                <input 
+                  type="number" 
+                  step="0.001"
+                  value={programadoTemp} 
+                  onChange={(e) => setProgramadoTemp(e.target.value)} 
+                  style={{ width: '100%', padding: 12, border: `2px solid ${styles.blue}`, borderRadius: 6, fontSize: '1rem', fontWeight: 600, boxSizing: 'border-box' }}
+                  placeholder="Ingrese el valor programado"
+                />
+              </div>
+              <div style={{ fontSize: '0.75rem', color: styles.gray500, marginBottom: 16 }}>
+                Logro global del indicador: {selectedIndicador?.logro || '-'}
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => setShowProgramadoModal(false)} style={{ flex: 1, padding: 12, border: `2px solid ${styles.gray300}`, background: 'transparent', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
+                  Cancelar
+                </button>
+                <button onClick={saveProgramado} data-testid="btn-save-programado" style={{ flex: 1, padding: 12, background: styles.blue, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
+                  💾 Guardar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
