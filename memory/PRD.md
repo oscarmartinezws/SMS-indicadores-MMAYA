@@ -39,6 +39,19 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - [x] Estructura jerárquica (separadores y opciones)
 - [x] Configuración de permisos por rol
 
+### Gestión de Indicadores (Mantenedor) - NUEVO
+- [x] Grid con todos los indicadores
+- [x] Columnas: #, ENTIDAD, ÁREA, SECTOR, PILAR, EJE, META, RESULTADO, ACCIÓN, CÓDIGO, INDICADOR, ESTADO, ACCIONES
+- [x] Botón "Adicionar" para crear nuevos indicadores
+- [x] Modal de edición con dos columnas:
+  - Izquierda: ENTIDAD, ÁREA, SECTOR, PILAR, EJE, META, RESULTADO, ACCIÓN (combos)
+  - Derecha: CÓDIGO, INDICADOR, FÓRMULA, AÑO BASE, LÍNEA BASE, AÑO LOGRO, LOGRO, ESTADO
+- [x] Combos cargan datos de catálogos existentes
+- [x] Guarda solo códigos/IDs en tabla matriz_parametro
+- [x] Botón "Editar" para modificar registros existentes
+- [x] Validación de campos requeridos
+- [x] Endpoint /api/sms/indicadores_full con joins a catálogos
+
 ### Seguimiento de Indicadores
 - [x] Selección de indicador
 - [x] Registro mensual de ejecución
