@@ -409,31 +409,32 @@ function IndicadoresView({ user }) {
 
   const inputStyle = { width: '100%', padding: '8px 10px', border: `1px solid ${styles.gray300}`, borderRadius: 4, fontSize: '0.85rem' };
   const labelStyle = { display: 'block', fontSize: '0.7rem', fontWeight: 600, color: styles.gray600, marginBottom: 4, textTransform: 'uppercase' };
+  const readOnlyStyle = { width: '100%', padding: '10px 12px', background: styles.gray100, border: `1px solid ${styles.gray200}`, borderRadius: 4, fontSize: '0.85rem', color: styles.gray700, minHeight: 40 };
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ fontWeight: 700, fontSize: '1.2rem', margin: 0 }}>Banco de Indicadores</h2>
         {isAdmin && (
-          <button onClick={() => openModal()} data-testid="btn-adicionar-indicador" style={{ padding: '10px 20px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => openModal(null, false)} data-testid="btn-adicionar-indicador" style={{ padding: '10px 20px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
             ➕ Adicionar
           </button>
         )}
       </div>
 
-      {/* Grid - Only codes, no descriptions */}
+      {/* Grid - Only codes */}
       <div style={{ background: styles.white, borderRadius: 6, overflow: 'auto', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
           <thead>
             <tr style={{ background: styles.black, color: styles.white }}>
-              {['#', 'ENTIDAD', 'ÁREA', 'SECTOR', 'PILAR', 'EJE', 'META', 'RESULTADO', 'ACCIÓN', 'CÓDIGO', 'INDICADOR', 'ESTADO', ...(isAdmin ? ['ACCIONES'] : [])].map(h => (
+              {['#', 'ENTIDAD', 'ÁREA', 'SECTOR', 'PILAR', 'EJE', 'META', 'RESULTADO', 'ACCIÓN', 'CÓDIGO', 'INDICADOR', 'ESTADO', 'ACCIONES'].map(h => (
                 <th key={h} style={{ padding: '10px 8px', textAlign: 'center', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {paginatedData.length === 0 ? (
-              <tr><td colSpan={isAdmin ? 13 : 12} style={{ textAlign: 'center', padding: 24, color: styles.gray500 }}>No hay indicadores</td></tr>
+              <tr><td colSpan={13} style={{ textAlign: 'center', padding: 24, color: styles.gray500 }}>No hay indicadores</td></tr>
             ) : paginatedData.map((item, idx) => (
               <tr key={item.id_indicador} style={{ borderBottom: `1px solid ${styles.gray200}`, background: idx % 2 === 0 ? styles.white : styles.gray50 }}>
                 <td style={{ padding: '8px', textAlign: 'center' }}>{(currentPage - 1) * PAGE_SIZE + idx + 1}</td>
@@ -450,11 +451,13 @@ function IndicadoresView({ user }) {
                 <td style={{ padding: '8px', textAlign: 'center' }}>
                   <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 600, background: item.estado === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: item.estado === 'ACTIVO' ? styles.green : styles.red }}>{item.estado}</span>
                 </td>
-                {isAdmin && (
-                  <td style={{ padding: '8px', textAlign: 'center' }}>
-                    <button onClick={() => openModal(item)} data-testid={`btn-edit-${item.id_indicador}`} style={{ padding: '4px 10px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}>✏️</button>
-                  </td>
-                )}
+                <td style={{ padding: '8px', textAlign: 'center' }}>
+                  {isAdmin ? (
+                    <button onClick={() => openModal(item, false)} data-testid={`btn-edit-${item.id_indicador}`} style={{ padding: '4px 10px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}>✏️ Editar</button>
+                  ) : (
+                    <button onClick={() => openModal(item, true)} data-testid={`btn-view-${item.id_indicador}`} style={{ padding: '4px 10px', background: styles.gray600, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}>👁 Ver</button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
