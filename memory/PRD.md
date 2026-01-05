@@ -134,6 +134,16 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 
 ## Tareas Completadas (Enero 2025)
 
+### 2025-01-05
+- ✅ **Mejoras de PROGRAMADO en vista Seguimiento**:
+  - Muestra suma de todos los PROGRAMADO anuales junto a la meta global
+  - Validación: no permite guardar si excede la meta global
+  - Modal muestra información completa: meta, suma actual, disponible
+  - Color verde/rojo según estado (cumple/excede meta)
+  - Nuevo endpoint: `GET /api/sms/rendicion/suma_programado/:id`
+  - Arreglado bug de ruta (endpoint movido antes de rutas parametrizadas)
+  - Testing completo con testing agent (100% éxito - 9/9 pruebas)
+
 ### 2025-01-04
 - ✅ Implementación de campos calculados en vista Seguimiento
   - `% EJEC` calculado automáticamente
