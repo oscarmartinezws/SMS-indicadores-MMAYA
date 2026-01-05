@@ -1344,7 +1344,12 @@ function SeguimientoView({ user, siteConfig }) {
                   );
                 })}
                 <td style={{ ...rowStyle, textAlign: 'center', background: '#DBEAFE', fontWeight: 600, color: styles.blue }}>
-                  {rendicion.programado || selectedIndicador?.logro || '-'}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    <span>{rendicion.programado || selectedIndicador?.logro || '-'}</span>
+                    {isAdmin && (
+                      <button onClick={openProgramadoModal} data-testid="btn-edit-programado" style={{ padding: '2px 6px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.65rem' }}>✏️</button>
+                    )}
+                  </div>
                 </td>
                 <td style={{ ...rowStyle, textAlign: 'center', background: '#FEE2E2', fontWeight: 600, color: styles.red }}>
                   {rendicion.logrado || '-'}
