@@ -1627,25 +1627,48 @@ function SeguimientoView({ user, siteConfig }) {
                   style={{ padding: '10px 20px', background: styles.gray200, color: styles.gray700, border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}>Cancelar</button>
                 <button onClick={async () => {
                   if (!newFile.nombre) { alert('Ingrese un nombre para el archivo'); return; }
-                  let fileUrl = newFile.url;
-                  if (newFile.file && !newFile.url) {
-                    // Upload file
+                  if (!selectedIndicador) { alert('Seleccione un indicador'); return; }
+                  
+                  try {
                     const formData = new FormData();
-                    formData.append('file', newFile.file);
-                    try {
-                      const res = await fetch(`${API_URL}/api/sms/configuracion/upload/adjunto`, { method: 'POST', body: formData });
-                      if (res.ok) {
-                        const data = await res.json();
-                        fileUrl = data.url;
-                      }
-                    } catch (err) { console.error(err); }
-                  }
-                  if (fileUrl || newFile.url) {
-                    setAdjuntos(prev => [...prev, { nombre: newFile.nombre, descripcion: newFile.descripcion, url: fileUrl || newFile.url, size: newFile.size || '-' }]);
-                    setShowFileModal(false);
-                    setNewFile({ nombre: '', descripcion: '', url: '', file: null });
-                  } else {
-                    alert('Seleccione un archivo o ingrese una URL');
+                    formData.append('id_indicador', selectedIndicador.id_indicador);
+                    formData.append('gestion', gestion);
+                    formData.append('nombre', newFile.nombre);
+                    formData.append('descripcion', newFile.descripcion || '');
+                    
+                    if (newFile.file) {
+                      formData.append('file', newFile.file);
+                    } else if (newFile.url) {
+                      formData.append('url', newFile.url);
+                    } else {
+                      alert('Seleccione un archivo o ingrese una URL');
+                      return;
+                    }
+                    
+                    const res = await fetch(`${API_URL}/api/sms/rendicion/adjuntos`, { 
+                      method: 'POST', 
+                      body: formData 
+                    });
+                    
+                    if (res.ok) {
+                      const data = await res.json();
+                      setAdjuntos(prev => [...prev, {
+                        id: data.archivo.id,
+                        nombre: data.archivo.nombre,
+                        descripcion: data.archivo.descripcion,
+                        url: data.archivo.url,
+                        size: data.archivo.size ? `${(data.archivo.size / 1024).toFixed(1)} KB` : '-'
+                      }]);
+                      setShowFileModal(false);
+                      setNewFile({ nombre: '', descripcion: '', url: '', file: null });
+                      alert('Archivo guardado correctamente');
+                    } else {
+                      const error = await res.json();
+                      alert('Error al guardar archivo: ' + (error.detail || 'Error desconocido'));
+                    }
+                  } catch (err) { 
+                    console.error(err); 
+                    alert('Error al guardar archivo');
                   }
                 }} 
                   style={{ padding: '10px 20px', background: styles.black, color: '#FFF', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}>Guardar</button>
