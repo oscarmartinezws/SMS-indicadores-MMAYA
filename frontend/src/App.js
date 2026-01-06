@@ -1570,13 +1570,13 @@ function SeguimientoView({ user, siteConfig }) {
               <tr><td colSpan={4} style={{ ...rowStyle, textAlign: 'center', color: styles.gray500, padding: 24 }}>No hay archivos adjuntos</td></tr>
             ) : (
               adjuntos.map((adj, idx) => (
-                <tr key={idx} style={{ borderBottom: `1px solid ${styles.gray200}` }}>
+                <tr key={adj.id || idx} style={{ borderBottom: `1px solid ${styles.gray200}` }}>
                   <td style={rowStyle}>{adj.nombre}</td>
                   <td style={rowStyle}>{adj.descripcion || '-'}</td>
                   <td style={rowStyle}>{adj.size || '-'}</td>
                   <td style={{ ...rowStyle, textAlign: 'center' }}>
-                    <a href={adj.url} target="_blank" rel="noopener noreferrer" style={{ color: styles.blue, marginRight: 8 }}>⬇️</a>
-                    <button onClick={() => setAdjuntos(prev => prev.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: styles.red, cursor: 'pointer' }}>🗑️</button>
+                    <a href={adj.url.startsWith('http') ? adj.url : `${API_URL}${adj.url}`} target="_blank" rel="noopener noreferrer" style={{ color: styles.blue, marginRight: 8 }}>⬇️</a>
+                    <button onClick={() => deleteAdjunto(adj.id)} style={{ background: 'none', border: 'none', color: styles.red, cursor: 'pointer' }}>🗑️</button>
                   </td>
                 </tr>
               ))
