@@ -1091,6 +1091,97 @@ app.get('/api/sms/uploads/:filename', (req, res) => {
   }
 });
 
+// ========== Archivos Adjuntos de Rendición ==========
+// Get adjuntos for a specific indicator and year
+app.get('/api/sms/rendicion/adjuntos/:id_indicador/:gestion', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, nombre_original as nombre, descripcion, nombre_almacenado as url, 
+              tamano_bytes as size, fecha_carga 
+       FROM archivos_rendicion 
+       WHERE id_indicador = $1 AND gestion = $2 
+       ORDER BY fecha_carga DESC`,
+      [req.params.id_indicador, req.params.gestion]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error getting adjuntos:', err);
+    res.status(500).json({ detail: 'Error al obtener archivos adjuntos' });
+  }
+});
+
+// Add new adjunto
+app.post('/api/sms/rendicion/adjuntos', upload.single('file'), async (req, res) => {
+  try {
+    const { id_indicador, gestion, nombre, descripcion } = req.body;
+    
+    if (!id_indicador || !gestion) {
+      return res.status(400).json({ detail: 'id_indicador y gestion son requeridos' });
+    }
+    
+    let nombreOriginal = nombre || 'Sin nombre';
+    let nombreAlmacenado = '';
+    let tamanoBytes = 0;
+    
+    if (req.file) {
+      nombreOriginal = nombre || req.file.originalname;
+      nombreAlmacenado = `/api/sms/uploads/${req.file.filename}`;
+      tamanoBytes = req.file.size;
+    } else if (req.body.url) {
+      nombreAlmacenado = req.body.url;
+      tamanoBytes = 0;
+    } else {
+      return res.status(400).json({ detail: 'Se requiere un archivo o URL' });
+    }
+    
+    const result = await pool.query(
+      `INSERT INTO archivos_rendicion 
+       (id, id_indicador, gestion, nombre_original, nombre_almacenado, descripcion, tamano_bytes, fecha_carga)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, NOW())
+       RETURNING id, nombre_original as nombre, descripcion, nombre_almacenado as url, tamano_bytes as size, fecha_carga`,
+      [id_indicador, gestion, nombreOriginal, nombreAlmacenado, descripcion || '', tamanoBytes]
+    );
+    
+    res.json({ message: 'Archivo guardado', archivo: result.rows[0] });
+  } catch (err) {
+    console.error('Error saving adjunto:', err);
+    res.status(500).json({ detail: 'Error al guardar archivo adjunto' });
+  }
+});
+
+// Delete adjunto
+app.delete('/api/sms/rendicion/adjuntos/:id', async (req, res) => {
+  try {
+    // Get file info before deleting
+    const fileInfo = await pool.query(
+      'SELECT nombre_almacenado FROM archivos_rendicion WHERE id = $1',
+      [req.params.id]
+    );
+    
+    if (fileInfo.rows.length === 0) {
+      return res.status(404).json({ detail: 'Archivo no encontrado' });
+    }
+    
+    // Delete from database
+    await pool.query('DELETE FROM archivos_rendicion WHERE id = $1', [req.params.id]);
+    
+    // Try to delete physical file if it's a local file
+    const url = fileInfo.rows[0].nombre_almacenado;
+    if (url && url.startsWith('/api/sms/uploads/')) {
+      const filename = url.replace('/api/sms/uploads/', '');
+      const filePath = path.join(UPLOAD_DIR, filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+    
+    res.json({ message: 'Archivo eliminado' });
+  } catch (err) {
+    console.error('Error deleting adjunto:', err);
+    res.status(500).json({ detail: 'Error al eliminar archivo' });
+  }
+});
+
 // ========== Start Server ==========
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`SMS Backend (Node.js/Express) running on http://0.0.0.0:${PORT}`);
