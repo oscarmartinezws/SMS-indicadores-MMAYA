@@ -153,6 +153,11 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - Calidad mejorada (scale: 3, quality: 1.0)
   - Indicadores largos se ajustan en múltiples líneas
   - Leyenda explicativa al final del reporte
+- ✅ **Archivos Adjuntos funcionando**:
+  - Guardado persistente en tabla `archivos_rendicion`
+  - Nuevos endpoints: GET/POST/DELETE `/api/sms/rendicion/adjuntos/...`
+  - Archivos físicos en `/app/backend/uploads/`
+  - Carga automática al seleccionar indicador/año
 
 ### 2025-01-04
 - ✅ Implementación de campos calculados en vista Seguimiento
