@@ -977,8 +977,43 @@ function SeguimientoView({ user, siteConfig }) {
       // Also fetch the sum of all programado and logrado values for this indicator
       fetchSumaProgramado(selectedIndicador.id_indicador);
       fetchSumaLogrado(selectedIndicador.id_indicador);
+      // Fetch adjuntos for this indicator and year
+      fetchAdjuntos(selectedIndicador.id_indicador, gestion);
     }
   }, [selectedIndicador, gestion]);
+
+  // Fetch adjuntos for indicator/year
+  const fetchAdjuntos = async (id_indicador, gestion) => {
+    try {
+      const res = await fetch(`${API_URL}/api/sms/rendicion/adjuntos/${id_indicador}/${gestion}`);
+      if (res.ok) {
+        const data = await res.json();
+        setAdjuntos(data.map(a => ({
+          id: a.id,
+          nombre: a.nombre,
+          descripcion: a.descripcion,
+          url: a.url,
+          size: a.size ? `${(a.size / 1024).toFixed(1)} KB` : '-'
+        })));
+      }
+    } catch (err) { console.error('Error fetching adjuntos:', err); }
+  };
+
+  // Delete adjunto
+  const deleteAdjunto = async (id) => {
+    if (!window.confirm('¿Está seguro de eliminar este archivo?')) return;
+    try {
+      const res = await fetch(`${API_URL}/api/sms/rendicion/adjuntos/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setAdjuntos(prev => prev.filter(a => a.id !== id));
+      } else {
+        alert('Error al eliminar archivo');
+      }
+    } catch (err) { 
+      console.error(err); 
+      alert('Error al eliminar archivo');
+    }
+  };
 
   const handleChange = (field, value) => setRendicion(prev => ({ ...prev, [field]: value }));
 
