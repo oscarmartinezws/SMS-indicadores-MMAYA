@@ -1154,26 +1154,32 @@ function SeguimientoView({ user, siteConfig }) {
       const mesesCortos = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
       const mesesHeaders = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
       
-      // Fetch rendicion data for all indicators
+      // Fetch rendicion data and sums for all indicators
       const allData = await Promise.all(
         indicadores.map(async (ind) => {
           try {
-            const res = await fetch(`${API_URL}/api/sms/rendicion/${ind.id_indicador}/${gestion}`);
-            const rendData = res.ok ? await res.json() : {};
-            return { indicador: ind, rendicion: rendData };
+            const [rendRes, sumaProgramadoRes, sumaLogradoRes] = await Promise.all([
+              fetch(`${API_URL}/api/sms/rendicion/${ind.id_indicador}/${gestion}`),
+              fetch(`${API_URL}/api/sms/rendicion/suma_programado/${ind.id_indicador}`),
+              fetch(`${API_URL}/api/sms/rendicion/suma_logrado/${ind.id_indicador}`)
+            ]);
+            const rendData = rendRes.ok ? await rendRes.json() : {};
+            const sumaProg = sumaProgramadoRes.ok ? (await sumaProgramadoRes.json()).suma_programado : 0;
+            const sumaLog = sumaLogradoRes.ok ? (await sumaLogradoRes.json()).suma_logrado : 0;
+            return { indicador: ind, rendicion: rendData, sumaProgramado: sumaProg, sumaLogrado: sumaLog };
           } catch (e) {
-            return { indicador: ind, rendicion: {} };
+            return { indicador: ind, rendicion: {}, sumaProgramado: 0, sumaLogrado: 0 };
           }
         })
       );
       
-      // Build HTML content for PDF with 3 sub-rows per indicator
+      // Build HTML content for PDF - Single row per indicator
       const htmlContent = `
-        <div id="pdf-content" style="font-family: Arial, sans-serif; font-size: 9px; padding: 15px; width: 100%;">
-          <h1 style="font-size: 16px; text-align: center; margin-bottom: 5px; color: #333;">RENDICIÓN DE INDICADORES - GESTIÓN ${gestion}</h1>
-          <h2 style="font-size: 11px; text-align: center; color: #666; margin-bottom: 15px;">Sistema de Monitoreo Sectorial</h2>
+        <div id="pdf-content" style="font-family: 'Segoe UI', Arial, sans-serif; padding: 15px; width: 100%;">
+          <h1 style="font-size: 18px; text-align: center; margin-bottom: 8px; color: #1a1a1a; font-weight: 700;">SEGUIMIENTO DE INDICADORES - GESTIÓN ${gestion}</h1>
+          <h2 style="font-size: 12px; text-align: center; color: #666; margin-bottom: 15px; font-weight: 400;">Sistema de Monitoreo Sectorial</h2>
           
-          <div style="margin-bottom: 15px; padding: 10px; background: #f5f5f5; border-radius: 5px; display: flex; flex-wrap: wrap; gap: 15px;">
+          <div style="margin-bottom: 15px; padding: 12px; background: #f5f5f5; border-radius: 6px; display: flex; flex-wrap: wrap; gap: 20px; font-size: 10px;">
             <span><strong>Entidad:</strong> ${contexto.entidad || '-'}</span>
             <span><strong>Área:</strong> ${contexto.area || '-'}</span>
             <span><strong>Sector:</strong> ${contexto.sector || '-'}</span>
@@ -1181,58 +1187,65 @@ function SeguimientoView({ user, siteConfig }) {
             <span><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</span>
           </div>
           
-          <table style="width: 100%; border-collapse: collapse; font-size: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
             <thead>
               <tr>
-                <th style="background: #1a1a1a; color: white; padding: 6px 4px; border: 1px solid #333; width: 60px;">CÓDIGO</th>
-                <th style="background: #1a1a1a; color: white; padding: 6px 4px; border: 1px solid #333; text-align: left; min-width: 180px;">INDICADOR</th>
-                <th style="background: #1a1a1a; color: white; padding: 6px 4px; border: 1px solid #333; width: 45px;">TIPO</th>
-                ${mesesHeaders.map(m => `<th style="background: #1a1a1a; color: white; padding: 6px 2px; border: 1px solid #333; width: 38px;">${m}</th>`).join('')}
-                <th style="background: #0066cc; color: white; padding: 6px 4px; border: 1px solid #333; width: 55px;">PROG.</th>
-                <th style="background: #cc0000; color: white; padding: 6px 4px; border: 1px solid #333; width: 55px;">LOGRADO</th>
+                <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; width: 55px; font-size: 8px;">CÓDIGO</th>
+                <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; text-align: left; min-width: 140px; font-size: 8px;">INDICADOR</th>
+                ${mesesHeaders.map(m => `<th style="background: #333; color: white; padding: 6px 2px; border: 1px solid #444; width: 32px; font-size: 7px;">${m}</th>`).join('')}
+                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 45px; font-size: 7px;">PROG.</th>
+                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 45px; font-size: 7px;">LOGRADO</th>
+                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 45px; font-size: 7px;">% PROG</th>
+                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 45px; font-size: 7px;">% LOG</th>
+                <th style="background: #006633; color: white; padding: 6px 3px; border: 1px solid #005522; width: 50px; font-size: 7px;">Σ PROG</th>
+                <th style="background: #993300; color: white; padding: 6px 3px; border: 1px solid #882200; width: 50px; font-size: 7px;">% LOGRO GLOBAL</th>
               </tr>
             </thead>
             <tbody>
-              ${allData.map(({ indicador, rendicion }, idx) => {
-                const programado = rendicion.programado || indicador.logro || '';
-                const logrado = rendicion.logrado || '';
+              ${allData.map(({ indicador, rendicion, sumaProgramado, sumaLogrado }, idx) => {
+                const programado = parseFloat(rendicion.programado) || parseFloat(indicador.logro) || 0;
+                const logrado = parseFloat(rendicion.logrado) || 0;
+                const metaGlobal = parseFloat(indicador.logro) || 0;
+                
+                // Calculate percentages
+                const porcProgramado = metaGlobal > 0 ? ((programado / metaGlobal) * 100).toFixed(1) : '0.0';
+                const porcLogrado = programado > 0 ? ((logrado / programado) * 100).toFixed(1) : '0.0';
+                const porcLogroGlobal = metaGlobal > 0 ? ((sumaLogrado / metaGlobal) * 100).toFixed(1) : '0.0';
+                
+                // Color for % LOGRO GLOBAL
+                const logroGlobalColor = parseFloat(porcLogroGlobal) >= 100 ? '#009933' : (parseFloat(porcLogroGlobal) >= 50 ? '#cc6600' : '#cc0000');
                 
                 return `
-                  <!-- Indicator group ${idx + 1} -->
-                  <!-- Row 1: EJECUTADO -->
-                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9f9f9'};">
-                    <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: center; vertical-align: middle; font-weight: bold;">${indicador.codi || ''}</td>
-                    <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: left; vertical-align: top; line-height: 1.3;">${indicador.indicador_resultado || ''}</td>
-                    <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e8f5e9; font-weight: 600; font-size: 7px;">EJEC</td>
+                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8f8f8'};">
+                    <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-weight: 600; font-size: 8px; vertical-align: middle;">${indicador.codi || ''}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: left; font-size: 8px; line-height: 1.4; word-wrap: break-word; max-width: 140px; vertical-align: middle;">${indicador.indicador_resultado || ''}</td>
                     ${mesesCortos.map(m => {
                       const val = rendicion['ejecutado_' + m];
-                      return '<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e8f5e9;">' + (val ? parseFloat(val).toFixed(2) : '') + '</td>';
+                      return '<td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; font-size: 7px; vertical-align: middle;">' + (val ? parseFloat(val).toFixed(2) : '-') + '</td>';
                     }).join('')}
-                    <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: center; vertical-align: middle; background: #e3f2fd; font-weight: bold;">${programado}</td>
-                    <td rowspan="3" style="border: 1px solid #ddd; padding: 4px; text-align: center; vertical-align: middle; background: #ffebee; font-weight: bold; color: #c00;">${logrado}</td>
-                  </tr>
-                  <!-- Row 2: % EJEC -->
-                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9f9f9'};">
-                    <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #fff3e0; font-weight: 600; font-size: 7px;">%EJEC</td>
-                    ${mesesCortos.map(m => {
-                      const val = rendicion['proc_ejecutado_' + m];
-                      return '<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #fff3e0;">' + (val ? (parseFloat(val) * 100).toFixed(1) + '%' : '') + '</td>';
-                    }).join('')}
-                  </tr>
-                  <!-- Row 3: ACUMULADO -->
-                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9f9f9'}; border-bottom: 2px solid #999;">
-                    <td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e1f5fe; font-weight: 600; font-size: 7px;">ACUM</td>
-                    ${mesesCortos.map(m => {
-                      const val = rendicion['acumulado_' + m];
-                      return '<td style="border: 1px solid #ddd; padding: 3px; text-align: center; background: #e1f5fe;">' + (val ? parseFloat(val).toFixed(2) : '') + '</td>';
-                    }).join('')}
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e3f2fd; font-weight: 600; font-size: 8px; vertical-align: middle;">${programado ? programado.toFixed(2) : '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-weight: 600; font-size: 8px; color: #c00; vertical-align: middle;">${logrado ? logrado.toFixed(2) : '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e3f2fd; font-size: 8px; vertical-align: middle;">${porcProgramado}%</td>
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-size: 8px; color: #c00; vertical-align: middle;">${porcLogrado}%</td>
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e8f5e9; font-weight: 600; font-size: 8px; vertical-align: middle;">${sumaProgramado ? sumaProgramado.toFixed(2) : '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #fff8e1; font-weight: 700; font-size: 8px; color: ${logroGlobalColor}; vertical-align: middle;">${porcLogroGlobal}%</td>
                   </tr>
                 `;
               }).join('')}
             </tbody>
           </table>
           
-          <p style="text-align: center; color: #999; margin-top: 20px; font-size: 8px;">
+          <div style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 4px; font-size: 8px;">
+            <strong>Leyenda:</strong>
+            <span style="margin-left: 15px;">PROG. = Programado del año</span>
+            <span style="margin-left: 10px;">LOGRADO = Logrado del año</span>
+            <span style="margin-left: 10px;">% PROG = (Prog. Año / Meta Global) × 100</span>
+            <span style="margin-left: 10px;">% LOG = (Logrado / Prog. Año) × 100</span>
+            <span style="margin-left: 10px;">Σ PROG = Suma programados todos los años</span>
+            <span style="margin-left: 10px;">% LOGRO GLOBAL = (Σ Logrado / Meta) × 100</span>
+          </div>
+          
+          <p style="text-align: center; color: #999; margin-top: 15px; font-size: 9px;">
             Total de indicadores: ${allData.length} | Generado el ${new Date().toLocaleString()}
           </p>
         </div>
@@ -1248,12 +1261,17 @@ function SeguimientoView({ user, siteConfig }) {
       
       const element = container.querySelector('#pdf-content');
       
-      // Configure PDF options
+      // Configure PDF options - Higher quality
       const opt = {
-        margin: [5, 5, 5, 5],
-        filename: `Rendicion_${gestion}_${contexto.area || 'Usuario'}.pdf`,
-        image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 1.5, useCORS: true, logging: false },
+        margin: [8, 8, 8, 8],
+        filename: `Seguimiento_Indicadores_${gestion}_${contexto.area || 'Usuario'}.pdf`,
+        image: { type: 'jpeg', quality: 1.0 },
+        html2canvas: { 
+          scale: 3, // Higher scale for better quality
+          useCORS: true, 
+          logging: false,
+          letterRendering: true
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
       };
       
