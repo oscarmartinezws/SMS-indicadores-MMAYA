@@ -147,6 +147,12 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - Campo calculado: SUMA LOGRADO (todos los años) / LOGRO PROGRAMADO (META) * 100
   - Colores: Verde >=100%, Naranja >=50%, Rojo <50%
   - Nuevo endpoint: `GET /api/sms/rendicion/suma_logrado/:id`
+- ✅ **Mejora del reporte PDF**:
+  - Título cambiado a "SEGUIMIENTO DE INDICADORES"
+  - Una sola fila por indicador con: EJECUCIÓN (ENE-DIC), PROG, LOGRADO, % PROG, % LOG, Σ PROG, % LOGRO GLOBAL
+  - Calidad mejorada (scale: 3, quality: 1.0)
+  - Indicadores largos se ajustan en múltiples líneas
+  - Leyenda explicativa al final del reporte
 
 ### 2025-01-04
 - ✅ Implementación de campos calculados en vista Seguimiento
