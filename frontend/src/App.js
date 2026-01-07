@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import html2pdf from 'html2pdf.js';
 import './App.css';
 
 // Imported components
-import { RolesView, MenuAdminView, UsuariosView } from './components/views';
-import { Login, Sidebar } from './components/common';
+import { RolesView, MenuAdminView, UsuariosView, SeguimientoView, HomeView, IndicadoresView, EntidadesAreasView, ConfiguracionView } from './components/views';
+import { Login, Sidebar, CrudTable } from './components/common';
 import { API_URL, colorThemes, baseStyles, getStyles } from './styles/theme';
 
 // Theme Context
@@ -18,11 +16,7 @@ let styles = getStyles('negro', 'claro');
 const rowStyle = { padding: '6px 10px', fontSize: '0.8rem', verticalAlign: 'middle' };
 const headerStyle = { background: styles.black, color: styles.white, padding: '8px 10px', textAlign: 'left', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase' };
 
-// Entidades y Areas View - Two sections
-function EntidadesAreasView() {
-  const [entidades, setEntidades] = useState([]);
-  const [areas, setAreas] = useState([]);
-  const [loading, setLoading] = useState(true);
+// Main App component
   const [selectedEntidad, setSelectedEntidad] = useState(null);
   const [showEntidadModal, setShowEntidadModal] = useState(false);
   const [showAreaModal, setShowAreaModal] = useState(false);
