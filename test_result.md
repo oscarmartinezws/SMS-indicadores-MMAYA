@@ -111,14 +111,35 @@ backend:
     file: "/app/backend/routes/catalogos.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "APIs de catálogos funcionando correctamente. GET, POST, PUT para todas las entidades."
+        comment: "CORREGIDO: Los endpoints de Metas, Resultados y Acciones tenían nombres de columnas incorrectos (codi en lugar de codi_meta, codi_resultado, codi_accion). Se corrigió para usar los nombres correctos de columnas de la BD."
+
+  - task: "API Áreas"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/entidades.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
       - working: true
-        agent: "testing"
-        comment: "VERIFICADO: APIs de catálogos funcionan correctamente. CrudTable carga datos de sectores sin errores. Modal de creación se abre y cierra correctamente."
+        agent: "main"
+        comment: "CORREGIDO: El endpoint de áreas usaba columna 'area' pero la columna real es 'area_organizacional'. Se corrigió para devolver solo el nombre correctamente."
+
+  - task: "API Roles (POST/PUT)"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/usuarios.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "CORREGIDO: Los endpoints POST/PUT de roles ahora aceptan tanto 'rol' como 'nombre' en el body para compatibilidad con el frontend."
 
   - task: "API Login con JWT"
     implemented: true
