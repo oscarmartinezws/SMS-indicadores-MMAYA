@@ -38,7 +38,7 @@ router.put('/entidades/:id', async (req, res) => {
 // ========== Areas ==========
 router.get('/areas', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id_area as id, area as nombre, id_entidad, estado FROM area ORDER BY id_area');
+    const result = await pool.query('SELECT id_area as id, area_organizacional as nombre, id_entidad, estado FROM area ORDER BY id_area');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -48,7 +48,7 @@ router.get('/areas', async (req, res) => {
 
 router.get('/entidades/:id/areas', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id_area as id, area as nombre, id_entidad, estado FROM area WHERE id_entidad = $1 ORDER BY id_area', [req.params.id]);
+    const result = await pool.query('SELECT id_area as id, area_organizacional as nombre, id_entidad, estado FROM area WHERE id_entidad = $1 ORDER BY id_area', [req.params.id]);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -58,7 +58,7 @@ router.get('/entidades/:id/areas', async (req, res) => {
 
 router.get('/areas_by_entidad/:id', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id_area as id, area as nombre, id_entidad, estado FROM area WHERE id_entidad = $1 ORDER BY id_area', [req.params.id]);
+    const result = await pool.query('SELECT id_area as id, area_organizacional as nombre, id_entidad, estado FROM area WHERE id_entidad = $1 ORDER BY id_area', [req.params.id]);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -69,7 +69,7 @@ router.get('/areas_by_entidad/:id', async (req, res) => {
 router.post('/areas', async (req, res) => {
   try {
     const { nombre, id_entidad, estado } = req.body;
-    const result = await pool.query('INSERT INTO area (area, id_entidad, estado) VALUES ($1, $2, $3) RETURNING id_area as id, area as nombre, id_entidad, estado', [nombre, id_entidad, estado || 'ACTIVO']);
+    const result = await pool.query('INSERT INTO area (area_organizacional, id_entidad, estado) VALUES ($1, $2, $3) RETURNING id_area as id, area_organizacional as nombre, id_entidad, estado', [nombre, id_entidad, estado || 'ACTIVO']);
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -80,7 +80,7 @@ router.post('/areas', async (req, res) => {
 router.put('/areas/:id', async (req, res) => {
   try {
     const { nombre, id_entidad, estado } = req.body;
-    await pool.query('UPDATE area SET area = $1, id_entidad = $2, estado = $3 WHERE id_area = $4', [nombre, id_entidad, estado, req.params.id]);
+    await pool.query('UPDATE area SET area_organizacional = $1, id_entidad = $2, estado = $3 WHERE id_area = $4', [nombre, id_entidad, estado, req.params.id]);
     res.json({ message: 'Área actualizada' });
   } catch (err) {
     console.error(err);
