@@ -35,7 +35,7 @@ function Sidebar({ user, menuItems, activeView, setActiveView, collapsed, siteCo
             {!collapsed && <span style={{ fontSize: '0.55rem', transition: 'transform 0.2s', transform: expandedGroups[sep.id_menu] ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>}
           </div>
           {!collapsed && expandedGroups[sep.id_menu] && groups[sep.id_menu]?.map(item => (
-            <div key={item.id_menu} onClick={() => item.enlace && setActiveView(item.enlace)} style={{ padding: '6px 14px 6px 40px', color: activeView === item.enlace ? '#FFFFFF' : currentStyles.gray400, background: activeView === item.enlace ? currentStyles.primaryHover : 'transparent', cursor: 'pointer', fontSize: '0.75rem', transition: 'all 0.15s ease' }}>{item.opcion}</div>
+            <div key={item.id_menu} onClick={() => { console.log('Clicking menu item:', item.opcion, 'enlace:', item.enlace); if (item.enlace) setActiveView(item.enlace); }} style={{ padding: '6px 14px 6px 40px', color: activeView === item.enlace ? '#FFFFFF' : currentStyles.gray400, background: activeView === item.enlace ? currentStyles.primaryHover : 'transparent', cursor: 'pointer', fontSize: '0.75rem', transition: 'all 0.15s ease' }}>{item.opcion}</div>
           ))}
         </div>
       ))}
