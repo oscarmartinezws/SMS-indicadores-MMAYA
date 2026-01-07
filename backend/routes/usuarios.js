@@ -86,8 +86,9 @@ router.get('/roles', async (req, res) => {
 
 router.post('/roles', async (req, res) => {
   try {
-    const { nombre, estado } = req.body;
-    const result = await pool.query('INSERT INTO rol (rol, estado) VALUES ($1, $2) RETURNING *', [nombre, estado || 'ACTIVO']);
+    const { rol, nombre, estado } = req.body;
+    const rolName = rol || nombre; // Accept both 'rol' and 'nombre'
+    const result = await pool.query('INSERT INTO rol (rol, estado) VALUES ($1, $2) RETURNING *', [rolName, estado || 'ACTIVO']);
     const newRolId = result.rows[0].id_rol;
     
     const menus = await pool.query('SELECT id_menu FROM menu');
@@ -95,7 +96,7 @@ router.post('/roles', async (req, res) => {
       await pool.query('INSERT INTO opciones (id_rol, id_menu, estado) VALUES ($1, $2, $3)', [newRolId, menu.id_menu, 'INACTIVO']);
     }
     
-    res.json({ id: newRolId, nombre: result.rows[0].rol, estado: result.rows[0].estado });
+    res.json({ id_rol: newRolId, rol: result.rows[0].rol, estado: result.rows[0].estado });
   } catch (err) {
     console.error(err);
     res.status(500).json({ detail: 'Error al crear rol' });
@@ -104,10 +105,12 @@ router.post('/roles', async (req, res) => {
 
 router.put('/roles/:id', async (req, res) => {
   try {
-    const { nombre, estado } = req.body;
-    await pool.query('UPDATE rol SET rol = $1, estado = $2 WHERE id_rol = $3', [nombre, estado, req.params.id]);
+    const { rol, nombre, estado } = req.body;
+    const rolName = rol || nombre; // Accept both 'rol' and 'nombre'
+    await pool.query('UPDATE rol SET rol = $1, estado = $2 WHERE id_rol = $3', [rolName, estado, req.params.id]);
     res.json({ message: 'Rol actualizado' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ detail: 'Error al actualizar rol' });
   }
 });
