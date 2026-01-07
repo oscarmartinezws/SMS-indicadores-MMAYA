@@ -95,6 +95,12 @@ function IndicadoresView({ user }) {
         logro: item.logro || '',
         estado: item.estado || 'ACTIVO'
       });
+      // Load planes for this indicator
+      if (item.planes && Array.isArray(item.planes)) {
+        setSelectedPlanes(item.planes.map(p => p.id));
+      } else {
+        setSelectedPlanes([]);
+      }
     } else {
       setEditingItem(null);
       setFormData({
@@ -103,6 +109,7 @@ function IndicadoresView({ user }) {
         indicador_resultado: '', formula_indicador: '', anio_base: '',
         linea_base: '', anio_logro: '', logro: '', estado: 'ACTIVO'
       });
+      setSelectedPlanes([]);
     }
     setShowModal(true);
   };
