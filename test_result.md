@@ -111,11 +111,14 @@ backend:
     file: "/app/backend/routes/catalogos.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "APIs de catálogos funcionando correctamente. GET, POST, PUT para todas las entidades."
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: APIs de catálogos funcionan correctamente. CrudTable carga datos de sectores sin errores. Modal de creación se abre y cierra correctamente."
 
   - task: "API Login con JWT"
     implemented: true
@@ -123,11 +126,14 @@ backend:
     file: "/app/backend/routes/auth.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Login funciona con credenciales Admin=omartinez/P1c0l0c0"
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: Login funciona correctamente para ambos usuarios. Admin (omartinez/P1c0l0c0) y usuario limitado (jperez/P1c0l0c0) autentican exitosamente. JWT se almacena correctamente."
 
   - task: "API Menu y Opciones"
     implemented: true
@@ -135,11 +141,14 @@ backend:
     file: "/app/backend/routes/menu.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Endpoints /api/sms/menu_admin y /api/sms/opciones/:id_rol funcionan correctamente"
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: APIs de menú funcionan correctamente. Sidebar se carga con grupos CONFIGURACION, PARAMETRICAS y OPERACIONES. Restricciones de usuario limitado funcionan correctamente."
 
   - task: "API Dashboard"
     implemented: true
@@ -147,11 +156,14 @@ backend:
     file: "/app/backend/routes/dashboard.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Dashboard summary y filtros funcionando"
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: API Dashboard funciona correctamente. KPIs se cargan (6 indicadores totales, 6 con avance, 100% avance general). Gráficos se renderizan correctamente. Filtros funcionan sin problemas."
 
 frontend:
   - task: "CrudTable Component"
