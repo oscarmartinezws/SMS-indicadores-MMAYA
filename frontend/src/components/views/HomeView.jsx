@@ -3,6 +3,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { API_URL, getStyles, defaultStyles } from '../../styles/theme';
 
 function HomeView({ user, siteConfig }) {
+  // Get styles based on site config
+  const styles = siteConfig ? getStyles(siteConfig.color_theme, siteConfig.modo) : defaultStyles;
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [years, setYears] = useState([]);
