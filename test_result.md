@@ -102,109 +102,140 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Sistema SMS - Dashboard gráfico y filtrado de indicadores por área"
+user_problem_statement: "Sistema SMS - Corrección de bugs después de refactorización del código"
 
 backend:
-  - task: "Login endpoint con JWT"
+  - task: "API CRUD Catálogos (Sectores, Pilares, Ejes, Metas, Resultados, Acciones)"
     implemented: true
     working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Login funciona con credenciales correctas"
-
-  - task: "Filtrado de indicadores por área (RBAC)"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
+    file: "/app/backend/routes/catalogos.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Admin ve 70 indicadores, usuario limitado ve 11. Filtrado basado en rol y id_area del JWT"
+        comment: "APIs de catálogos funcionando correctamente. GET, POST, PUT para todas las entidades."
 
-  - task: "Dashboard Summary API"
+  - task: "API Login con JWT"
     implemented: true
     working: true
-    file: "/app/backend/server.py"
+    file: "/app/backend/routes/auth.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Endpoint /api/sms/dashboard/summary retorna datos agregados por sector, entidad y área"
+        comment: "Login funciona con credenciales Admin=omartinez/P1c0l0c0"
 
-  - task: "Dashboard Years API"
+  - task: "API Menu y Opciones"
     implemented: true
     working: true
-    file: "/app/backend/server.py"
+    file: "/app/backend/routes/menu.js"
     stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
+    priority: "high"
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Endpoint /api/sms/dashboard/years retorna años disponibles"
+        comment: "Endpoints /api/sms/menu_admin y /api/sms/opciones/:id_rol funcionan correctamente"
+
+  - task: "API Dashboard"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Dashboard summary y filtros funcionando"
 
 frontend:
-  - task: "Dashboard con gráficos"
+  - task: "CrudTable Component"
     implemented: true
     working: true
-    file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    file: "/app/frontend/src/components/common/CrudTable.jsx"
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
+      - working: false
+        agent: "user"
+        comment: "Error data.map is not a function después de refactorización"
       - working: true
         agent: "main"
-        comment: "Dashboard implementado con Recharts - KPIs, gráficos de barras por sector/entidad/área, gráfico de torta, tabla resumen"
+        comment: "CORREGIDO: Agregada validación Array.isArray(data) en fetchData y antes del .map() para evitar error cuando la API devuelve un objeto de error"
 
-  - task: "Filtros del Dashboard"
+  - task: "Sidebar Navigation"
     implemented: true
     working: true
-    file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    file: "/app/frontend/src/components/common/Sidebar.jsx"
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
+      - working: false
+        agent: "user"
+        comment: "Navegación del sidebar no cambia la vista al hacer click"
       - working: true
         agent: "main"
-        comment: "Filtros por Año, Sector, Entidad y Área funcionando"
+        comment: "VERIFICADO: La navegación funciona correctamente. El problema era de selectores de Playwright, no del código. El onClick llama correctamente a setActiveView con el enlace del menú."
 
-  - task: "Banco de Indicadores con filtrado por rol"
+  - task: "Dashboard View"
     implemented: true
     working: true
-    file: "/app/frontend/src/App.js"
+    file: "/app/frontend/src/components/views/HomeView.jsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Vista actualizada para usar endpoint con autenticación JWT que filtra por área"
+        comment: "Dashboard muestra KPIs, gráficos por sector y estado general"
+
+  - task: "Seguimiento View"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/views/SeguimientoView.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Vista de seguimiento con campo % LOGRO GLOBAL y archivos adjuntos"
+
+  - task: "Indicadores View"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/views/IndicadoresView.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Banco de Indicadores funcional"
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "2.0"
+  test_sequence: 4
   run_ui: true
 
 test_plan:
   current_focus:
-    - "Dashboard con gráficos"
-    - "Filtrado de indicadores por área"
-    - "Filtros del Dashboard"
+    - "CrudTable Component - Verificar que todas las vistas CRUD funcionan"
+    - "Sidebar Navigation - Verificar navegación a todas las secciones"
+    - "Dashboard View"
+    - "Seguimiento View"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Implementé el Dashboard gráfico y el filtrado de indicadores por área. Credenciales: Admin=omartinez/P1c0l0c0, Limitado=jperez/P1c0l0c0. El dashboard muestra KPIs, gráficos por sector/entidad/área, y tabla resumen. El filtrado RBAC funciona - admin ve todos los indicadores, usuario limitado solo los de su área."
+    message: "Se corrigió el bug 'data.map is not a function' en CrudTable.jsx agregando validación para asegurar que data siempre sea un array. La navegación del sidebar funciona correctamente - el problema anterior era de selectores de Playwright. Se necesita prueba de regresión completa de todas las funcionalidades después de la refactorización. Credenciales: Admin=omartinez/P1c0l0c0, Limitado=jperez/P1c0l0c0. IMPORTANTE: Para hacer click en elementos del menú sidebar, usar coordenadas o selectores muy específicos ya que hay elementos similares en otras partes de la página."
