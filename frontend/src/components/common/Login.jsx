@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { API_URL } from '../../styles/theme';
+import { API_URL, defaultStyles as styles } from '../../styles/theme';
 
-function Login({ onLogin, styles }) {
+function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
