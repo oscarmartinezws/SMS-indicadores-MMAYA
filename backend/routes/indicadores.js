@@ -92,13 +92,24 @@ router.get('/indicadores_full', async (req, res) => {
 // Get indicators (with auth filter)
 router.get('/matriz_parametros', authenticateToken, async (req, res) => {
   try {
-    let query = 'SELECT * FROM matriz_parametro ORDER BY id_indicador';
+    let query = `
+      SELECT mp.*, 
+        COALESCE(
+          (SELECT json_agg(json_build_object('id', p.id_plan, 'nombre', p.nombre))
+           FROM indicador_plan ip 
+           INNER JOIN plan p ON ip.id_plan = p.id_plan 
+           WHERE ip.id_indicador = mp.id_indicador), '[]'
+        ) as planes
+      FROM matriz_parametro mp
+    `;
     let params = [];
     
     if (req.user.rol !== 'ADMINISTRADOR' && req.user.id_area) {
-      query = 'SELECT * FROM matriz_parametro WHERE id_area = $1 ORDER BY id_indicador';
+      query += ' WHERE mp.id_area = $1';
       params = [req.user.id_area];
     }
+    
+    query += ' ORDER BY mp.id_indicador';
     
     const result = await pool.query(query, params);
     res.json(result.rows);
