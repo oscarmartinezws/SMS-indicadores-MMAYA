@@ -239,3 +239,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Se corrigió el bug 'data.map is not a function' en CrudTable.jsx agregando validación para asegurar que data siempre sea un array. La navegación del sidebar funciona correctamente - el problema anterior era de selectores de Playwright. Se necesita prueba de regresión completa de todas las funcionalidades después de la refactorización. Credenciales: Admin=omartinez/P1c0l0c0, Limitado=jperez/P1c0l0c0. IMPORTANTE: Para hacer click en elementos del menú sidebar, usar coordenadas o selectores muy específicos ya que hay elementos similares en otras partes de la página."
+  - agent: "testing"
+    message: "PRUEBA DE REGRESIÓN COMPLETADA EXITOSAMENTE. Todas las funcionalidades principales funcionan correctamente después de la refactorización. Login, Dashboard, navegación del sidebar, vistas CRUD, Seguimiento e Indicadores están operativos. Se confirmó que el campo % LOGRO GLOBAL está presente en la vista de Seguimiento. Restricciones de usuario limitado funcionan correctamente. No se encontraron errores críticos. Sistema listo para producción."
