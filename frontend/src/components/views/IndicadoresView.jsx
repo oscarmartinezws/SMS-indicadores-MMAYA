@@ -483,6 +483,70 @@ function IndicadoresView({ user }) {
                         </select>
                       )}
                     </div>
+                    
+                    {/* Planes Section */}
+                    <div style={{ marginTop: 8, padding: 16, background: '#F8FAFC', borderRadius: 8, border: `1px solid ${styles.gray200}` }}>
+                      <label style={{ ...labelStyle, marginBottom: 12, fontSize: '0.8rem', color: styles.gray700 }}>📋 PLANES ASOCIADOS</label>
+                      {viewOnly ? (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          {selectedPlanes.length > 0 ? selectedPlanes.map(planId => {
+                            const plan = catalogs?.planes?.find(p => p.id === planId);
+                            return plan ? (
+                              <span key={plan.id} style={{ 
+                                padding: '6px 14px', 
+                                borderRadius: 20, 
+                                fontSize: '0.85rem', 
+                                fontWeight: 600, 
+                                background: plan.nombre === 'PDES' ? '#DBEAFE' : plan.nombre === 'PSDI' ? '#D1FAE5' : '#FEF3C7', 
+                                color: plan.nombre === 'PDES' ? '#1E40AF' : plan.nombre === 'PSDI' ? '#065F46' : '#92400E' 
+                              }}>
+                                {plan.nombre}
+                              </span>
+                            ) : null;
+                          }) : <span style={{ color: styles.gray500, fontStyle: 'italic' }}>Sin planes asociados</span>}
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                          {catalogs?.planes?.map(plan => {
+                            const isSelected = selectedPlanes.includes(plan.id);
+                            return (
+                              <button
+                                key={plan.id}
+                                type="button"
+                                onClick={() => {
+                                  if (isSelected) {
+                                    setSelectedPlanes(prev => prev.filter(id => id !== plan.id));
+                                  } else {
+                                    setSelectedPlanes(prev => [...prev, plan.id]);
+                                  }
+                                }}
+                                style={{
+                                  padding: '8px 16px',
+                                  borderRadius: 20,
+                                  fontSize: '0.85rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  border: isSelected ? 'none' : `2px solid ${styles.gray300}`,
+                                  background: isSelected 
+                                    ? (plan.nombre === 'PDES' ? '#DBEAFE' : plan.nombre === 'PSDI' ? '#D1FAE5' : '#FEF3C7')
+                                    : styles.white,
+                                  color: isSelected 
+                                    ? (plan.nombre === 'PDES' ? '#1E40AF' : plan.nombre === 'PSDI' ? '#065F46' : '#92400E')
+                                    : styles.gray500,
+                                  boxShadow: isSelected ? '0 2px 4px rgba(0,0,0,0.1)' : 'none'
+                                }}
+                              >
+                                {isSelected && '✓ '}{plan.nombre}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                      <div style={{ marginTop: 8, fontSize: '0.7rem', color: styles.gray500 }}>
+                        {viewOnly ? '' : 'Haga clic en los planes para seleccionar/deseleccionar'}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
