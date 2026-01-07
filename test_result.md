@@ -111,11 +111,14 @@ backend:
     file: "/app/backend/routes/catalogos.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "CORREGIDO: Los endpoints de Metas, Resultados y Acciones tenían nombres de columnas incorrectos (codi en lugar de codi_meta, codi_resultado, codi_accion). Se corrigió para usar los nombres correctos de columnas de la BD."
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: APIs funcionan correctamente después del reinicio del backend. Endpoints /api/sms/metas, /api/sms/resultados, /api/sms/acciones devuelven datos correctos con estructura {id, codigo, nombre, estado}. Las correcciones de nombres de columnas están aplicadas correctamente."
 
   - task: "API Áreas"
     implemented: true
