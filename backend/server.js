@@ -653,10 +653,8 @@ app.put('/api/sms/opciones/:id', async (req, res) => {
 app.get('/api/sms/menu_admin', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT m.id_menu, m.opcion, m.enlace, m.tipo_opcion, m.id_padre, m.estado,
-              o.id_opcion, o.id_rol, o.estado as opcion_estado
+      `SELECT m.id_menu, m.opcion, m.enlace, m.tipo_opcion, m.id_padre, m.estado
        FROM menu m
-       LEFT JOIN opciones o ON m.id_menu = o.id_menu
        ORDER BY m.id_menu`
     );
     res.json(result.rows);
