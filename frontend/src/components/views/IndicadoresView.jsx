@@ -184,6 +184,22 @@ function IndicadoresView({ user }) {
       });
       
       if (res.ok) {
+        // Get the indicator ID (for new ones, it's in the response)
+        let indicadorId = editingItem?.id_indicador;
+        if (!editingItem) {
+          const newIndicador = await res.json();
+          indicadorId = newIndicador.id_indicador;
+        }
+        
+        // Save planes
+        if (indicadorId) {
+          await fetch(`${API_URL}/api/sms/indicador_planes/${indicadorId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ planes: selectedPlanes })
+          });
+        }
+        
         alert(editingItem ? 'Indicador actualizado' : 'Indicador creado');
         setShowModal(false);
         const token = localStorage.getItem('sms_token');
