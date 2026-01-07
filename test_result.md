@@ -126,11 +126,14 @@ backend:
     file: "/app/backend/routes/entidades.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "CORREGIDO: El endpoint de áreas usaba columna 'area' pero la columna real es 'area_organizacional'. Se corrigió para devolver solo el nombre correctamente."
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: API /api/sms/areas funciona correctamente, devuelve datos con formato {id, nombre, id_entidad, estado}. Los nombres de áreas se muestran correctamente sin formatos incorrectos."
 
   - task: "API Roles (POST/PUT)"
     implemented: true
