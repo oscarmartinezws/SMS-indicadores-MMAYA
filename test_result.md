@@ -277,6 +277,18 @@ frontend:
         agent: "testing"
         comment: "VERIFICADO: Banco de Indicadores funciona correctamente. Tabla de indicadores se carga con 71 registros. Paginación funcional (Página 1 de 8). Botón Adicionar disponible para admin. Navegación desde sidebar exitosa. Vista muestra códigos de entidad, área, sector, etc."
 
+  - task: "Sidebar Group Expansion"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/common/Sidebar.jsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "PROBLEMA CRÍTICO: Los grupos del sidebar (PARAMETRICAS, SEGURIDAD, OPERACIONES) no se expanden al hacer click para mostrar los submenús. Los grupos son visibles y tienen click handlers, pero los elementos hijos (Meta, Resultado, Acción, Usuarios, Rol, Entidad) no aparecen. El estado expandedGroups no se está actualizando correctamente. Esto impide el acceso a las funcionalidades específicas solicitadas en las pruebas."
+
 metadata:
   created_by: "main_agent"
   version: "2.0"
