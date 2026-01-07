@@ -158,6 +158,17 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - Nuevos endpoints: GET/POST/DELETE `/api/sms/rendicion/adjuntos/...`
   - Archivos físicos en `/app/backend/uploads/`
   - Carga automática al seleccionar indicador/año
+- ✅ **Bug fix - Menú duplicado**:
+  - Corregido query que hacía LEFT JOIN innecesario con tabla opciones
+  - Ahora muestra 15 menús únicos sin duplicados
+- ✅ **Bug fix - Accesos por Rol**:
+  - Creadas opciones faltantes para Rol 2 (USUARIO AREA)
+  - Ahora los 3 roles tienen sus 15 opciones cada uno
+- ✅ **Refactorización Frontend (Fase 1)**:
+  - Creada estructura de carpetas: `/components/views`, `/components/common`, `/styles`
+  - Extraído `theme.js` con estilos compartidos
+  - Extraídos componentes: `Login.jsx`, `Sidebar.jsx`, `RolesView.jsx`, `MenuAdminView.jsx`, `UsuariosView.jsx`
+  - Reducido `App.js` de 2510 a 2236 líneas (-274 líneas, -11%)
 
 ### 2025-01-04
 - ✅ Implementación de campos calculados en vista Seguimiento
