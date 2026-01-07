@@ -16,6 +16,7 @@ function IndicadoresView({ user }) {
     indicador_resultado: '', formula_indicador: '', anio_base: '',
     linea_base: '', anio_logro: '', logro: '', estado: 'ACTIVO'
   });
+  const [selectedPlanes, setSelectedPlanes] = useState([]);
   
   // Catalogs for dropdowns
   const [catalogs, setCatalogs] = useState(null);
