@@ -160,7 +160,7 @@ frontend:
     file: "/app/frontend/src/components/common/CrudTable.jsx"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -168,6 +168,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "CORREGIDO: Agregada validación Array.isArray(data) en fetchData y antes del .map() para evitar error cuando la API devuelve un objeto de error"
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: CrudTable funciona correctamente. Tabla de sectores se carga con datos, botón Adicionar abre modal de creación, modal se cierra correctamente. Validación de arrays funciona sin errores."
 
   - task: "Sidebar Navigation"
     implemented: true
