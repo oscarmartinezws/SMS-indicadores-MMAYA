@@ -141,11 +141,14 @@ backend:
     file: "/app/backend/routes/usuarios.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "CORREGIDO: Los endpoints POST/PUT de roles ahora aceptan tanto 'rol' como 'nombre' en el body para compatibilidad con el frontend."
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: APIs de roles funcionan correctamente. Los endpoints están operativos y listos para crear/editar roles una vez que se resuelva el problema de navegación del sidebar."
 
   - task: "API Login con JWT"
     implemented: true
