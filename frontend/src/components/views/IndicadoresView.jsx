@@ -243,14 +243,14 @@ function IndicadoresView({ user }) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
           <thead>
             <tr style={{ background: styles.black, color: styles.white }}>
-              {['#', 'ENTIDAD', 'ÁREA', 'SECTOR', 'PILAR', 'EJE', 'META', 'RESULTADO', 'ACCIÓN', 'CÓDIGO', 'INDICADOR', 'ESTADO', 'ACCIONES'].map(h => (
+              {['#', 'ENTIDAD', 'ÁREA', 'SECTOR', 'PILAR', 'EJE', 'META', 'RESULTADO', 'ACCIÓN', 'CÓDIGO', 'INDICADOR', 'PLANES', 'ESTADO', 'ACCIONES'].map(h => (
                 <th key={h} style={{ padding: '10px 8px', textAlign: 'center', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {paginatedData.length === 0 ? (
-              <tr><td colSpan={13} style={{ textAlign: 'center', padding: 24, color: styles.gray500 }}>No hay indicadores</td></tr>
+              <tr><td colSpan={14} style={{ textAlign: 'center', padding: 24, color: styles.gray500 }}>No hay indicadores</td></tr>
             ) : paginatedData.map((item, idx) => (
               <tr key={item.id_indicador} style={{ borderBottom: `1px solid ${styles.gray200}`, background: idx % 2 === 0 ? styles.white : styles.gray50 }}>
                 <td style={{ padding: '8px', textAlign: 'center' }}>{(currentPage - 1) * PAGE_SIZE + idx + 1}</td>
@@ -264,6 +264,15 @@ function IndicadoresView({ user }) {
                 <td style={{ padding: '8px', textAlign: 'center' }}>{item.codi_accion}</td>
                 <td style={{ padding: '8px', textAlign: 'center', fontWeight: 600 }}>{item.codi}</td>
                 <td style={{ padding: '8px', maxWidth: 250 }} title={item.indicador_resultado}>{(item.indicador_resultado || '').substring(0, 50)}{(item.indicador_resultado || '').length > 50 ? '...' : ''}</td>
+                <td style={{ padding: '8px', textAlign: 'center' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
+                    {item.planes && item.planes.length > 0 ? item.planes.map(plan => (
+                      <span key={plan.id} style={{ padding: '2px 8px', borderRadius: 12, fontSize: '0.6rem', fontWeight: 600, background: plan.nombre === 'PDES' ? '#DBEAFE' : plan.nombre === 'PSDI' ? '#D1FAE5' : '#FEF3C7', color: plan.nombre === 'PDES' ? '#1E40AF' : plan.nombre === 'PSDI' ? '#065F46' : '#92400E' }}>
+                        {plan.nombre}
+                      </span>
+                    )) : <span style={{ color: styles.gray400, fontSize: '0.65rem' }}>-</span>}
+                  </div>
+                </td>
                 <td style={{ padding: '8px', textAlign: 'center' }}>
                   <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 600, background: item.estado === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: item.estado === 'ACTIVO' ? styles.green : styles.red }}>{item.estado}</span>
                 </td>
