@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import html2pdf from 'html2pdf.js';
-import { API_URL, getStyles, defaultStyles } from '../../styles/theme';
+import { API_URL, getStyles, defaultStyles, getTableStyles } from '../../styles/theme';
 
 function SeguimientoView({ user, siteConfig }) {
   // Get styles based on site config
   const styles = siteConfig ? getStyles(siteConfig.color_theme, siteConfig.modo) : defaultStyles;
+  const { rowStyle, headerStyle } = getTableStyles(styles);
   
   const [indicadores, setIndicadores] = useState([]);
   const [selectedIndicador, setSelectedIndicador] = useState(null);
