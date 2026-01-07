@@ -8,6 +8,9 @@ import { RolesView, MenuAdminView, UsuariosView } from './components/views';
 import { Login, Sidebar } from './components/common';
 import { API_URL, colorThemes, baseStyles, getStyles } from './styles/theme';
 
+// Theme Context
+const ThemeContext = createContext();
+
 // Default styles (will be overridden by context)
 let styles = getStyles('negro', 'claro');
 
