@@ -211,11 +211,14 @@ frontend:
     file: "/app/frontend/src/components/views/SeguimientoView.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Vista de seguimiento con campo % LOGRO GLOBAL y archivos adjuntos"
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: Vista de Seguimiento funciona correctamente. Campo % LOGRO GLOBAL presente y visible. Botones de exportación (CSV y PDF) disponibles. Contexto de usuario se muestra correctamente. Navegación desde sidebar exitosa."
 
   - task: "Indicadores View"
     implemented: true
