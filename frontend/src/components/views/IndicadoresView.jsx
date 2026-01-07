@@ -45,7 +45,7 @@ function IndicadoresView({ user }) {
     if (catalogs) return;
     setLoadingCatalogs(true);
     try {
-      const [entRes, areaRes, secRes, pilRes, ejeRes, metaRes, resRes, accRes] = await Promise.all([
+      const [entRes, areaRes, secRes, pilRes, ejeRes, metaRes, resRes, accRes, planRes] = await Promise.all([
         fetch(`${API_URL}/api/sms/entidades`),
         fetch(`${API_URL}/api/sms/areas`),
         fetch(`${API_URL}/api/sms/sectores`),
@@ -53,7 +53,8 @@ function IndicadoresView({ user }) {
         fetch(`${API_URL}/api/sms/ejes`),
         fetch(`${API_URL}/api/sms/metas`),
         fetch(`${API_URL}/api/sms/resultados`),
-        fetch(`${API_URL}/api/sms/acciones`)
+        fetch(`${API_URL}/api/sms/acciones`),
+        fetch(`${API_URL}/api/sms/planes`)
       ]);
       setCatalogs({
         entidades: await entRes.json(),
@@ -63,7 +64,8 @@ function IndicadoresView({ user }) {
         ejes: await ejeRes.json(),
         metas: await metaRes.json(),
         resultados: await resRes.json(),
-        acciones: await accRes.json()
+        acciones: await accRes.json(),
+        planes: await planRes.json()
       });
     } catch (err) { console.error(err); }
     finally { setLoadingCatalogs(false); }
