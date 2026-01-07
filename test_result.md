@@ -250,18 +250,14 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "2.0"
-  test_sequence: 4
+  test_sequence: 5
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "CrudTable Component - Verificar que todas las vistas CRUD funcionan"
-    - "Sidebar Navigation - Verificar navegación a todas las secciones"
-    - "Dashboard View"
-    - "Seguimiento View"
+  current_focus: []
   stuck_tasks: []
-  test_all: true
-  test_priority: "high_first"
+  test_all: false
+  test_priority: "completed"
 
 agent_communication:
   - agent: "main"
