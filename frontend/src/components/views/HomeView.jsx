@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { API_URL, getStyles, defaultStyles } from '../../styles/theme';
+import { API_URL, getStyles, defaultStyles, getTableStyles } from '../../styles/theme';
 
 function HomeView({ user, siteConfig }) {
   // Get styles based on site config
   const styles = siteConfig ? getStyles(siteConfig.color_theme, siteConfig.modo) : defaultStyles;
+  const { rowStyle, headerStyle } = getTableStyles(styles);
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [years, setYears] = useState([]);
