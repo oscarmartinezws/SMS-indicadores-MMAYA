@@ -3,6 +3,60 @@ const router = express.Router();
 const pool = require('../config/db');
 const { authenticateToken } = require('../middleware/auth');
 
+// ========== Planes ==========
+// Get all plans
+router.get('/planes', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id_plan as id, nombre, descripcion, estado FROM plan ORDER BY id_plan');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ detail: 'Error al obtener planes' });
+  }
+});
+
+// Get plans for an indicator
+router.get('/indicador_planes/:id_indicador', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT p.id_plan as id, p.nombre, p.descripcion, p.estado 
+      FROM plan p 
+      INNER JOIN indicador_plan ip ON p.id_plan = ip.id_plan 
+      WHERE ip.id_indicador = $1 
+      ORDER BY p.nombre
+    `, [req.params.id_indicador]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ detail: 'Error al obtener planes del indicador' });
+  }
+});
+
+// Set plans for an indicator (replace all)
+router.put('/indicador_planes/:id_indicador', async (req, res) => {
+  try {
+    const { planes } = req.body; // Array of plan IDs
+    const idIndicador = req.params.id_indicador;
+    
+    // Delete existing associations
+    await pool.query('DELETE FROM indicador_plan WHERE id_indicador = $1', [idIndicador]);
+    
+    // Insert new associations
+    if (planes && planes.length > 0) {
+      const values = planes.map((idPlan, i) => `($1, $${i + 2})`).join(', ');
+      await pool.query(
+        `INSERT INTO indicador_plan (id_indicador, id_plan) VALUES ${values}`,
+        [idIndicador, ...planes]
+      );
+    }
+    
+    res.json({ message: 'Planes actualizados' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ detail: 'Error al actualizar planes' });
+  }
+});
+
 // Get all indicators with full data
 router.get('/indicadores_full', async (req, res) => {
   try {
