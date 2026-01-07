@@ -80,6 +80,7 @@ function App() {
                   return menuItem ? { ...menuItem, estado: opt.estado } : null;
                 })
                 .filter(Boolean);
+              console.log('Menu items loaded:', menuWithAccess);
               setMenuItems(menuWithAccess);
             });
         })
