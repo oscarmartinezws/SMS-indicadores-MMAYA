@@ -196,11 +196,14 @@ frontend:
     file: "/app/frontend/src/components/views/HomeView.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Dashboard muestra KPIs, gráficos por sector y estado general"
+      - working: true
+        agent: "testing"
+        comment: "VERIFICADO: Dashboard funciona correctamente. KPIs se muestran (Total Indicadores: 6, Con Avance: 6, Sin Avance: 0, % Avance General: 100%). Gráficos de barras y pie chart se renderizan correctamente. Filtros (Año, Sector, Entidad, Área) funcionan sin problemas."
 
   - task: "Seguimiento View"
     implemented: true
