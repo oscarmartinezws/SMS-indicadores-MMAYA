@@ -5,7 +5,7 @@ const { rowStyle, headerStyle } = getTableStyles(styles);
 
 function CrudTable({ title, endpoint, columns, formFields, idField = 'id' }) {
   const [data, setData] = useState([]); const [loading, setLoading] = useState(true); const [showModal, setShowModal] = useState(false); const [editItem, setEditItem] = useState(null); const [formData, setFormData] = useState({});
-  const fetchData = useCallback(async () => { try { setLoading(true); const res = await fetch(`${API_URL}/api/sms/${endpoint}`); setData(await res.json()); } catch (err) { console.error(err); } finally { setLoading(false); } }, [endpoint]);
+  const fetchData = useCallback(async () => { try { setLoading(true); const res = await fetch(`${API_URL}/api/sms/${endpoint}`); const result = await res.json(); setData(Array.isArray(result) ? result : []); } catch (err) { console.error(err); setData([]); } finally { setLoading(false); } }, [endpoint]);
   useEffect(() => { fetchData(); }, [fetchData]);
   const openModal = (item = null) => { if (item) { setEditItem(item); setFormData({ ...item }); } else { setEditItem(null); setFormData({ estado: 'ACTIVO' }); } setShowModal(true); };
   const saveItem = async () => { try { const method = editItem ? 'PUT' : 'POST'; const url = editItem ? `${API_URL}/api/sms/${endpoint}/${editItem[idField]}` : `${API_URL}/api/sms/${endpoint}`; const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) }); if (res.ok) { setShowModal(false); fetchData(); } else { const err = await res.json(); alert(err.detail || 'Error al guardar'); } } catch (err) { console.error(err); alert('Error de conexión'); } };
