@@ -107,7 +107,7 @@ router.put('/ejes/:id', async (req, res) => {
 // ========== Metas ==========
 router.get('/metas', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id_meta as id, codi as codigo, meta as nombre, estado FROM meta ORDER BY id_meta');
+    const result = await pool.query('SELECT id_meta as id, codi_meta as codigo, meta as nombre, estado FROM meta ORDER BY id_meta');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -118,7 +118,7 @@ router.get('/metas', async (req, res) => {
 router.post('/metas', async (req, res) => {
   try {
     const { codigo, nombre, estado } = req.body;
-    const result = await pool.query('INSERT INTO meta (codi, meta, estado) VALUES ($1, $2, $3) RETURNING id_meta as id, codi as codigo, meta as nombre, estado', [codigo, nombre, estado || 'ACTIVO']);
+    const result = await pool.query('INSERT INTO meta (codi_meta, meta, estado) VALUES ($1, $2, $3) RETURNING id_meta as id, codi_meta as codigo, meta as nombre, estado', [codigo, nombre, estado || 'ACTIVO']);
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -129,7 +129,7 @@ router.post('/metas', async (req, res) => {
 router.put('/metas/:id', async (req, res) => {
   try {
     const { codigo, nombre, estado } = req.body;
-    await pool.query('UPDATE meta SET codi = $1, meta = $2, estado = $3 WHERE id_meta = $4', [codigo, nombre, estado, req.params.id]);
+    await pool.query('UPDATE meta SET codi_meta = $1, meta = $2, estado = $3 WHERE id_meta = $4', [codigo, nombre, estado, req.params.id]);
     res.json({ message: 'Meta actualizada' });
   } catch (err) {
     console.error(err);
@@ -140,7 +140,7 @@ router.put('/metas/:id', async (req, res) => {
 // ========== Resultados ==========
 router.get('/resultados', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id_resultado as id, codi as codigo, resultado as nombre, estado FROM resultado ORDER BY id_resultado');
+    const result = await pool.query('SELECT id_resultado as id, codi_resultado as codigo, resultado as nombre, estado FROM resultado ORDER BY id_resultado');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -151,7 +151,7 @@ router.get('/resultados', async (req, res) => {
 router.post('/resultados', async (req, res) => {
   try {
     const { codigo, nombre, estado } = req.body;
-    const result = await pool.query('INSERT INTO resultado (codi, resultado, estado) VALUES ($1, $2, $3) RETURNING id_resultado as id, codi as codigo, resultado as nombre, estado', [codigo, nombre, estado || 'ACTIVO']);
+    const result = await pool.query('INSERT INTO resultado (codi_resultado, resultado, estado) VALUES ($1, $2, $3) RETURNING id_resultado as id, codi_resultado as codigo, resultado as nombre, estado', [codigo, nombre, estado || 'ACTIVO']);
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -162,7 +162,7 @@ router.post('/resultados', async (req, res) => {
 router.put('/resultados/:id', async (req, res) => {
   try {
     const { codigo, nombre, estado } = req.body;
-    await pool.query('UPDATE resultado SET codi = $1, resultado = $2, estado = $3 WHERE id_resultado = $4', [codigo, nombre, estado, req.params.id]);
+    await pool.query('UPDATE resultado SET codi_resultado = $1, resultado = $2, estado = $3 WHERE id_resultado = $4', [codigo, nombre, estado, req.params.id]);
     res.json({ message: 'Resultado actualizado' });
   } catch (err) {
     console.error(err);
@@ -173,7 +173,7 @@ router.put('/resultados/:id', async (req, res) => {
 // ========== Acciones ==========
 router.get('/acciones', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id_accion as id, codi as codigo, accion as nombre, estado FROM accion ORDER BY id_accion');
+    const result = await pool.query('SELECT id_accion as id, codi_accion as codigo, accion as nombre, estado FROM accion ORDER BY id_accion');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -184,7 +184,7 @@ router.get('/acciones', async (req, res) => {
 router.post('/acciones', async (req, res) => {
   try {
     const { codigo, nombre, estado } = req.body;
-    const result = await pool.query('INSERT INTO accion (codi, accion, estado) VALUES ($1, $2, $3) RETURNING id_accion as id, codi as codigo, accion as nombre, estado', [codigo, nombre, estado || 'ACTIVO']);
+    const result = await pool.query('INSERT INTO accion (codi_accion, accion, estado) VALUES ($1, $2, $3) RETURNING id_accion as id, codi_accion as codigo, accion as nombre, estado', [codigo, nombre, estado || 'ACTIVO']);
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -195,7 +195,7 @@ router.post('/acciones', async (req, res) => {
 router.put('/acciones/:id', async (req, res) => {
   try {
     const { codigo, nombre, estado } = req.body;
-    await pool.query('UPDATE accion SET codi = $1, accion = $2, estado = $3 WHERE id_accion = $4', [codigo, nombre, estado, req.params.id]);
+    await pool.query('UPDATE accion SET codi_accion = $1, accion = $2, estado = $3 WHERE id_accion = $4', [codigo, nombre, estado, req.params.id]);
     res.json({ message: 'Acción actualizada' });
   } catch (err) {
     console.error(err);
