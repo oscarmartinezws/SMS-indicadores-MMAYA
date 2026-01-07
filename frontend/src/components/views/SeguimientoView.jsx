@@ -321,66 +321,73 @@ function SeguimientoView({ user, siteConfig }) {
       );
       
       // Build HTML content for PDF - Single row per indicator
-      const htmlContent = `
-        <div id="pdf-content" style="font-family: 'Segoe UI', Arial, sans-serif; padding: 15px; width: 100%;">
-          <h1 style="font-size: 18px; text-align: center; margin-bottom: 8px; color: #1a1a1a; font-weight: 700;">SEGUIMIENTO DE INDICADORES - GESTIÓN ${gestion}</h1>
-          <h2 style="font-size: 12px; text-align: center; color: #666; margin-bottom: 15px; font-weight: 400;">Sistema de Monitoreo Sectorial</h2>
-          
-          <div style="margin-bottom: 15px; padding: 12px; background: #f5f5f5; border-radius: 6px; display: flex; flex-wrap: wrap; gap: 20px; font-size: 10px;">
-            <span><strong>Entidad:</strong> ${contexto.entidad || '-'}</span>
-            <span><strong>Área:</strong> ${contexto.area || '-'}</span>
-            <span><strong>Sector:</strong> ${contexto.sector || '-'}</span>
-            <span><strong>Usuario:</strong> ${user?.nombre || '-'}</span>
-            <span><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</span>
-          </div>
-          
-          <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
-            <thead>
-              <tr>
-                <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; width: 55px; font-size: 8px;">CÓDIGO</th>
-                <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; text-align: left; min-width: 140px; font-size: 8px;">INDICADOR</th>
-                ${mesesHeaders.map(m => `<th style="background: #333; color: white; padding: 6px 2px; border: 1px solid #444; width: 32px; font-size: 7px;">${m}</th>`).join('')}
-                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 45px; font-size: 7px;">PROG.</th>
-                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 45px; font-size: 7px;">LOGRADO</th>
-                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 45px; font-size: 7px;">% PROG</th>
-                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 45px; font-size: 7px;">% LOG</th>
-                <th style="background: #006633; color: white; padding: 6px 3px; border: 1px solid #005522; width: 50px; font-size: 7px;">Σ PROG</th>
-                <th style="background: #993300; color: white; padding: 6px 3px; border: 1px solid #882200; width: 50px; font-size: 7px;">% LOGRO GLOBAL</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${allData.map(({ indicador, rendicion, sumaProgramado, sumaLogrado }, idx) => {
-                const programado = parseFloat(rendicion.programado) || parseFloat(indicador.logro) || 0;
-                const logrado = parseFloat(rendicion.logrado) || 0;
-                const metaGlobal = parseFloat(indicador.logro) || 0;
-                
-                // Calculate percentages
-                const porcProgramado = metaGlobal > 0 ? ((programado / metaGlobal) * 100).toFixed(1) : '0.0';
-                const porcLogrado = programado > 0 ? ((logrado / programado) * 100).toFixed(1) : '0.0';
-                const porcLogroGlobal = metaGlobal > 0 ? ((sumaLogrado / metaGlobal) * 100).toFixed(1) : '0.0';
-                
-                // Color for % LOGRO GLOBAL
-                const logroGlobalColor = parseFloat(porcLogroGlobal) >= 100 ? '#009933' : (parseFloat(porcLogroGlobal) >= 50 ? '#cc6600' : '#cc0000');
-                
-                return `
-                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8f8f8'};">
-                    <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-weight: 600; font-size: 8px; vertical-align: middle;">${indicador.codi || ''}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: left; font-size: 8px; line-height: 1.4; word-wrap: break-word; max-width: 140px; vertical-align: middle;">${indicador.indicador_resultado || ''}</td>
-                    ${mesesCortos.map(m => {
-                      const val = rendicion['ejecutado_' + m];
-                      return '<td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; font-size: 7px; vertical-align: middle;">' + (val ? parseFloat(val).toFixed(2) : '-') + '</td>';
-                    }).join('')}
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e3f2fd; font-weight: 600; font-size: 8px; vertical-align: middle;">${programado ? programado.toFixed(2) : '-'}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-weight: 600; font-size: 8px; color: #c00; vertical-align: middle;">${logrado ? logrado.toFixed(2) : '-'}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e3f2fd; font-size: 8px; vertical-align: middle;">${porcProgramado}%</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-size: 8px; color: #c00; vertical-align: middle;">${porcLogrado}%</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e8f5e9; font-weight: 600; font-size: 8px; vertical-align: middle;">${sumaProgramado ? sumaProgramado.toFixed(2) : '-'}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #fff8e1; font-weight: 700; font-size: 8px; color: ${logroGlobalColor}; vertical-align: middle;">${porcLogroGlobal}%</td>
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
+324|      const htmlContent = `
+325|        <div id="pdf-content" style="font-family: 'Segoe UI', Arial, sans-serif; padding: 15px; width: 100%;">
+326|          <h1 style="font-size: 18px; text-align: center; margin-bottom: 8px; color: #1a1a1a; font-weight: 700;">SEGUIMIENTO DE INDICADORES - GESTIÓN ${gestion}</h1>
+327|          <h2 style="font-size: 12px; text-align: center; color: #666; margin-bottom: 15px; font-weight: 400;">Sistema de Monitoreo Sectorial</h2>
+328|          
+329|          <div style="margin-bottom: 15px; padding: 12px; background: #f5f5f5; border-radius: 6px; display: flex; flex-wrap: wrap; gap: 20px; font-size: 10px;">
+330|            <span><strong>Entidad:</strong> ${contexto.entidad || '-'}</span>
+331|            <span><strong>Área:</strong> ${contexto.area || '-'}</span>
+332|            <span><strong>Sector:</strong> ${contexto.sector || '-'}</span>
+333|            <span><strong>Usuario:</strong> ${user?.nombre || '-'}</span>
+334|            <span><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</span>
+335|          </div>
+336|          
+337|          <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
+338|            <thead>
+339|              <tr>
+340|                <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; width: 55px; font-size: 8px;">CÓDIGO</th>
+341|                <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; text-align: left; min-width: 120px; font-size: 8px;">INDICADOR</th>
+342|                <th style="background: #4a4a4a; color: white; padding: 8px 4px; border: 1px solid #333; width: 60px; font-size: 8px;">PLAN</th>
+343|                ${mesesHeaders.map(m => `<th style="background: #333; color: white; padding: 6px 2px; border: 1px solid #444; width: 30px; font-size: 7px;">${m}</th>`).join('')}
+344|                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 42px; font-size: 7px;">PROG.</th>
+345|                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 42px; font-size: 7px;">LOGRADO</th>
+346|                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 40px; font-size: 7px;">% PROG</th>
+347|                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 40px; font-size: 7px;">% LOG</th>
+348|                <th style="background: #006633; color: white; padding: 6px 3px; border: 1px solid #005522; width: 45px; font-size: 7px;">Σ PROG</th>
+349|                <th style="background: #993300; color: white; padding: 6px 3px; border: 1px solid #882200; width: 48px; font-size: 7px;">% LOGRO GLOBAL</th>
+350|              </tr>
+351|            </thead>
+352|            <tbody>
+353|              ${allData.map(({ indicador, rendicion, sumaProgramado, sumaLogrado }, idx) => {
+354|                const programado = parseFloat(rendicion.programado) || parseFloat(indicador.logro) || 0;
+355|                const logrado = parseFloat(rendicion.logrado) || 0;
+356|                const metaGlobal = parseFloat(indicador.logro) || 0;
+357|                
+358|                // Calculate percentages
+359|                const porcProgramado = metaGlobal > 0 ? ((programado / metaGlobal) * 100).toFixed(1) : '0.0';
+360|                const porcLogrado = programado > 0 ? ((logrado / programado) * 100).toFixed(1) : '0.0';
+361|                const porcLogroGlobal = metaGlobal > 0 ? ((sumaLogrado / metaGlobal) * 100).toFixed(1) : '0.0';
+362|                
+363|                // Color for % LOGRO GLOBAL
+364|                const logroGlobalColor = parseFloat(porcLogroGlobal) >= 100 ? '#009933' : (parseFloat(porcLogroGlobal) >= 50 ? '#cc6600' : '#cc0000');
+365|                
+366|                // Get planes for this indicator
+367|                const planesText = indicador.planes && indicador.planes.length > 0 
+368|                  ? indicador.planes.map(p => p.nombre).join(', ') 
+369|                  : '-';
+370|                
+371|                return `
+372|                  <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8f8f8'};">
+373|                    <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-weight: 600; font-size: 8px; vertical-align: middle;">${indicador.codi || ''}</td>
+374|                    <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: left; font-size: 8px; line-height: 1.4; word-wrap: break-word; max-width: 120px; vertical-align: middle;">${indicador.indicador_resultado || ''}</td>
+375|                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; font-size: 7px; font-weight: 600; vertical-align: middle; background: #f5f5f5;">${planesText}</td>
+376|                    ${mesesCortos.map(m => {
+377|                      const val = rendicion['ejecutado_' + m];
+378|                      return '<td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; font-size: 7px; vertical-align: middle;">' + (val ? parseFloat(val).toFixed(2) : '-') + '</td>';
+379|                    }).join('')}
+380|                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e3f2fd; font-weight: 600; font-size: 8px; vertical-align: middle;">${programado ? programado.toFixed(2) : '-'}</td>
+381|                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-weight: 600; font-size: 8px; color: #c00; vertical-align: middle;">${logrado ? logrado.toFixed(2) : '-'}</td>
+382|                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e3f2fd; font-size: 8px; vertical-align: middle;">${porcProgramado}%</td>
+383|                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-size: 8px; color: #c00; vertical-align: middle;">${porcLogrado}%</td>
+384|                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e8f5e9; font-weight: 600; font-size: 8px; vertical-align: middle;">${sumaProgramado ? sumaProgramado.toFixed(2) : '-'}</td>
+385|                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #fff8e1; font-weight: 700; font-size: 8px; color: ${logroGlobalColor}; vertical-align: middle;">${porcLogroGlobal}%</td>
+386|                  </tr>
+387|                `;
+388|              }).join('')}
+389|            </tbody>
+390|          </table>
           
           <div style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 4px; font-size: 8px;">
             <strong>Leyenda:</strong>
