@@ -164,4 +164,128 @@ router.get('/years', async (req, res) => {
   }
 });
 
+// Get indicator progress by year (for user dashboard chart)
+router.get('/indicador_progreso/:id_indicador', async (req, res) => {
+  try {
+    const idIndicador = parseInt(req.params.id_indicador);
+    
+    // Get all rendicion records for this indicator across all years
+    const result = await pool.query(`
+      SELECT 
+        r.gestion as year,
+        r.programado,
+        r.logrado,
+        mp.logro as meta_global
+      FROM rendicion r
+      INNER JOIN matriz_parametro mp ON r.id_indicador = mp.id_indicador
+      WHERE r.id_indicador = $1
+      ORDER BY r.gestion
+    `, [idIndicador]);
+    
+    // Also get the sum of logrado across all years for % logro global
+    const sumaResult = await pool.query(`
+      SELECT COALESCE(SUM(logrado), 0) as suma_logrado
+      FROM rendicion
+      WHERE id_indicador = $1
+    `, [idIndicador]);
+    
+    const metaResult = await pool.query(`
+      SELECT logro as meta_global FROM matriz_parametro WHERE id_indicador = $1
+    `, [idIndicador]);
+    
+    const sumaLogrado = parseFloat(sumaResult.rows[0]?.suma_logrado) || 0;
+    const metaGlobal = parseFloat(metaResult.rows[0]?.meta_global) || 0;
+    const porcLogroGlobal = metaGlobal > 0 ? ((sumaLogrado / metaGlobal) * 100) : 0;
+    
+    res.json({
+      data_por_anio: result.rows.map(r => ({
+        year: r.year,
+        programado: parseFloat(r.programado) || 0,
+        logrado: parseFloat(r.logrado) || 0,
+        meta_global: parseFloat(r.meta_global) || 0
+      })),
+      suma_logrado: sumaLogrado,
+      meta_global: metaGlobal,
+      porc_logro_global: Math.round(porcLogroGlobal * 100) / 100
+    });
+  } catch (err) {
+    console.error('Error getting indicator progress:', err);
+    res.status(500).json({ detail: 'Error al obtener progreso del indicador' });
+  }
+});
+
+// Dashboard summary for users (with avance global calculation)
+router.get('/summary_user', authenticateToken, async (req, res) => {
+  try {
+    const idArea = req.user.id_area;
+    
+    if (!idArea) {
+      return res.status(400).json({ detail: 'Usuario sin área asignada' });
+    }
+    
+    // Get all active indicators for this area
+    const indicadoresResult = await pool.query(`
+      SELECT 
+        mp.id_indicador, mp.indicador_resultado, mp.codi, mp.logro as meta_global, mp.estado,
+        s.sector, e.entidad, a.area_organizacional as area
+      FROM matriz_parametro mp
+      LEFT JOIN sector s ON mp.id_sector = s.id_sector
+      LEFT JOIN entidad e ON mp.id_entidad = e.id_entidad
+      LEFT JOIN area a ON mp.id_area = a.id_area
+      WHERE mp.id_area = $1 AND mp.estado = 'ACTIVO'
+      ORDER BY mp.id_indicador
+    `, [idArea]);
+    
+    const indicadores = indicadoresResult.rows;
+    
+    // For each indicator, get the sum of all logrado values and calculate % logro global
+    const indicadoresConAvance = await Promise.all(indicadores.map(async (ind) => {
+      const sumaResult = await pool.query(`
+        SELECT COALESCE(SUM(logrado), 0) as suma_logrado
+        FROM rendicion
+        WHERE id_indicador = $1
+      `, [ind.id_indicador]);
+      
+      const sumaLogrado = parseFloat(sumaResult.rows[0]?.suma_logrado) || 0;
+      const metaGlobal = parseFloat(ind.meta_global) || 0;
+      const porcLogroGlobal = metaGlobal > 0 ? ((sumaLogrado / metaGlobal) * 100) : 0;
+      
+      return {
+        ...ind,
+        suma_logrado: sumaLogrado,
+        porc_logro_global: porcLogroGlobal,
+        tiene_avance: sumaLogrado > 0
+      };
+    }));
+    
+    const totalIndicadores = indicadoresConAvance.length;
+    const conAvance = indicadoresConAvance.filter(i => i.tiene_avance).length;
+    const sinAvance = totalIndicadores - conAvance;
+    
+    // Calculate avance global (average of % logro global for indicators with avance)
+    const indicadoresConAvanceList = indicadoresConAvance.filter(i => i.tiene_avance);
+    const avanceGlobal = indicadoresConAvanceList.length > 0
+      ? indicadoresConAvanceList.reduce((sum, i) => sum + i.porc_logro_global, 0) / indicadoresConAvanceList.length
+      : 0;
+    
+    res.json({
+      contexto: indicadores.length > 0 ? {
+        sector: indicadores[0].sector,
+        entidad: indicadores[0].entidad,
+        area: indicadores[0].area
+      } : { sector: '-', entidad: '-', area: '-' },
+      general: {
+        total_indicadores: totalIndicadores,
+        con_avance: conAvance,
+        sin_avance: sinAvance,
+        avance_global: Math.round(avanceGlobal * 100) / 100
+      },
+      indicadores: indicadoresConAvance
+    });
+  } catch (err) {
+    console.error('Dashboard user error:', err);
+    res.status(500).json({ detail: 'Error al obtener dashboard de usuario' });
+  }
+});
+
 module.exports = router;
