@@ -40,12 +40,12 @@ router.get('/summary', authenticateToken, async (req, res) => {
     
     let filters = [];
     let params = [];
-    let mpFilters = [];
+    let mpFilters = ['mp.estado = \'ACTIVO\''];
     let mpParams = [];
     let paramIdx = 1;
     let mpParamIdx = 1;
     
-    if (year) {
+    if (year && year !== 'TODOS') {
       filters.push(`r.gestion = $${paramIdx++}`);
       params.push(parseInt(year));
     }
@@ -78,6 +78,9 @@ router.get('/summary', authenticateToken, async (req, res) => {
       mpParams.push(req.user.id_area);
     }
     
+    // Always add estado = ACTIVO to the main filters
+    filters.push(`mp.estado = 'ACTIVO'`);
+    
     const whereClause = filters.length > 0 ? filters.join(' AND ') : '1=1';
     const mpWhereClause = mpFilters.length > 0 ? mpFilters.join(' AND ') : '1=1';
     
@@ -107,43 +110,73 @@ router.get('/summary', authenticateToken, async (req, res) => {
     const dataResult = await pool.query(dataQuery, params);
     const indicators = dataResult.rows;
     
+    // Get unique indicators with their total logrado across all years
+    const indicatorMap = {};
+    for (const ind of indicators) {
+      if (!indicatorMap[ind.id_indicador]) {
+        indicatorMap[ind.id_indicador] = {
+          ...ind,
+          total_logrado_global: 0
+        };
+      }
+      indicatorMap[ind.id_indicador].total_logrado_global += parseFloat(ind.logrado) || 0;
+    }
+    
+    // Calculate % logro global for each indicator
+    const uniqueIndicators = Object.values(indicatorMap).map(ind => {
+      const metaGlobal = parseFloat(ind.logro_programado) || 0;
+      const porcLogroGlobal = metaGlobal > 0 ? ((ind.total_logrado_global / metaGlobal) * 100) : 0;
+      return {
+        ...ind,
+        porc_logro_global: porcLogroGlobal,
+        tiene_avance: ind.total_logrado_global > 0
+      };
+    });
+    
     const sectorSummary = {};
     const entidadSummary = {};
     const areaSummary = {};
     
-    indicators.forEach(ind => {
+    uniqueIndicators.forEach(ind => {
       const sector = ind.sector || 'Sin Sector';
       const entidad = ind.entidad || 'Sin Entidad';
       const area = ind.area || 'Sin Área';
-      const hasProgress = ind.total_acumulado && parseFloat(ind.total_acumulado) > 0;
+      const hasProgress = ind.tiene_avance;
       
       if (!sectorSummary[sector]) sectorSummary[sector] = { total: 0, con_avance: 0, acumulado: 0 };
       sectorSummary[sector].total++;
-      if (hasProgress) { sectorSummary[sector].con_avance++; sectorSummary[sector].acumulado += parseFloat(ind.total_acumulado); }
+      if (hasProgress) { sectorSummary[sector].con_avance++; sectorSummary[sector].acumulado += ind.total_logrado_global; }
       
       if (!entidadSummary[entidad]) entidadSummary[entidad] = { total: 0, con_avance: 0, acumulado: 0 };
       entidadSummary[entidad].total++;
-      if (hasProgress) { entidadSummary[entidad].con_avance++; entidadSummary[entidad].acumulado += parseFloat(ind.total_acumulado); }
+      if (hasProgress) { entidadSummary[entidad].con_avance++; entidadSummary[entidad].acumulado += ind.total_logrado_global; }
       
       if (!areaSummary[area]) areaSummary[area] = { total: 0, con_avance: 0, acumulado: 0 };
       areaSummary[area].total++;
-      if (hasProgress) { areaSummary[area].con_avance++; areaSummary[area].acumulado += parseFloat(ind.total_acumulado); }
+      if (hasProgress) { areaSummary[area].con_avance++; areaSummary[area].acumulado += ind.total_logrado_global; }
     });
     
-    const totalIndicators = indicators.length;
-    const withProgress = indicators.filter(i => i.total_acumulado && parseFloat(i.total_acumulado) > 0).length;
+    const totalIndicators = uniqueIndicators.length;
+    const withProgress = uniqueIndicators.filter(i => i.tiene_avance).length;
+    
+    // Calculate avance global (average of % logro global for indicators with avance)
+    const indicadoresConAvance = uniqueIndicators.filter(i => i.tiene_avance);
+    const avanceGlobal = indicadoresConAvance.length > 0
+      ? indicadoresConAvance.reduce((sum, i) => sum + i.porc_logro_global, 0) / indicadoresConAvance.length
+      : 0;
     
     res.json({
       general: {
         total_indicadores: totalIndicators,
         con_avance: withProgress,
         sin_avance: totalIndicators - withProgress,
-        porcentaje_avance: totalIndicators > 0 ? Math.round((withProgress / totalIndicators) * 10000) / 100 : 0
+        porcentaje_avance: totalIndicators > 0 ? Math.round((withProgress / totalIndicators) * 10000) / 100 : 0,
+        avance_global: Math.round(avanceGlobal * 100) / 100
       },
       por_sector: Object.entries(sectorSummary).map(([nombre, v]) => ({ nombre, ...v })),
       por_entidad: Object.entries(entidadSummary).map(([nombre, v]) => ({ nombre, ...v })),
       por_area: Object.entries(areaSummary).map(([nombre, v]) => ({ nombre, ...v })),
-      indicadores: indicators.slice(0, 50)
+      indicadores: uniqueIndicators.slice(0, 50)
     });
   } catch (err) {
     console.error('Dashboard error:', err);
