@@ -65,17 +65,33 @@ function SeguimientoView({ user, siteConfig }) {
     const loadData = async () => {
       try {
         const token = localStorage.getItem('sms_token');
-        if (user?.id_area) {
-          const ctxRes = await fetch(`${API_URL}/api/sms/contexto_usuario/${user.id_area}`);
-          if (ctxRes.ok) setContexto(await ctxRes.json());
-        }
         // Use the main endpoint that handles filtering based on user role
         const indRes = await fetch(`${API_URL}/api/sms/matriz_parametros`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const indData = await indRes.json();
         setIndicadores(indData);
-        if (indData.length > 0) setSelectedIndicador(indData[0]);
+        if (indData.length > 0) {
+          setSelectedIndicador(indData[0]);
+          // Get context from first indicator (which has sector, entidad, area from JOIN)
+          if (indData[0].sector || indData[0].entidad || indData[0].area) {
+            setContexto({
+              sector: indData[0].sector || '-',
+              entidad: indData[0].entidad || '-',
+              area: indData[0].area || '-'
+            });
+          }
+        }
+        // If no context from indicators, try to get from user area
+        if (user?.id_area) {
+          const ctxRes = await fetch(`${API_URL}/api/sms/dashboard/contexto_usuario/${user.id_area}`);
+          if (ctxRes.ok) {
+            const ctxData = await ctxRes.json();
+            if (ctxData && (ctxData.sector !== '-' || ctxData.entidad !== '-' || ctxData.area !== '-')) {
+              setContexto(ctxData);
+            }
+          }
+        }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     };
