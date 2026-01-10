@@ -295,18 +295,39 @@ router.get('/summary_user', authenticateToken, async (req, res) => {
     const conAvance = indicadoresConAvance.filter(i => i.tiene_avance).length;
     const sinAvance = totalIndicadores - conAvance;
     
-    // Calculate avance global (average of % logro global for indicators with avance)
-    const indicadoresConAvanceList = indicadoresConAvance.filter(i => i.tiene_avance);
-    const avanceGlobal = indicadoresConAvanceList.length > 0
-      ? indicadoresConAvanceList.reduce((sum, i) => sum + i.porc_logro_global, 0) / indicadoresConAvanceList.length
+    // Calculate avance global (average of % logro global for ALL indicators)
+    const avanceGlobal = totalIndicadores > 0
+      ? indicadoresConAvance.reduce((sum, i) => sum + i.porc_logro_global, 0) / totalIndicadores
       : 0;
     
+    // Get context from first indicator or from area directly
+    let contexto = { sector: '-', entidad: '-', area: '-' };
+    if (indicadores.length > 0) {
+      contexto = {
+        sector: indicadores[0].sector || '-',
+        entidad: indicadores[0].entidad || '-',
+        area: indicadores[0].area || '-'
+      };
+    } else {
+      // Try to get context from area table
+      const areaResult = await pool.query(`
+        SELECT a.area_organizacional as area, e.entidad, s.sector
+        FROM area a
+        LEFT JOIN entidad e ON a.id_entidad = e.id_entidad
+        LEFT JOIN sector s ON e.id_sector = s.id_sector
+        WHERE a.id_area = $1
+      `, [idArea]);
+      if (areaResult.rows.length > 0) {
+        contexto = {
+          sector: areaResult.rows[0].sector || '-',
+          entidad: areaResult.rows[0].entidad || '-',
+          area: areaResult.rows[0].area || '-'
+        };
+      }
+    }
+    
     res.json({
-      contexto: indicadores.length > 0 ? {
-        sector: indicadores[0].sector,
-        entidad: indicadores[0].entidad,
-        area: indicadores[0].area
-      } : { sector: '-', entidad: '-', area: '-' },
+      contexto: contexto,
       general: {
         total_indicadores: totalIndicadores,
         con_avance: conAvance,
