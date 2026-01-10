@@ -94,6 +94,9 @@ router.get('/matriz_parametros', authenticateToken, async (req, res) => {
   try {
     let query = `
       SELECT mp.*, 
+        s.sector,
+        e.entidad,
+        a.area_organizacional as area,
         COALESCE(
           (SELECT json_agg(json_build_object('id', p.id_plan, 'nombre', p.nombre))
            FROM indicador_plan ip 
@@ -101,6 +104,9 @@ router.get('/matriz_parametros', authenticateToken, async (req, res) => {
            WHERE ip.id_indicador = mp.id_indicador), '[]'
         ) as planes
       FROM matriz_parametro mp
+      LEFT JOIN sector s ON mp.id_sector = s.id_sector
+      LEFT JOIN entidad e ON mp.id_entidad = e.id_entidad
+      LEFT JOIN area a ON mp.id_area = a.id_area
     `;
     let params = [];
     
