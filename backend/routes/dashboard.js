@@ -159,10 +159,9 @@ router.get('/summary', authenticateToken, async (req, res) => {
     const totalIndicators = uniqueIndicators.length;
     const withProgress = uniqueIndicators.filter(i => i.tiene_avance).length;
     
-    // Calculate avance global (average of % logro global for indicators with avance)
-    const indicadoresConAvance = uniqueIndicators.filter(i => i.tiene_avance);
-    const avanceGlobal = indicadoresConAvance.length > 0
-      ? indicadoresConAvance.reduce((sum, i) => sum + i.porc_logro_global, 0) / indicadoresConAvance.length
+    // Calculate avance global (average of % logro global for ALL indicators)
+    const avanceGlobal = totalIndicators > 0
+      ? uniqueIndicators.reduce((sum, i) => sum + i.porc_logro_global, 0) / totalIndicators
       : 0;
     
     res.json({
