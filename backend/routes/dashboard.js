@@ -312,7 +312,15 @@ router.get('/summary_user', authenticateToken, async (req, res) => {
     
     // Get context from first indicator or from area directly
     let contexto = { sector: '-', entidad: '-', area: '-' };
-    if (indicadores.length > 0) {
+    
+    if (isInvitado) {
+      // INVITADO sees all indicators - show global context
+      contexto = {
+        sector: 'TODOS',
+        entidad: 'TODOS',
+        area: 'TODOS'
+      };
+    } else if (indicadores.length > 0) {
       contexto = {
         sector: indicadores[0].sector || '-',
         entidad: indicadores[0].entidad || '-',
