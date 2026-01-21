@@ -23,6 +23,11 @@ router.post('/login', async (req, res) => {
     
     const user = result.rows[0];
     
+    // Check if user is ACTIVE
+    if (user.estado !== 'ACTIVO') {
+      return res.status(401).json({ detail: 'Usuario inactivo. Contacte al administrador.' });
+    }
+    
     // Check password (bcrypt or plain)
     let validPassword = false;
     if (user.clave && user.clave.startsWith('$2')) {
