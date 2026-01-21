@@ -21,7 +21,10 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - Botones de acción VISIBLES pero DESHABILITADOS (opacity: 0.5, cursor: not-allowed)
   - No puede crear, editar ni eliminar registros
   - Puede ver todos los datos y exportar reportes
-  - **Ve TODOS los indicadores** (no filtrado por área) en Banco de Indicadores y Seguimiento
+  - **Ve TODOS los indicadores** (71 registros) en:
+    - Dashboard (Sector: TODOS, Entidad: TODOS, Área: TODOS)
+    - Banco de Indicadores
+    - Seguimiento
 
 ### Dashboard
 - [x] KPIs de indicadores (total, con avance, sin avance, % avance)
@@ -145,17 +148,14 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - ✅ **Rol INVITADO (solo lectura) - UI Completa**:
   - Botones de acción (+ Adicionar, ✏️ Editar, 💾 Guardar) VISIBLES pero DESHABILITADOS
   - Estilo aplicado: `opacity: 0.5, cursor: not-allowed`
-  - Implementado en todos los componentes:
-    - CrudTable.jsx (Sectores, Pilares, Ejes, Metas, Resultados, Acciones)
-    - UsuariosView.jsx
-    - RolesView.jsx (incluyendo dropdown de estado en ACCESO)
-    - EntidadesAreasView.jsx (ambas secciones: Entidad y Área)
-    - MenuAdminView.jsx
-    - IndicadoresView.jsx
-    - SeguimientoView.jsx (botones, inputs y textareas)
-    - ConfiguracionView.jsx
-  - **INVITADO ve TODOS los indicadores** (igual que ADMIN, pero solo lectura)
-  - Modificación en `/backend/routes/indicadores.js` para excluir INVITADO del filtro por área
+  - Implementado en todos los componentes de vista
+  - **INVITADO ve TODOS los indicadores** (71 registros):
+    - Dashboard: Contexto muestra "TODOS" para Sector, Entidad y Área
+    - Banco de Indicadores: Lista completa de 71 indicadores
+    - Seguimiento: Acceso a todos los indicadores para consulta
+  - Modificaciones en backend:
+    - `/backend/routes/indicadores.js`: Excluir INVITADO del filtro por área
+    - `/backend/routes/dashboard.js`: summary y summary_user sin filtro para INVITADO
   - Testing completo: 100% de pruebas pasadas
 
 ### 2025-01-05
