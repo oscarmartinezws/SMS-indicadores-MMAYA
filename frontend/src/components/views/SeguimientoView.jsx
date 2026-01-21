@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import html2pdf from 'html2pdf.js';
 import { API_URL, getStyles, defaultStyles, getTableStyles } from '../../styles/theme';
 
-function SeguimientoView({ user, siteConfig }) {
+function SeguimientoView({ user, siteConfig, readOnly = false }) {
   // Get styles based on site config
   const styles = siteConfig ? getStyles(siteConfig.color_theme, siteConfig.modo) : defaultStyles;
   const { rowStyle, headerStyle } = getTableStyles(styles);
@@ -24,6 +24,7 @@ function SeguimientoView({ user, siteConfig }) {
   const [sumaLogrado, setSumaLogrado] = useState(0);
 
   const isAdmin = user?.rol === 'ADMINISTRADOR';
+  const canEdit = !readOnly && (isAdmin || user?.rol !== 'INVITADO');
   const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
   const mesesCortos = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 
