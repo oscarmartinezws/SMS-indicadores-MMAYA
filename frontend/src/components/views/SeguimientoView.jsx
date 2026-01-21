@@ -816,7 +816,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
       )}
 
       {/* Modal for editing PROGRAMADO - Only Admin */}
-      {showProgramadoModal && isAdmin && (
+      {showProgramadoModal && canEdit && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
           <div style={{ background: styles.white, borderRadius: 10, padding: 0, maxWidth: 400, width: '90%', overflow: 'hidden' }}>
             <div style={{ background: styles.blue, color: styles.white, padding: '16px 20px' }}>
