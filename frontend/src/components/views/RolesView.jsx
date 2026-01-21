@@ -67,7 +67,7 @@ function RolesView({ readOnly = false }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h2 style={{ fontWeight: 700, fontSize: '1.2rem' }}>ROLES</h2>
-        <button onClick={() => openModal()} style={{ padding: '8px 16px', background: styles.black, color: styles.white, border: 'none', borderRadius: 5, fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}>+ Adicionar</button>
+        {!readOnly && <button onClick={() => openModal()} style={{ padding: '8px 16px', background: styles.black, color: styles.white, border: 'none', borderRadius: 5, fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}>+ Adicionar</button>}
       </div>
       <div style={{ background: styles.white, borderRadius: 6, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -76,7 +76,7 @@ function RolesView({ readOnly = false }) {
               <th style={headerStyle}>ID ROL</th>
               <th style={headerStyle}>ROL</th>
               <th style={headerStyle}>ESTADO</th>
-              <th style={{ ...headerStyle, textAlign: 'center' }}>OP</th>
+              {!readOnly && <th style={{ ...headerStyle, textAlign: 'center' }}>OP</th>}
             </tr>
           </thead>
           <tbody>
@@ -87,9 +87,9 @@ function RolesView({ readOnly = false }) {
                 <td style={{ ...rowStyle, textAlign: 'center' }}>
                   <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 600, background: role.estado === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: role.estado === 'ACTIVO' ? styles.green : styles.red }}>{role.estado}</span>
                 </td>
-                <td style={{ ...rowStyle, textAlign: 'center' }}>
+                {!readOnly && <td style={{ ...rowStyle, textAlign: 'center' }}>
                   <button onClick={(e) => { e.stopPropagation(); openModal(role); }} style={{ padding: '3px 10px', background: styles.gray100, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.75rem' }}>✏️</button>
-                </td>
+                </td>}
               </tr>
             ))}
           </tbody>
