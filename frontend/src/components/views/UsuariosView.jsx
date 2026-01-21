@@ -3,7 +3,7 @@ import { API_URL, defaultStyles as styles, getTableStyles } from '../../styles/t
 
 const { rowStyle, headerStyle } = getTableStyles(styles);
 
-function UsuariosView() {
+function UsuariosView({ readOnly = false }) {
   const [data, setData] = useState([]); 
   const [areas, setAreas] = useState([]); 
   const [roles, setRoles] = useState([]); 
@@ -25,6 +25,7 @@ function UsuariosView() {
   }, []);
   
   const openModal = (item = null) => { 
+    if (readOnly) return;
     if (item) { 
       setEditItem(item); 
       setFormData({ ...item, clave: '' }); 
