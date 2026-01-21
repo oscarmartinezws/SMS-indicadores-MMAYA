@@ -27,6 +27,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
   const canEdit = !readOnly && (isAdmin || user?.rol !== 'INVITADO');
   const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
   const mesesCortos = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+  const disabledBtnStyle = { opacity: 0.5, cursor: 'not-allowed' };
 
   // Fetch suma programado for selected indicator
   const fetchSumaProgramado = async (id_indicador) => {
@@ -504,7 +505,12 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 {indicadores.map(ind => <option key={ind.id_indicador} value={ind.id_indicador}>{ind.codi} - {ind.indicador_resultado?.substring(0, 80)}...</option>)}
               </select>
             </div>
-            <button onClick={saveRendicion} data-testid="btn-guardar" style={{ padding: '12px 24px', background: styles.black, color: styles.white, border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>
+            <button 
+              onClick={!readOnly ? saveRendicion : undefined} 
+              disabled={readOnly}
+              data-testid="btn-guardar" 
+              style={{ padding: '12px 24px', background: styles.black, color: styles.white, border: 'none', borderRadius: 8, fontWeight: 600, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.85rem', ...(readOnly ? disabledBtnStyle : {}) }}
+            >
               💾 Guardar
             </button>
             <div style={{ position: 'relative' }}>
@@ -597,9 +603,12 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 <td style={{ ...rowStyle, textAlign: 'center', background: '#DBEAFE', fontWeight: 600, color: styles.blue }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                     <span>{rendicion.programado || selectedIndicador?.logro || '-'}</span>
-                    {canEdit && (
-                      <button onClick={openProgramadoModal} data-testid="btn-edit-programado" style={{ padding: '2px 6px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.65rem' }}>✏️</button>
-                    )}
+                    <button 
+                      onClick={() => !readOnly && openProgramadoModal()} 
+                      disabled={readOnly}
+                      data-testid="btn-edit-programado" 
+                      style={{ padding: '2px 6px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.65rem', ...(readOnly ? disabledBtnStyle : {}) }}
+                    >✏️</button>
                   </div>
                 </td>
                 <td style={{ ...rowStyle, textAlign: 'center', background: '#FEE2E2', fontWeight: 600, color: styles.red }}>
@@ -697,7 +706,11 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
       <div style={{ background: styles.white, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
         <div style={{ ...darkHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>ARCHIVOS ADJUNTOS</span>
-          {canEdit && <button onClick={() => setShowFileModal(true)} style={{ padding: '6px 12px', background: styles.white, color: styles.black, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.7rem' }}>+ Agregar archivo</button>}
+          <button 
+            onClick={() => !readOnly && setShowFileModal(true)} 
+            disabled={readOnly}
+            style={{ padding: '6px 12px', background: styles.white, color: styles.black, border: 'none', borderRadius: 6, fontWeight: 600, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.7rem', ...(readOnly ? disabledBtnStyle : {}) }}
+          >+ Agregar archivo</button>
         </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead><tr>{['NOMBRE', 'DESCRIPCIÓN', 'TAMAÑO', 'ACCIONES'].map(h => <th key={h} style={headerStyle}>{h}</th>)}</tr></thead>
@@ -712,7 +725,11 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                   <td style={rowStyle}>{adj.size || '-'}</td>
                   <td style={{ ...rowStyle, textAlign: 'center' }}>
                     <a href={adj.url.startsWith('http') ? adj.url : `${API_URL}${adj.url}`} target="_blank" rel="noopener noreferrer" style={{ color: styles.blue, marginRight: 8 }}>⬇️</a>
-                    {canEdit && <button onClick={() => deleteAdjunto(adj.id)} style={{ background: 'none', border: 'none', color: styles.red, cursor: 'pointer' }}>🗑️</button>}
+                    <button 
+                      onClick={() => !readOnly && deleteAdjunto(adj.id)} 
+                      disabled={readOnly}
+                      style={{ background: 'none', border: 'none', color: styles.red, cursor: readOnly ? 'not-allowed' : 'pointer', ...(readOnly ? disabledBtnStyle : {}) }}
+                    >🗑️</button>
                   </td>
                 </tr>
               ))
