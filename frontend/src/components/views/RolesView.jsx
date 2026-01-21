@@ -3,7 +3,7 @@ import { API_URL, defaultStyles as styles, getTableStyles } from '../../styles/t
 
 const { rowStyle, headerStyle } = getTableStyles(styles);
 
-function RolesView() {
+function RolesView({ readOnly = false }) {
   const [roles, setRoles] = useState([]); 
   const [selectedRoleId, setSelectedRoleId] = useState(null); 
   const [options, setOptions] = useState([]); 
@@ -27,6 +27,7 @@ function RolesView() {
   };
   
   const updateOptionState = async (id, estado) => { 
+    if (readOnly) return;
     await fetch(`${API_URL}/api/sms/opciones/${id}`, { 
       method: 'PUT', 
       headers: { 'Content-Type': 'application/json' }, 
@@ -36,6 +37,7 @@ function RolesView() {
   };
   
   const openModal = (role = null) => { 
+    if (readOnly) return;
     if (role) { 
       setEditRole(role); 
       setFormData({ rol: role.rol, estado: role.estado }); 
@@ -47,6 +49,7 @@ function RolesView() {
   };
   
   const saveRole = async () => { 
+    if (readOnly) return;
     if (!formData.rol.trim()) { alert('El nombre del rol es obligatorio'); return; } 
     const method = editRole ? 'PUT' : 'POST'; 
     const url = editRole ? `${API_URL}/api/sms/roles/${editRole.id_rol}` : `${API_URL}/api/sms/roles`; 
