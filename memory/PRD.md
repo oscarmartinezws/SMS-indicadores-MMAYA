@@ -16,6 +16,11 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 - [x] Hash de contraseñas con bcrypt
 - [x] Verificación de token
 - [x] Control de acceso basado en roles (RBAC)
+- [x] **Bloqueo de usuarios INACTIVO** (no pueden iniciar sesión)
+- [x] **Rol INVITADO (solo lectura)** implementado:
+  - Botones de acción VISIBLES pero DESHABILITADOS (opacity: 0.5, cursor: not-allowed)
+  - No puede crear, editar ni eliminar registros
+  - Puede ver todos los datos y exportar reportes
 
 ### Dashboard
 - [x] KPIs de indicadores (total, con avance, sin avance, % avance)
@@ -131,8 +136,24 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 ## Credenciales de Prueba
 - **Admin:** omartinez / P1c0l0c0
 - **Usuario:** jperez / P1c0l0c0
+- **Invitado (solo lectura):** invitado / invitado123
 
 ## Tareas Completadas (Enero 2025)
+
+### 2025-01-21
+- ✅ **Rol INVITADO (solo lectura) - UI Completa**:
+  - Botones de acción (+ Adicionar, ✏️ Editar, 💾 Guardar) VISIBLES pero DESHABILITADOS
+  - Estilo aplicado: `opacity: 0.5, cursor: not-allowed`
+  - Implementado en todos los componentes:
+    - CrudTable.jsx (Sectores, Pilares, Ejes, Metas, Resultados, Acciones)
+    - UsuariosView.jsx
+    - RolesView.jsx (incluyendo dropdown de estado en ACCESO)
+    - EntidadesAreasView.jsx (ambas secciones: Entidad y Área)
+    - MenuAdminView.jsx
+    - IndicadoresView.jsx
+    - SeguimientoView.jsx (botones, inputs y textareas)
+    - ConfiguracionView.jsx
+  - Testing completo: 100% de pruebas pasadas
 
 ### 2025-01-05
 - ✅ **Mejoras de PROGRAMADO en vista Seguimiento**:
