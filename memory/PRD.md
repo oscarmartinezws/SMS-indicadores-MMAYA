@@ -21,6 +21,7 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - Botones de acción VISIBLES pero DESHABILITADOS (opacity: 0.5, cursor: not-allowed)
   - No puede crear, editar ni eliminar registros
   - Puede ver todos los datos y exportar reportes
+  - **Ve TODOS los indicadores** (no filtrado por área) en Banco de Indicadores y Seguimiento
 
 ### Dashboard
 - [x] KPIs de indicadores (total, con avance, sin avance, % avance)
@@ -153,6 +154,8 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
     - IndicadoresView.jsx
     - SeguimientoView.jsx (botones, inputs y textareas)
     - ConfiguracionView.jsx
+  - **INVITADO ve TODOS los indicadores** (igual que ADMIN, pero solo lectura)
+  - Modificación en `/backend/routes/indicadores.js` para excluir INVITADO del filtro por área
   - Testing completo: 100% de pruebas pasadas
 
 ### 2025-01-05
