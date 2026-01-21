@@ -61,13 +61,19 @@ function RolesView({ readOnly = false }) {
     } 
   };
   
+  const disabledBtnStyle = { opacity: 0.5, cursor: 'not-allowed' };
+
   if (loading) return <div style={{ textAlign: 'center', padding: 24 }}>Cargando...</div>;
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h2 style={{ fontWeight: 700, fontSize: '1.2rem' }}>ROLES</h2>
-        {!readOnly && <button onClick={() => openModal()} style={{ padding: '8px 16px', background: styles.black, color: styles.white, border: 'none', borderRadius: 5, fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}>+ Adicionar</button>}
+        <button 
+          onClick={() => !readOnly && openModal()} 
+          disabled={readOnly}
+          style={{ padding: '8px 16px', background: styles.black, color: styles.white, border: 'none', borderRadius: 5, fontWeight: 600, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.8rem', ...(readOnly ? disabledBtnStyle : {}) }}
+        >+ Adicionar</button>
       </div>
       <div style={{ background: styles.white, borderRadius: 6, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -76,7 +82,7 @@ function RolesView({ readOnly = false }) {
               <th style={headerStyle}>ID ROL</th>
               <th style={headerStyle}>ROL</th>
               <th style={headerStyle}>ESTADO</th>
-              {!readOnly && <th style={{ ...headerStyle, textAlign: 'center' }}>OP</th>}
+              <th style={{ ...headerStyle, textAlign: 'center' }}>OP</th>
             </tr>
           </thead>
           <tbody>
@@ -87,9 +93,13 @@ function RolesView({ readOnly = false }) {
                 <td style={{ ...rowStyle, textAlign: 'center' }}>
                   <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 600, background: role.estado === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: role.estado === 'ACTIVO' ? styles.green : styles.red }}>{role.estado}</span>
                 </td>
-                {!readOnly && <td style={{ ...rowStyle, textAlign: 'center' }}>
-                  <button onClick={(e) => { e.stopPropagation(); openModal(role); }} style={{ padding: '3px 10px', background: styles.gray100, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.75rem' }}>✏️</button>
-                </td>}
+                <td style={{ ...rowStyle, textAlign: 'center' }}>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); !readOnly && openModal(role); }} 
+                    disabled={readOnly}
+                    style={{ padding: '3px 10px', background: styles.gray100, border: 'none', borderRadius: 4, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.75rem', ...(readOnly ? disabledBtnStyle : {}) }}
+                  >✏️</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -113,7 +123,12 @@ function RolesView({ readOnly = false }) {
                 <td style={{ ...rowStyle, textAlign: 'center' }}>{opt.id_opcion}</td>
                 <td style={rowStyle}>{opt.opcion}</td>
                 <td style={{ ...rowStyle, textAlign: 'center' }}>
-                  <select value={opt.estado} onChange={(e) => updateOptionState(opt.id_opcion, e.target.value)} style={{ padding: '3px 6px', border: 'none', borderRadius: 4, background: styles.gray100, fontSize: '0.75rem', cursor: 'pointer' }}>
+                  <select 
+                    value={opt.estado} 
+                    onChange={(e) => !readOnly && updateOptionState(opt.id_opcion, e.target.value)} 
+                    disabled={readOnly}
+                    style={{ padding: '3px 6px', border: 'none', borderRadius: 4, background: styles.gray100, fontSize: '0.75rem', cursor: readOnly ? 'not-allowed' : 'pointer', ...(readOnly ? disabledBtnStyle : {}) }}
+                  >
                     <option value="ACTIVO">ACTIVO</option>
                     <option value="INACTIVO">INACTIVO</option>
                   </select>
