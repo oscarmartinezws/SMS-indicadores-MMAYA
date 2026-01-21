@@ -590,8 +590,14 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                   return (
                     <td key={m} style={{ ...rowStyle, padding: 4, background: isSelected ? '#D1FAE5' : 'transparent' }}>
                       {isSelected ? (
-                        <input type="number" step="0.001" value={rendicion[fieldName] || ''} 
-                          onChange={(e) => handleChange(fieldName, e.target.value)} style={cellInput} />
+                        <input 
+                          type="number" 
+                          step="0.001" 
+                          value={rendicion[fieldName] || ''} 
+                          onChange={(e) => !readOnly && handleChange(fieldName, e.target.value)} 
+                          disabled={readOnly}
+                          style={{ ...cellInput, ...(readOnly ? disabledBtnStyle : {}) }} 
+                        />
                       ) : (
                         <span style={{ display: 'block', textAlign: 'center', fontSize: '0.75rem', color: styles.gray600 }}>
                           {rendicion[fieldName] || ''}
