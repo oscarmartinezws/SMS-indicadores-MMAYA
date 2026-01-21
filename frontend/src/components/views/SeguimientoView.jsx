@@ -697,7 +697,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
       <div style={{ background: styles.white, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
         <div style={{ ...darkHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>ARCHIVOS ADJUNTOS</span>
-          <button onClick={() => setShowFileModal(true)} style={{ padding: '6px 12px', background: styles.white, color: styles.black, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.7rem' }}>+ Agregar archivo</button>
+          {canEdit && <button onClick={() => setShowFileModal(true)} style={{ padding: '6px 12px', background: styles.white, color: styles.black, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: '0.7rem' }}>+ Agregar archivo</button>}
         </div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead><tr>{['NOMBRE', 'DESCRIPCIÓN', 'TAMAÑO', 'ACCIONES'].map(h => <th key={h} style={headerStyle}>{h}</th>)}</tr></thead>
@@ -712,10 +712,11 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                   <td style={rowStyle}>{adj.size || '-'}</td>
                   <td style={{ ...rowStyle, textAlign: 'center' }}>
                     <a href={adj.url.startsWith('http') ? adj.url : `${API_URL}${adj.url}`} target="_blank" rel="noopener noreferrer" style={{ color: styles.blue, marginRight: 8 }}>⬇️</a>
-                    <button onClick={() => deleteAdjunto(adj.id)} style={{ background: 'none', border: 'none', color: styles.red, cursor: 'pointer' }}>🗑️</button>
+                    {canEdit && <button onClick={() => deleteAdjunto(adj.id)} style={{ background: 'none', border: 'none', color: styles.red, cursor: 'pointer' }}>🗑️</button>}
                   </td>
                 </tr>
               ))
+            )}
             )}
           </tbody>
         </table>
