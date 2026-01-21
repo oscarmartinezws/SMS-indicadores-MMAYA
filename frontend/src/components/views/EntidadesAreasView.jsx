@@ -166,7 +166,7 @@ function EntidadesAreasView({ readOnly = false }) {
       </div>
 
       {/* Entidad Modal */}
-      {showEntidadModal && (
+      {showEntidadModal && !readOnly && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
           <div style={{ background: styles.white, borderRadius: 10, padding: 20, maxWidth: 400, width: '90%' }}>
             <h3 style={{ marginBottom: 16, fontWeight: 700, fontSize: '1rem' }}>{editItem ? 'Editar' : 'Nueva'} Entidad</h3>
