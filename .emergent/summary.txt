@@ -2,93 +2,84 @@
 The user's initial request was for comprehensive maintenance and feature development on a system with a Node.js backend and React frontend, connected to a PostgreSQL database.
 
 The most recent requests during this session were:
-1.  **Calculated Field:** Add a % LOGRO GLOBAL field to the Seguimiento view.
-2.  **PDF Report Enhancements:** Modify the PDF export to change the title, simplify the data rows, improve text quality, and handle long indicator names.
-3.  **Bug Fix - File Attachments:** Fix a bug where attached files in the Seguimiento view were not being saved.
-4.  **Bug Fix - UI Duplicates:** Fix issues where the Menu and Acceso por Rol maintenance views were showing duplicate records.
-5.  **Critical Refactoring:** Refactor the monolithic frontend () and backend () into a modular structure without affecting functionality. The user is cost-conscious and emphasized that the application must work correctly after the changes.
-6.  **Bug Hunt:** After the refactoring, the user requested a full validation of all functionalities to find any new bugs or regressions.
+1.  **Bug Hunt & Stabilization:** After a major refactoring, the user requested a full validation of all functionalities, which revealed several bugs in CRUD views, the dashboard, and navigation. These have been progressively fixed.
+2.  **Add Planes to Indicators:** Implement a feature to associate indicators with one or more Planes (PDES, PSDI, PTDI) using a multi-select interface and display them in the indicator list.
+3.  **Enhance PDF Report:** Include the newly added Plan information in the PDF report generated from the Seguimiento (Tracking) view.
+4.  **Dashboard Overhaul:** Completely redesign the dashboard to provide two distinct views based on user role:
+    *   **Admin View:** Global filters, specific KPI calculations, and aggregate charts.
+    *   **User View:** Context-specific information (Sector, Entidad, Área), an indicator dropdown, and a detailed bar chart for the selected indicator's yearly progress.
+5.  **Implement Security and Roles:**
+    *   Prevent users with an INACTIVO status from logging into the system.
+    *   Create a new read-only INVITADO (Guest) role that can view data but cannot perform any write operations (add, edit, delete).
+6.  **UI Polish for Read-Only Role:** The user specified that for the INVITADO role, action buttons should be visible but disabled (greyed out), not hidden from the UI.
 
 **User's preferred language**: Spanish
 
 **what currently exists?**
-The application is a full-stack system with a **React frontend** and a **Node.js/Express.js backend** using a single **PostgreSQL** database.
+The application is a stable, full-stack system with a modular **React frontend** and **Node.js/Express.js backend** connected to a **PostgreSQL** database. Major regressions from a previous refactoring have been fixed.
 
-A major refactoring has just been completed:
--   **Frontend:** The monolithic  (over 2,500 lines) has been broken down into a modular structure. Views are now in  and common components are in .  now primarily handles routing and state management and is only ~167 lines.
--   **Backend:** The monolithic  (over 1,100 lines) has been modularized. Endpoints are now grouped by functionality into separate files under  using Express Router.  is now only ~53 lines and handles setup and route mounting.
-
-Despite the refactoring, regressions have been introduced, and the application is not fully stable.
+Key recent additions include:
+-   A Planes feature for associating indicators with plans.
+-   A completely redesigned, role-aware dashboard (Admin vs. User views).
+-   A new, partially implemented INVITADO (Guest) role intended for read-only access. The backend logic to prevent inactive users from logging in is complete. The frontend has been partially updated to handle the read-only state.
 
 **Last working item**:
--   **Last item agent was working:** The agent was investigating a critical bug reported by the user ( in ) which appeared after the major refactoring. This error breaks all generic CRUD maintenance views (like Sector, Pilar, etc.). The agent correctly identified that  was missing from an import in  and was about to validate the entire application after fixing it. However, the user reported another error (), indicating the fix was incomplete or another issue exists.
+-   **Last item agent was working:** The agent was addressing user feedback on the new INVITADO role. The user reported that menu items were duplicated and that action buttons (like + Adicionar, Editar) were being hidden, whereas the requirement was for them to be visible but disabled.
+    -   The agent successfully fixed the duplicated menu issue by cleaning the  table in the database.
+    -   The agent then began the task of changing the frontend components to disable buttons instead of hiding them for read-only users. It started modifying , , , and  but did not complete the changes for all required views.
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** Frontend testing agent. A full regression test is required after the fix due to the extensive refactoring.
+-   **Which testing method agent to use?** Frontend testing agent. After the changes are applied to all views, the agent should log in as the  user and perform a comprehensive check across all screens to ensure all action buttons and interactive elements are visible but disabled.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1 (P0):  error in .**
-    -   **Description:** All CRUD views that use the generic  component are crashing. This is a major regression from the refactoring. The error occurs because the component is receiving an object from the API instead of an array, which it cannot iterate over with .
-    -   **Attempted fixes:** The agent first found and fixed a missing  import in the component. However, the  error persists, as reported by the user.
+-   **Issue 1 (P0): Buttons for INVITADO role should be disabled, not hidden.**
+    -   **Description:** For the read-only INVITADO role, action buttons (, edit/delete icons, save buttons in modals) should be visible but greyed out/disabled, not completely hidden. This provides better UX by showing what actions are possible for other roles.
+    -   **Attempted fixes:** The agent started updating components (, , , ) to pass a  prop and use the  attribute on buttons. This work is incomplete.
     -   **Next debug checklist:**
-        1.  View the file .
-        2.  Locate the line where  is called.
-        3.  Add a safeguard to ensure  is always an array before mapping. Modify the line to .
-        4.  Restart the frontend supervisor: frontend: ERROR (not running)
+        1.  Review all view components inside .
+        2.  For each view, ensure the  prop (passed from ) is used to disable all interactive elements that perform write actions. This includes:
+            *    buttons.
+            *   Edit () and Delete buttons in tables.
+            *    (Save) buttons inside modals.
+            *   Clickable cells or elements in the  for entering data.
+        3.  The agent already updated several files; this process needs to be completed for: , , , and .
+        4.  After applying all changes, restart the frontend: frontend: ERROR (not running)
 frontend: started.
-        5.  Use the  to test one of the failing views (e.g., PARAMETRICAS -> Sector) to confirm the fix.
-        6.  Once confirmed, run a full regression test using the  to ensure no other functionality was broken.
-    -   **Why fix this issue and what will be achieved with the fix?** This will restore the core functionality of all CRUD maintenance screens, which are currently unusable.
+        5.  Log in as the  user and use the  to verify the disabled state of buttons on multiple pages (e.g., Sectores, Banco de Indicadores, Seguimiento).
+    -   **Why fix this issue and what will be achieved with the fix?** This will correctly implement the user's requirement for the read-only role's UI, improving user experience by clearly indicating which actions are not permitted.
     -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** Y (It's a regression from the recent refactoring).
+    -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** Frontend.
     -   **Blocked on other issue:** None.
 
--   **Issue 2 (P1): Sidebar navigation not working correctly.**
-    -   **Description:** During testing, the agent observed that clicking on sidebar menu items (e.g., Sector) did not switch to the correct view; the Dashboard remained visible. The agent suspected a Playwright selector issue but did not fully resolve it before moving on.
-    -   **Attempted fixes:** None. The agent moved to debug the  issue.
-    -   **Next debug checklist:**
-        1.  Review  and .
-        2.  Verify that the  handler on menu items correctly calls the  function with the right view name (e.g., 'loadSectorView').
-        3.  Check the  statement in  to ensure the view names match what the sidebar is sending.
-        4.  This should be tested as part of the full regression test after Issue 1 is fixed.
-    -   **Why fix this issue and what will be achieved with the fix?** To restore main navigation functionality.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** Y (Regression).
-    -   **Should Test frontend/backend/both after fix?** Frontend.
-    -   **Blocked on other issue:** Issue 1.
-
 **In progress Task List**:
-None.
+-   **Task 1 (P0): Complete the INVITADO role UI implementation.**
+    -   **Where to resume:** Continue modifying the remaining frontend view components (, , , ) to correctly handle the  prop by disabling, not hiding, action buttons.
+    -   **What will be achieved with this?** A fully functional read-only guest role that aligns with the user's UI/UX requirements.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Frontend.
+    -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 
-**Upcoming Tasks:**
--   **Task 1 (P0): Full Regression Testing.**
-    -   **Where to resume:** After fixing the  bug (Issue 1).
-    -   **What will be achieved:** Stabilize the application by performing a comprehensive test of all features (Login, Dashboard, All CRUD views, Seguimiento, Indicadores, File attachments, PDF export) to identify and fix any remaining regressions from the major refactoring.
-
 **Future Tasks:**
--   **Task 2 (P1): Implement Server-Side Validation.**
-    -   **Where to start:** Backend routes in .
-    -   **What will be achieved:** Enhance security and data integrity by adding input validation to all  and  endpoints using a library like  or .
-
--   **Task 3 (P2): Add Unit/Integration Tests.**
-    -   **Where to start:** Create  directories in both frontend and backend.
-    -   **What will be achieved:** Improve long-term stability and prevent future regressions by creating an automated test suite.
-
--   **Task 4 (P2): Database Cleanup.**
-    -   **Where to start:** Investigate tables , , .
-    -   **What will be achieved:** Remove unused and empty database tables to clean up the schema.
+-   **Task 1 (P1): Implement Server-Side Validation.**
+    -   Add input validation to all  and  endpoints in the backend () to improve security and data integrity.
+-   **Task 2 (P2): Add Unit/Integration Tests.**
+    -   Create  directories in both the frontend and backend to build an automated test suite, preventing future regressions.
+-   **Task 3 (P2): Database Cleanup.**
+    -   Investigate and remove any potentially unused or empty database tables.
 
 **Completed work in this session**
--   **Feature - % LOGRO GLOBAL Field:** Implemented the new calculated field in the Seguimiento view, including backend endpoint and frontend display with conditional coloring.
--   **Feature - PDF Report Overhaul:** Rewrote the PDF export functionality with a new title, a simplified single-row layout per indicator, improved text quality, and better handling of long text.
--   **Bug Fix - File Attachments:** Successfully implemented the persistence of file attachments for the Rendicion records. This involved creating new backend endpoints to link uploads to the  table and updating the frontend modal to use them.
--   **Bug Fix - UI Duplicates:** Fixed bugs causing duplicate records in the Menu Admin and Acceso por Rol views by correcting backend queries and seeding missing data.
--   **Refactoring - Frontend:** Decomposed the monolithic  into modular view and common components, reducing the file size by over 93%.
--   **Refactoring - Backend:** Modularized the monolithic  into logical route files using Express Router, reducing the file size by over 95%.
+-   **Bug Fix - Critical Regressions:** Fixed  error in  and resolved sidebar navigation issues.
+-   **Bug Fix - Post-Refactor Bugs:** Fixed numerous bugs in the Metas, Resultados, Acciones, Roles, and Usuarios CRUD views related to incorrect API calls and database queries.
+-   **Feature - Indicator Planes:** Successfully implemented the ability to associate indicators with multiple plans, including DB schema changes, backend endpoints, and a multi-select UI in the frontend.
+-   **Feature - PDF Report Enhancement:** Added the Plan information to the PDF report generated from the Seguimiento view.
+-   **Feature - Dashboard Overhaul:** Completely rewrote  to create distinct, functional dashboards for Admin and User roles.
+-   **Bug Fix - Dashboard KPIs and Context:** Corrected the Avance Global calculation and fixed the display of user context (Sector, Entidad, Área) on both the User Dashboard and the Seguimiento view.
+-   **Feature - Security:** Implemented a check in the login endpoint to block users with an INACTIVO status.
+-   **Bug Fix - INVITADO Role:** Fixed an issue causing duplicated menu items for the new guest role.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -100,79 +91,78 @@ None.
 
 
 **Key Technical Concepts**
--   **Backend:** Node.js, Express.js, PostgreSQL ( library), JWT.
--   **Frontend:** React.js, Fetch API, .
--   **Architecture:** Recently refactored from monolithic to a modular full-stack application.
+-   **Backend:** Node.js, Express.js, PostgreSQL ( library), JWT for authentication.
+-   **Frontend:** React.js, State Management (, ), Fetch API, Conditional Rendering.
+-   **PDF Generation:**  for client-side PDF creation.
+-   **Architecture:** Modular full-stack application (refactored from monolith).
 
 **key DB schema**
--   **rendicion:** Stores monthly indicator data.
--   **archivos_rendicion:** {id, id_rendicion, nombre_archivo, url_archivo, ...} - Stores metadata for uploaded files, linked to a .
--   **matriz_parametro:** Stores indicator definitions.
--   **usuario:** Stores user data and roles.
--   **opciones:** Stores menu access permissions per role.
+-   **New Tables:**
+    -   : {id_plan, nombre, estado}
+    -   : {id_indicador_plan, id_indicador, id_plan} (Many-to-many relationship)
+-   **Key Existing Tables:**  (indicators),  (monthly data), , , .
 
 **changes in tech stack**
 None.
 
 **All files of reference**
--   : File with the current P0 bug.
--   : Core frontend router, recently refactored.
--   : Core backend setup, recently refactored.
--   : Directory containing all the new view components.
--   : Directory containing all the new backend route modules.
+-   **/app/frontend/src/App.js**: Contains the core logic for routing and passing the  prop.
+-   **/app/frontend/src/components/common/CrudTable.jsx**: Modified to support disabled buttons.
+-   **/app/frontend/src/components/views/**: All files in this directory need to be checked/modified to handle the  prop correctly.
+-   **/app/backend/routes/auth.js**: Was modified to block inactive users.
 
 **Areas that need refactoring**:
-The critical refactoring of monolithic files is complete. The focus should now shift to stabilizing the application and then moving on to code quality improvements like server-side validation and adding tests.
+None. The code is in a good state after the recent refactoring and bug fixes.
 
 **key api endpoints**
--   **New/Modified:**
-    -   : Gets the sum of all logrado values for an indicator.
-    -   : Gets attachments for a specific rendicion.
-    -   : Adds a new attachment record.
-    -   : Deletes an attachment record.
--   **Refactored:** All previous endpoints were moved from  into the  directory.
+-   **New:**
+    -   : Fetches all available plans.
+    -   : Associates plans with an indicator.
+    -   : Gets yearly progress data for the user dashboard chart.
+-   **Modified:**
+    -   : Now verifies .
+    -    & : Logic for Avance Global KPI was updated.
+    -   : Query updated to join and return plan data and context names.
 
 **Critical Info for New Agent**
--   **PRIORITY 1: STABILIZE THE APP.** The application has just undergone a massive refactoring. The immediate goal is to fix all regressions (like the  bug) and perform a full regression test to ensure all features work as they did before.
--   **User is cost-conscious.** The user has explicitly stated that refactoring should not break existing functionality as it costs them credits. Proceed with caution and test thoroughly.
--   **The new modular structure is the source of truth.** Do not refer to the old monolithic structure. All new code and fixes should follow the new component/route-based architecture.
+-   Your immediate and highest priority task is to complete the UI implementation for the INVITADO role. The user is very specific: action buttons must be **disabled and visible**, not hidden.
+-   This change needs to be applied consistently across all CRUD views located in .
+-   The agent was in the middle of this task. You must review the work done and complete it for all remaining components.
+-   Use the credentials  /  to test the read-only functionality thoroughly once your changes are complete.
 
 **documents and test reports created in this job**
--    (Updated)
--   
--    (This report likely contains failures related to the current bugs)
+-    was updated during this session.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User ():** Reports that errors still exist, providing a screenshot of the  error in . *(IN PROGRESS)*
-2.  **User ():** Requests a full validation of all functionalities after refactoring to check for bugs. *(IN PROGRESS)*
-3.  **User ():** Approves continuing with the backend refactoring. *(COMPLETED)*
-4.  **User ():** Approves continuing with critical refactoring. *(COMPLETED)*
-5.  **User ():** Approves starting the critical refactoring, emphasizing that functionality must not be affected due to cost. *(COMPLETED)*
-6.  **User ():** Asks to fix a duplicated rol access issue and to be shown what needs refactoring. *(COMPLETED)*
-7.  **User ():** Reports a duplicated menu bug and asks for a list of items to refactor/improve. *(COMPLETED)*
-8.  **User ():** Reports that file attachments are not being saved and asks for details on which tables are used for uploads. *(COMPLETED)*
-9.  **User ():** Requests several improvements to the PDF export report. *(COMPLETED)*
-10. **User ():** Requests the addition of a new calculated field % LOGRO GLOBAL. *(COMPLETED)*
+1.  : **(PENDING)** Reports two bugs with the INVITADO role: 1. The menu is duplicated. 2. Action buttons are hidden, but they should be visible and disabled. Provides screenshots for clarity.
+2.  : **(IN PROGRESS)** Requests blocking of inactive users and the creation of a read-only INVITADO role.
+3.  : **(RESOLVED)** Reports that the user context (Entidad, Area, Sector) is not showing on the Seguimiento screen.
+4.  : **(RESOLVED)** Reports issues with the User Dashboard: context is not displaying, and the Avance Global calculation is incorrect.
+5.  : **(RESOLVED)** Provides detailed requirements for a complete overhaul of the Dashboard, with separate views for Admins and Users.
+6.  : **(RESOLVED)** Requests that the Plan information be included in the PDF report.
+7.  : **(RESOLVED)** Requests the new Planes feature for the Banco de Indicadores, including a UI mockup.
+8.  : **(RESOLVED)** Reports a list of 6 bugs that appeared after the major refactoring, affecting Users, Roles, Entities, Metas, Resultados, and Acciones views.
+9.  : **(RESOLVED)** Approves the agent's plan to fix the initial post-refactoring bugs.
+10. : The session started with a critical bug () and a broken sidebar navigation, which were the top priorities.
 
 **Project Health Check:**
--   **Broken:** All CRUD maintenance views (e.g., Sector, Pilar, Eje) are non-functional due to the  error in the  component. Navigation from the sidebar may also be impaired.
+-   **Broken:** None.
+-   **Mocked:** None.
 
 **3rd Party Integrations**
 -   **jsPDF:** Used for client-side PDF generation.
--   **html2pdf.js:** Used with jsPDF to convert HTML content to a downloadable PDF.
+-   **html2pdf.js:** A wrapper for jsPDF to convert HTML elements to PDF.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES, but the latest test run () was not fully analyzed and likely contains details about the current regressions. The agent needs to re-run tests after fixing the blocking issues.
+-   **Testing agent used after significant changes:** YES.
+-   **Troubleshoot agent used after agent stuck in loop:** YES.
 -   **Test files created:** None.
--   **Known regressions:**  functionality is broken. Sidebar navigation is potentially broken.
+-   **Known regressions:** The UI behavior for the new INVITADO role does not match user requirements (buttons are hidden instead of disabled).
 
 **Credentials to test flow:**
--   **Admin User:**
-    -   Username: 
-    -   Password: 
--   **Limited User:**
-    -   Username: 
-    -   Password: 
+-   **Admin User:**  / 
+-   **Limited User:**  / 
+-   **Guest User (Read-Only):**  / 
 
 **What agent forgot to execute**
-The agent did not fully resolve the  bug. While an initial fix (adding ) was applied, the root cause ( not being an array) was not addressed before the session ended. The agent also did not fully investigate a potential sidebar navigation bug, dismissing it as a test script issue without confirmation.</analysis>
+The agent did not finish propagating the disabled buttons logic to all the necessary view components for the read-only role. The work was started but not completed across the entire application, leaving the implementation in an inconsistent state.</analysis>
