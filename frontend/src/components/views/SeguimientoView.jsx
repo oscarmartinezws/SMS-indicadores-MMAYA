@@ -693,16 +693,24 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
         <div style={{ background: styles.white, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
           <div style={darkHeader}>DESCRIPCIÓN CUALITATIVA DEL AVANCE</div>
           <div style={{ padding: 16 }}>
-            <textarea value={rendicion.descripcion_cualitativa || ''} onChange={(e) => handleChange('descripcion_cualitativa', e.target.value)} rows={5}
-              style={{ width: '100%', padding: 12, border: `2px solid ${styles.gray300}`, borderRadius: 8, fontSize: '0.85rem', resize: 'vertical', boxSizing: 'border-box' }}
+            <textarea 
+              value={rendicion.descripcion_cualitativa || ''} 
+              onChange={(e) => !readOnly && handleChange('descripcion_cualitativa', e.target.value)} 
+              disabled={readOnly}
+              rows={5}
+              style={{ width: '100%', padding: 12, border: `2px solid ${styles.gray300}`, borderRadius: 8, fontSize: '0.85rem', resize: 'vertical', boxSizing: 'border-box', ...(readOnly ? disabledBtnStyle : {}) }}
               placeholder="Ingrese la descripción cualitativa del avance..." />
           </div>
         </div>
         <div style={{ background: styles.white, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
           <div style={darkHeader}>MODIFICACIONES</div>
           <div style={{ padding: 16 }}>
-            <textarea value={rendicion.modificaciones || ''} onChange={(e) => handleChange('modificaciones', e.target.value)} rows={5}
-              style={{ width: '100%', padding: 12, border: `2px solid ${styles.gray300}`, borderRadius: 8, fontSize: '0.85rem', resize: 'vertical', boxSizing: 'border-box' }}
+            <textarea 
+              value={rendicion.modificaciones || ''} 
+              onChange={(e) => !readOnly && handleChange('modificaciones', e.target.value)} 
+              disabled={readOnly}
+              rows={5}
+              style={{ width: '100%', padding: 12, border: `2px solid ${styles.gray300}`, borderRadius: 8, fontSize: '0.85rem', resize: 'vertical', boxSizing: 'border-box', ...(readOnly ? disabledBtnStyle : {}) }}
               placeholder="Ingrese las modificaciones..." />
           </div>
         </div>
