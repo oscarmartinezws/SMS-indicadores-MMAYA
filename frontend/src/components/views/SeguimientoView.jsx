@@ -748,7 +748,6 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 </tr>
               ))
             )}
-            )}
           </tbody>
         </table>
       </div>
