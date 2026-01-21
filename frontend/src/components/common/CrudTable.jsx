@@ -10,20 +10,32 @@ function CrudTable({ title, endpoint, columns, formFields, idField = 'id', readO
   const openModal = (item = null) => { if (readOnly) return; if (item) { setEditItem(item); setFormData({ ...item }); } else { setEditItem(null); setFormData({ estado: 'ACTIVO' }); } setShowModal(true); };
   const saveItem = async () => { if (readOnly) return; try { const method = editItem ? 'PUT' : 'POST'; const url = editItem ? `${API_URL}/api/sms/${endpoint}/${editItem[idField]}` : `${API_URL}/api/sms/${endpoint}`; const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) }); if (res.ok) { setShowModal(false); fetchData(); } else { const err = await res.json(); alert(err.detail || 'Error al guardar'); } } catch (err) { console.error(err); alert('Error de conexión'); } };
 
+  const disabledBtnStyle = { opacity: 0.5, cursor: 'not-allowed' };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h2 style={{ fontWeight: 700, fontSize: '1.2rem' }}>{title}</h2>
-        {!readOnly && <button onClick={() => openModal()} style={{ padding: '8px 16px', background: styles.black, color: styles.white, border: 'none', borderRadius: 5, fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}>+ Adicionar</button>}
+        <button 
+          onClick={() => !readOnly && openModal()} 
+          disabled={readOnly}
+          style={{ padding: '8px 16px', background: styles.black, color: styles.white, border: 'none', borderRadius: 5, fontWeight: 600, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.8rem', ...(readOnly ? disabledBtnStyle : {}) }}
+        >+ Adicionar</button>
       </div>
       {loading ? <div style={{ textAlign: 'center', padding: 24 }}>Cargando...</div> : (
         <div style={{ background: styles.white, borderRadius: 6, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr>{columns.map(col => <th key={col.key} style={headerStyle}>{col.label}</th>)}{!readOnly && <th style={{ ...headerStyle, textAlign: 'center' }}>Op</th>}</tr></thead>
+            <thead><tr>{columns.map(col => <th key={col.key} style={headerStyle}>{col.label}</th>)}<th style={{ ...headerStyle, textAlign: 'center' }}>Op</th></tr></thead>
             <tbody>{(Array.isArray(data) ? data : []).map((item, idx) => (
               <tr key={item[idField] || idx} style={{ borderBottom: `1px solid ${styles.gray200}` }}>
                 {columns.map(col => <td key={col.key} style={rowStyle}>{col.key === 'estado' ? <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 600, background: item[col.key] === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: item[col.key] === 'ACTIVO' ? styles.green : styles.red }}>{item[col.key]}</span> : item[col.key]}</td>)}
-                {!readOnly && <td style={{ ...rowStyle, textAlign: 'center' }}><button onClick={() => openModal(item)} style={{ padding: '3px 10px', background: styles.gray100, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.75rem' }}>✏️</button></td>}
+                <td style={{ ...rowStyle, textAlign: 'center' }}>
+                  <button 
+                    onClick={() => !readOnly && openModal(item)} 
+                    disabled={readOnly}
+                    style={{ padding: '3px 10px', background: styles.gray100, border: 'none', borderRadius: 4, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.75rem', ...(readOnly ? disabledBtnStyle : {}) }}
+                  >✏️</button>
+                </td>
               </tr>
             ))}</tbody>
           </table>
