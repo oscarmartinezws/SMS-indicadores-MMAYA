@@ -90,7 +90,7 @@ function EntidadesAreasView({ readOnly = false }) {
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, background: styles.black, padding: '10px 14px', borderRadius: '6px 6px 0 0' }}>
           <h3 style={{ fontWeight: 700, fontSize: '0.9rem', color: styles.white, margin: 0 }}>ENTIDAD</h3>
-          <button onClick={() => openEntidadModal()} style={{ padding: '6px 14px', background: styles.green, color: styles.white, border: 'none', borderRadius: 4, fontWeight: 600, cursor: 'pointer', fontSize: '0.75rem' }}>+ Adicionar</button>
+          {!readOnly && <button onClick={() => openEntidadModal()} style={{ padding: '6px 14px', background: styles.green, color: styles.white, border: 'none', borderRadius: 4, fontWeight: 600, cursor: 'pointer', fontSize: '0.75rem' }}>+ Adicionar</button>}
         </div>
         <div style={{ background: styles.white, borderRadius: '0 0 6px 6px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', maxHeight: 400, overflowY: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
@@ -99,7 +99,7 @@ function EntidadesAreasView({ readOnly = false }) {
                 <th style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 600, width: 40 }}>#</th>
                 <th style={{ padding: '8px 10px', textAlign: 'left', fontWeight: 600 }}>NOMBRE DE LA ENTIDAD</th>
                 <th style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 600, width: 80 }}>ESTADO</th>
-                <th style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 600, width: 100 }}>ACCIONES</th>
+                {!readOnly && <th style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 600, width: 100 }}>ACCIONES</th>}
               </tr>
             </thead>
             <tbody>
@@ -110,10 +110,10 @@ function EntidadesAreasView({ readOnly = false }) {
                   <td style={{ padding: '8px 10px', textAlign: 'center' }}>
                     <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: '0.65rem', fontWeight: 600, background: ent.estado === 'ACTIVO' ? '#D1FAE5' : '#FEE2E2', color: ent.estado === 'ACTIVO' ? styles.green : styles.red }}>{ent.estado}</span>
                   </td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                  {!readOnly && <td style={{ padding: '8px 10px', textAlign: 'center' }}>
                     <button onClick={(e) => { e.stopPropagation(); openEntidadModal(ent); }} style={{ padding: '3px 8px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem', marginRight: 4 }}>✏️</button>
                     <button onClick={(e) => { e.stopPropagation(); setSelectedEntidad(ent); }} style={{ padding: '3px 8px', background: styles.gray600, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}>📋</button>
-                  </td>
+                  </td>}
                 </tr>
               ))}
             </tbody>
@@ -127,7 +127,7 @@ function EntidadesAreasView({ readOnly = false }) {
           <h3 style={{ fontWeight: 700, fontSize: '0.9rem', color: styles.white, margin: 0 }}>
             ÁREA ORGANIZACIONAL {selectedEntidad ? `- ${selectedEntidad.nombre}` : ''}
           </h3>
-          {selectedEntidad && (
+          {selectedEntidad && !readOnly && (
             <button onClick={() => openAreaModal()} style={{ padding: '6px 14px', background: styles.green, color: styles.white, border: 'none', borderRadius: 4, fontWeight: 600, cursor: 'pointer', fontSize: '0.75rem' }}>+ Adicionar</button>
           )}
         </div>
