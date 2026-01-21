@@ -3,7 +3,7 @@ import { API_URL, defaultStyles as styles, getTableStyles } from '../../styles/t
 
 const { rowStyle, headerStyle } = getTableStyles(styles);
 
-function EntidadesAreasView() {
+function EntidadesAreasView({ readOnly = false }) {
   const [entidades, setEntidades] = useState([]);
   const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
