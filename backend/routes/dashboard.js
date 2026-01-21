@@ -71,7 +71,7 @@ router.get('/summary', authenticateToken, async (req, res) => {
       mpParams.push(parseInt(id_area));
     }
     
-    if (req.user.rol !== 'ADMINISTRADOR' && req.user.id_area) {
+    if (req.user.rol !== 'ADMINISTRADOR' && req.user.rol !== 'INVITADO' && req.user.id_area) {
       filters.push(`mp.id_area = $${paramIdx++}`);
       params.push(req.user.id_area);
       mpFilters.push(`mp.id_area = $${mpParamIdx++}`);
@@ -250,13 +250,15 @@ router.get('/indicador_progreso/:id_indicador', async (req, res) => {
 router.get('/summary_user', authenticateToken, async (req, res) => {
   try {
     const idArea = req.user.id_area;
+    const isInvitado = req.user.rol === 'INVITADO';
     
-    if (!idArea) {
+    // INVITADO can see all indicators, other users need an area
+    if (!isInvitado && !idArea) {
       return res.status(400).json({ detail: 'Usuario sin área asignada' });
     }
     
-    // Get all active indicators for this area
-    const indicadoresResult = await pool.query(`
+    // Build query - INVITADO sees all, others see only their area
+    let indicadoresQuery = `
       SELECT 
         mp.id_indicador, mp.indicador_resultado, mp.codi, mp.logro as meta_global, mp.estado,
         s.sector, e.entidad, a.area_organizacional as area
@@ -264,9 +266,18 @@ router.get('/summary_user', authenticateToken, async (req, res) => {
       LEFT JOIN sector s ON mp.id_sector = s.id_sector
       LEFT JOIN entidad e ON mp.id_entidad = e.id_entidad
       LEFT JOIN area a ON mp.id_area = a.id_area
-      WHERE mp.id_area = $1 AND mp.estado = 'ACTIVO'
-      ORDER BY mp.id_indicador
-    `, [idArea]);
+      WHERE mp.estado = 'ACTIVO'
+    `;
+    
+    let params = [];
+    if (!isInvitado) {
+      indicadoresQuery += ' AND mp.id_area = $1';
+      params = [idArea];
+    }
+    
+    indicadoresQuery += ' ORDER BY mp.id_indicador';
+    
+    const indicadoresResult = await pool.query(indicadoresQuery, params);
     
     const indicadores = indicadoresResult.rows;
     
