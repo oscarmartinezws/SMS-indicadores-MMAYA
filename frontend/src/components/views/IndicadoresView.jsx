@@ -3,7 +3,7 @@ import { API_URL, defaultStyles as styles, getTableStyles } from '../../styles/t
 
 const { rowStyle, headerStyle } = getTableStyles(styles);
 
-function IndicadoresView({ user }) {
+function IndicadoresView({ user, readOnly = false }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -22,7 +22,7 @@ function IndicadoresView({ user }) {
   const [catalogs, setCatalogs] = useState(null);
   const [loadingCatalogs, setLoadingCatalogs] = useState(false);
   
-  const isAdmin = user?.rol === 'ADMINISTRADOR';
+  const isAdmin = user?.rol === 'ADMINISTRADOR' && !readOnly;
   const PAGE_SIZE = 10;
 
   // Fetch only basic data for grid
