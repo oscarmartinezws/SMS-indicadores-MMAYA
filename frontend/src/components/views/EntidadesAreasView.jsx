@@ -46,12 +46,14 @@ function EntidadesAreasView({ readOnly = false }) {
 
   // Entidad modal handlers
   const openEntidadModal = (item = null) => {
+    if (readOnly) return;
     setEditItem(item);
     setFormData(item ? { ...item } : { nombre: '', estado: 'ACTIVO' });
     setShowEntidadModal(true);
   };
 
   const saveEntidad = async () => {
+    if (readOnly) return;
     try {
       const method = editItem ? 'PUT' : 'POST';
       const url = editItem ? `${API_URL}/api/sms/entidades/${editItem.id}` : `${API_URL}/api/sms/entidades`;
@@ -63,6 +65,7 @@ function EntidadesAreasView({ readOnly = false }) {
 
   // Area modal handlers
   const openAreaModal = (item = null) => {
+    if (readOnly) return;
     setEditItem(item);
     setFormData(item ? { ...item } : { nombre: '', id_entidad: selectedEntidad?.id, estado: 'ACTIVO' });
     setShowAreaModal(true);
