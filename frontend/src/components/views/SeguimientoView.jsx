@@ -597,7 +597,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 <td style={{ ...rowStyle, textAlign: 'center', background: '#DBEAFE', fontWeight: 600, color: styles.blue }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                     <span>{rendicion.programado || selectedIndicador?.logro || '-'}</span>
-                    {isAdmin && (
+                    {canEdit && (
                       <button onClick={openProgramadoModal} data-testid="btn-edit-programado" style={{ padding: '2px 6px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.65rem' }}>✏️</button>
                     )}
                   </div>
