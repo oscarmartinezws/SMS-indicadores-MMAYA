@@ -3,7 +3,7 @@ import { API_URL, colorThemes, defaultStyles as styles, getTableStyles } from '.
 
 const { rowStyle, headerStyle } = getTableStyles(styles);
 
-function ConfiguracionView({ siteConfig, onConfigChange }) {
+function ConfiguracionView({ siteConfig, onConfigChange, readOnly = false }) {
   const [config, setConfig] = useState({
     plan_anio_inicio: 2020,
     plan_anio_fin: 2025,
@@ -18,6 +18,7 @@ function ConfiguracionView({ siteConfig, onConfigChange }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const disabledBtnStyle = { opacity: 0.5, cursor: 'not-allowed' };
 
   useEffect(() => {
     fetchConfig();
@@ -72,7 +73,11 @@ function ConfiguracionView({ siteConfig, onConfigChange }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 style={{ fontWeight: 700, fontSize: '1.3rem' }}>⚙️ Configuración del Sistema</h2>
-        <button onClick={saveConfig} disabled={saving} style={{ padding: '10px 24px', background: styles.black, color: '#FFFFFF', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', opacity: saving ? 0.7 : 1 }}>
+        <button 
+          onClick={!readOnly ? saveConfig : undefined} 
+          disabled={saving || readOnly} 
+          style={{ padding: '10px 24px', background: styles.black, color: '#FFFFFF', border: 'none', borderRadius: 8, fontWeight: 600, cursor: (saving || readOnly) ? 'not-allowed' : 'pointer', fontSize: '0.85rem', opacity: (saving || readOnly) ? 0.5 : 1 }}
+        >
           {saving ? 'Guardando...' : '💾 Guardar Configuración'}
         </button>
       </div>

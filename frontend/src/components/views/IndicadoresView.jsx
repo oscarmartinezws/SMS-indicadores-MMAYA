@@ -24,6 +24,7 @@ function IndicadoresView({ user, readOnly = false }) {
   
   const isAdmin = user?.rol === 'ADMINISTRADOR' && !readOnly;
   const PAGE_SIZE = 10;
+  const disabledBtnStyle = { opacity: 0.5, cursor: 'not-allowed' };
 
   // Fetch only basic data for grid
   useEffect(() => {
@@ -231,11 +232,14 @@ function IndicadoresView({ user, readOnly = false }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ fontWeight: 700, fontSize: '1.2rem', margin: 0 }}>Banco de Indicadores</h2>
-        {isAdmin && (
-          <button onClick={() => openModal(null, false)} data-testid="btn-adicionar-indicador" style={{ padding: '10px 20px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-            ➕ Adicionar
-          </button>
-        )}
+        <button 
+          onClick={() => !readOnly && openModal(null, false)} 
+          disabled={readOnly}
+          data-testid="btn-adicionar-indicador" 
+          style={{ padding: '10px 20px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: readOnly ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, ...(readOnly ? disabledBtnStyle : {}) }}
+        >
+          ➕ Adicionar
+        </button>
       </div>
 
       {/* Grid - Only codes */}
@@ -280,7 +284,18 @@ function IndicadoresView({ user, readOnly = false }) {
                   {isAdmin ? (
                     <button onClick={() => openModal(item, false)} data-testid={`btn-edit-${item.id_indicador}`} style={{ padding: '4px 10px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}>✏️ Editar</button>
                   ) : (
-                    <button onClick={() => openModal(item, true)} data-testid={`btn-view-${item.id_indicador}`} style={{ padding: '4px 10px', background: styles.gray600, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}>👁 Ver</button>
+                    <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+                      <button 
+                        onClick={() => openModal(item, true)} 
+                        data-testid={`btn-view-${item.id_indicador}`} 
+                        style={{ padding: '4px 10px', background: styles.gray600, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}
+                      >👁 Ver</button>
+                      <button 
+                        disabled={readOnly}
+                        data-testid={`btn-edit-disabled-${item.id_indicador}`} 
+                        style={{ padding: '4px 10px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.7rem', ...(readOnly ? disabledBtnStyle : {}) }}
+                      >✏️</button>
+                    </div>
                   )}
                 </td>
               </tr>
