@@ -110,7 +110,9 @@ router.get('/matriz_parametros', authenticateToken, async (req, res) => {
     `;
     let params = [];
     
-    if (req.user.rol !== 'ADMINISTRADOR' && req.user.id_area) {
+    // ADMINISTRADOR and INVITADO can see ALL indicators
+    // Other users only see indicators from their area
+    if (req.user.rol !== 'ADMINISTRADOR' && req.user.rol !== 'INVITADO' && req.user.id_area) {
       query += ' WHERE mp.id_area = $1';
       params = [req.user.id_area];
     }
