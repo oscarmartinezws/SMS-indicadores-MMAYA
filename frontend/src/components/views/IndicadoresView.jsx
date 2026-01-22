@@ -34,8 +34,9 @@ function IndicadoresView({ user, readOnly = false }) {
         const res = await fetch(`${API_URL}/api/sms/matriz_parametros`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        setData(await res.json());
-      } catch (err) { console.error(err); }
+        const result = await res.json();
+        setData(Array.isArray(result) ? result : []);
+      } catch (err) { console.error(err); setData([]); }
       finally { setLoading(false); }
     };
     fetchData();
