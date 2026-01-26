@@ -154,24 +154,21 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - **Logrado Acumulado**: Suma logrado + línea base (etiqueta: "Incluye L.B.")
   - **% Logro Global**: (Línea Base + Suma Logrado) / Meta Global (etiqueta: "Incluye L.B.")
 
-- ✅ **Reporte Ficha de Seguimiento por Indicador (PDF)**:
-  - Diseño basado en modelo proporcionado
-  - **Contexto del Indicador**: Muestra Sector, Entidad y Área del indicador (no del usuario)
-  - Secciones: Contexto del Indicador, Selección de Indicador, Seguimiento Anual, Descripción Cualitativa, Modificaciones
-  - Incluye **LOGRADO (SIN L.B.)** además del logrado con línea base
-  - Colores diferenciados: azul (programado), rojo (logrado ejecutado), naranja (% logro global)
-  - Nota al pie indicando que incluye valor de línea base
-  - **Disponible en**:
-    - Seguimiento: Menú "Exportar" > "Ficha del Indicador"
-    - Dashboard Usuario: Botón "Descargar Ficha" en detalle del indicador
-
+- ✅ **Reportes de Seguimiento**:
+  - **Ficha del Indicador**: Reporte individual con datos del indicador (Sector, Entidad, Área del indicador)
+  - **Reporte Detallado (PDF)**: Reporte de todos los indicadores con:
+    - Columna L.B. (Línea Base)
+    - Meses de ejecución (ENE-DIC)
+    - PROG. (Programado del año)
+    - LOGRADO (Suma logrado + L.B.)
+    - SIN L.B. (Suma logrado sin Línea Base)
+    - Σ PROG (Suma programados + L.B.)
+    - % GLOBAL (% Logro Global)
+    - Nota: "Los cálculos incluyen el valor de la Línea Base"
+  - **Exportar a CSV**: Datos en formato CSV
+  
 - ✅ **Interfaz de Seguimiento actualizada**:
-  - Nuevo campo: **LOGRADO (SIN L.B.)** en la barra de información del indicador
-  - Campos mostrados: Año Base, Línea Base, Año Logro, Meta, Logrado (Sin L.B.), % Logro Global (Con L.B.), Suma Programado (Con L.B.)
-
-- ✅ **Dashboard Usuario actualizado**:
-  - Nuevo campo: **LOGRADO (SIN L.B.)** en el detalle del indicador
-  - Muestra datos del indicador (Sector, Entidad, Área) en vez de contexto global "TODOS"
+  - Muestra 7 campos: Año Base, Línea Base, Año Logro, Meta, **LOGRADO (SIN L.B.)**, % Logro Global (Con L.B.), Suma Programado (Con L.B.)
   - Cambios en backend:
     - `/routes/rendicion.js`: suma_programado y suma_logrado incluyen linea_base
     - `/routes/dashboard.js`: indicador_progreso y summary_user incluyen linea_base
