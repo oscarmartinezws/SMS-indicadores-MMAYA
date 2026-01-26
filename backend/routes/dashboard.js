@@ -227,12 +227,15 @@ router.get('/indicador_progreso/:id_indicador', async (req, res) => {
       FROM matriz_parametro WHERE id_indicador = $1
     `, [idIndicador]);
     
-    const sumaLogrado = parseFloat(sumaResult.rows[0]?.suma_logrado) || 0;
+    const sumaLogradoSinLB = parseFloat(sumaResult.rows[0]?.suma_logrado) || 0;
     const metaGlobal = parseFloat(metaResult.rows[0]?.meta_global) || 0;
     const lineaBase = parseFloat(metaResult.rows[0]?.linea_base) || 0;
     
-    // % Logro Global = (Línea Base + Suma Logrado) / Meta Global * 100
-    const logradoConLineaBase = sumaLogrado + lineaBase;
+    // Only include linea_base if there's actual progress (suma_logrado_sin_lb > 0)
+    const tieneAvance = sumaLogradoSinLB > 0;
+    const logradoConLineaBase = tieneAvance ? (sumaLogradoSinLB + lineaBase) : 0;
+    
+    // % Logro Global = (Logrado con/sin L.B.) / Meta Global * 100
     const porcLogroGlobal = metaGlobal > 0 ? ((logradoConLineaBase / metaGlobal) * 100) : 0;
     
     res.json({
@@ -244,10 +247,12 @@ router.get('/indicador_progreso/:id_indicador', async (req, res) => {
         linea_base: parseFloat(r.linea_base) || 0
       })),
       suma_logrado: logradoConLineaBase,
-      suma_logrado_sin_lb: sumaLogrado,
+      suma_logrado_sin_lb: sumaLogradoSinLB,
       linea_base: lineaBase,
       meta_global: metaGlobal,
       porc_logro_global: Math.round(porcLogroGlobal * 100) / 100,
+      tiene_avance: tieneAvance,
+      incluye_linea_base: tieneAvance
       incluye_linea_base: true
     });
   } catch (err) {
