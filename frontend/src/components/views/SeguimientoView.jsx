@@ -538,7 +538,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                   <span style="font-weight: 700; color: #1a1a1a; font-size: 12px;">${selectedIndicador.codi}</span>
                   <span style="font-size: 11px; color: #333;"> - ${selectedIndicador.indicador_resultado || ''}</span>
                 </div>
-                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                   <div>
                     <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">AÑO BASE</div>
                     <div style="font-size: 11px; font-weight: 600;">${selectedIndicador.anio_base || '-'}</div>
@@ -552,16 +552,20 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                     <div style="font-size: 11px; font-weight: 600;">${selectedIndicador.anio_logro || '-'}</div>
                   </div>
                   <div>
-                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LOGRO PROGRAMADO (META)</div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">META</div>
                     <div style="font-size: 11px; font-weight: 600; color: #0066cc;">${metaGlobal.toFixed(2)}</div>
                   </div>
                   <div>
-                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">% LOGRO GLOBAL <span style="color: #0066cc; font-size: 7px;">(Incluye L.B.)</span></div>
-                    <div style="font-size: 14px; font-weight: 700; color: ${logroGlobalColor};">${porcLogroGlobal}%</div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LOGRADO (SIN L.B.)</div>
+                    <div style="font-size: 11px; font-weight: 600; color: #666;">${logradoSinLB.toFixed(2)}</div>
                   </div>
                   <div>
-                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">SUMA PROGRAMADO <span style="color: #0066cc; font-size: 7px;">(Incluye L.B.)</span></div>
-                    <div style="font-size: 11px; font-weight: 600; color: #009933;">${sumaProgramado.toFixed(2)} / ${metaGlobal.toFixed(2)}</div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LOGRADO <span style="color: #0066cc; font-size: 7px;">(Con L.B.)</span></div>
+                    <div style="font-size: 11px; font-weight: 600; color: #009933;">${logradoAcumulado.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">% LOGRO GLOBAL <span style="color: #0066cc; font-size: 7px;">(Con L.B.)</span></div>
+                    <div style="font-size: 14px; font-weight: 700; color: ${logroGlobalColor};">${porcLogroGlobal}%</div>
                   </div>
                 </div>
               </div>
