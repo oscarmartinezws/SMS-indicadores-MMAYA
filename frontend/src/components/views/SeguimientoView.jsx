@@ -752,21 +752,21 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 📥 Exportar ▾
               </button>
               {showExportMenu && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: styles.white, borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 100, minWidth: 200, overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: styles.white, borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 1000, minWidth: 220, overflow: 'visible' }}>
                   <button onClick={() => { exportFichaIndicador(); setShowExportMenu(false); }} data-testid="btn-export-ficha" style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10, borderBottom: `1px solid ${styles.gray200}` }}
                     onMouseEnter={(e) => e.target.style.background = styles.gray100}
                     onMouseLeave={(e) => e.target.style.background = 'transparent'}>
                     📋 Ficha del Indicador
                   </button>
-                  <button onClick={() => { exportToCSV(); setShowExportMenu(false); }} data-testid="btn-export-csv" style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10, borderBottom: `1px solid ${styles.gray200}` }}
+                  <button onClick={() => { exportToPDF(); setShowExportMenu(false); }} data-testid="btn-export-pdf" style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10, borderBottom: `1px solid ${styles.gray200}` }}
+                    onMouseEnter={(e) => e.target.style.background = styles.gray100}
+                    onMouseLeave={(e) => e.target.style.background = 'transparent'}>
+                    📄 Reporte Detallado (PDF)
+                  </button>
+                  <button onClick={() => { exportToCSV(); setShowExportMenu(false); }} data-testid="btn-export-csv" style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10 }}
                     onMouseEnter={(e) => e.target.style.background = styles.gray100}
                     onMouseLeave={(e) => e.target.style.background = 'transparent'}>
                     📊 Exportar a CSV
-                  </button>
-                  <button onClick={() => { exportToPDF(); setShowExportMenu(false); }} data-testid="btn-export-pdf" style={{ width: '100%', padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10 }}
-                    onMouseEnter={(e) => e.target.style.background = styles.gray100}
-                    onMouseLeave={(e) => e.target.style.background = 'transparent'}>
-                    📄 Exportar a PDF
                   </button>
                 </div>
               )}
