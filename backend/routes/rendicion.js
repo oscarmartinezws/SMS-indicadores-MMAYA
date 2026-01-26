@@ -45,7 +45,7 @@ router.get('/suma_programado/:id_indicador', async (req, res) => {
   }
 });
 
-// Sum of LOGRADO across all years + LINEA BASE
+// Sum of LOGRADO across all years + LINEA BASE (only if there's actual progress)
 router.get('/suma_logrado/:id_indicador', async (req, res) => {
   try {
     // Get sum of logrado from rendicion
@@ -60,14 +60,19 @@ router.get('/suma_logrado/:id_indicador', async (req, res) => {
       [req.params.id_indicador]
     );
     
-    const sumaLogrado = parseFloat(sumResult.rows[0].suma_logrado) || 0;
+    const sumaLogradoSinLB = parseFloat(sumResult.rows[0].suma_logrado) || 0;
     const lineaBase = parseFloat(lineaBaseResult.rows[0]?.linea_base) || 0;
     
+    // Only include linea_base if there's actual progress (suma_logrado_sin_lb > 0)
+    const tieneAvance = sumaLogradoSinLB > 0;
+    const sumaLogradoConLB = tieneAvance ? (sumaLogradoSinLB + lineaBase) : 0;
+    
     res.json({ 
-      suma_logrado: sumaLogrado + lineaBase,
-      suma_logrado_sin_lb: sumaLogrado,
+      suma_logrado: sumaLogradoConLB,
+      suma_logrado_sin_lb: sumaLogradoSinLB,
       linea_base: lineaBase,
-      incluye_linea_base: true
+      tiene_avance: tieneAvance,
+      incluye_linea_base: tieneAvance
     });
   } catch (err) {
     console.error('Error getting suma logrado:', err);
