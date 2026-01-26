@@ -234,10 +234,10 @@ function IndicadoresView({ user, readOnly = false }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ fontWeight: 700, fontSize: '1.2rem', margin: 0 }}>Banco de Indicadores</h2>
         <button 
-          onClick={() => !readOnly && openModal(null, false)} 
-          disabled={readOnly}
+          onClick={() => isAdmin && openModal(null, false)} 
+          disabled={!isAdmin}
           data-testid="btn-adicionar-indicador" 
-          style={{ padding: '10px 20px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: readOnly ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, ...(readOnly ? disabledBtnStyle : {}) }}
+          style={{ padding: '10px 20px', background: styles.green, color: styles.white, border: 'none', borderRadius: 6, fontWeight: 600, cursor: isAdmin ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 6, ...(!isAdmin ? disabledBtnStyle : {}) }}
         >
           ➕ Adicionar
         </button>
