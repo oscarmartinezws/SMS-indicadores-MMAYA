@@ -362,7 +362,7 @@ function HomeView({ user, siteConfig }) {
               <div style={{ fontSize: '0.65rem', color: styles.gray500 }}>Activos en tu área</div>
             </div>
             <div style={{ ...cardStyle, borderLeft: `4px solid ${styles.green}` }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>Con Avance</div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>Con Avance <span style={{ fontSize: '0.55rem', color: styles.blue }}>(Incluye L.B.)</span></div>
               <div style={{ fontSize: '2rem', fontWeight: 700, color: styles.green }}>{dashboardData.general.con_avance || 0}</div>
               <div style={{ fontSize: '0.65rem', color: styles.gray500 }}>Reportan avance</div>
             </div>
@@ -372,7 +372,7 @@ function HomeView({ user, siteConfig }) {
               <div style={{ fontSize: '0.65rem', color: styles.gray500 }}>Sin reportar avance</div>
             </div>
             <div style={{ ...cardStyle, borderLeft: `4px solid ${styles.blue}` }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>Avance Global</div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: styles.gray500, textTransform: 'uppercase', marginBottom: 8 }}>Avance Global <span style={{ fontSize: '0.55rem', color: styles.blue }}>(Incluye L.B.)</span></div>
               <div style={{ fontSize: '2rem', fontWeight: 700, color: styles.blue }}>{dashboardData.general.avance_global || 0}%</div>
               <div style={{ fontSize: '0.65rem', color: styles.gray500 }}>Promedio de % logro global</div>
             </div>
