@@ -149,10 +149,19 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - Botones de acción VISIBLES pero DESHABILITADOS
   - INVITADO ve TODOS los indicadores (71 registros)
 
-- ✅ **Cálculos con Línea Base implementados**:
-  - **Suma Programado Anual**: Incluye línea base (etiqueta: "Incluye L.B.")
-  - **Logrado Acumulado**: Suma logrado + línea base (etiqueta: "Incluye L.B.")
-  - **% Logro Global**: (Línea Base + Suma Logrado) / Meta Global (etiqueta: "Incluye L.B.")
+- ✅ **Cálculos con Línea Base implementados (Lógica Condicional)**:
+  - **Regla**: La línea base SOLO se incluye si hay al menos un logrado > 0
+  - **Sin avance (logrado = 0)**: 
+    - Logrado Acumulado = 0 (NO incluye línea base)
+    - % Logro Global = 0%
+    - Estado = "SIN AVANCE"
+  - **Con avance (logrado > 0)**:
+    - Logrado Acumulado = Suma logrado + Línea Base
+    - % Logro Global = (Logrado con L.B.) / Meta × 100
+    - Etiquetas muestran "(Con L.B.)"
+  - Cambios en backend:
+    - `/routes/rendicion.js`: suma_logrado verifica tiene_avance
+    - `/routes/dashboard.js`: summary_user e indicador_progreso con lógica condicional
 
 - ✅ **Reportes de Seguimiento**:
   - **Ficha del Indicador**: Reporte individual con datos del indicador (Sector, Entidad, Área del indicador)
