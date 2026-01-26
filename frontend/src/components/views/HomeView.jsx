@@ -589,14 +589,20 @@ function HomeView({ user, siteConfig }) {
                   </div>
                   <div style={{ marginBottom: 12 }}>
                     <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>LOGRADO (SIN L.B.)</div>
-                    <div style={{ fontSize: '1rem', fontWeight: 700, color: styles.gray600 }}>{indicadorProgreso?.suma_logrado_sin_lb?.toFixed(2) || (indicadorProgreso?.suma_logrado - (selectedIndicador?.linea_base || 0))?.toFixed(2) || 0}</div>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: (indicadorProgreso?.suma_logrado_sin_lb || 0) > 0 ? styles.green : styles.gray600 }}>{indicadorProgreso?.suma_logrado_sin_lb?.toFixed(2) || 0}</div>
                   </div>
                   <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>LOGRADO ACUMULADO <span style={{ fontSize: '0.55rem', color: styles.blue }}>(Con L.B.)</span></div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 700, color: styles.green }}>{indicadorProgreso?.suma_logrado?.toFixed(2) || 0}</div>
+                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>
+                      LOGRADO ACUMULADO {indicadorProgreso?.tiene_avance && <span style={{ fontSize: '0.55rem', color: styles.blue }}>(Con L.B.)</span>}
+                    </div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700, color: (indicadorProgreso?.suma_logrado || 0) > 0 ? styles.green : styles.gray500 }}>
+                      {indicadorProgreso?.tiene_avance ? indicadorProgreso?.suma_logrado?.toFixed(2) : '0.00'}
+                    </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL <span style={{ fontSize: '0.55rem', color: styles.blue }}>(Incluye L.B.)</span></div>
+                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>
+                      % LOGRO GLOBAL {indicadorProgreso?.tiene_avance && <span style={{ fontSize: '0.55rem', color: styles.blue }}>(Incluye L.B.)</span>}
+                    </div>
                     <div style={{ 
                       fontSize: '1.5rem', 
                       fontWeight: 700, 
