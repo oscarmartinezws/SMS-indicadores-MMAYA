@@ -494,6 +494,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
       const lineaBase = parseFloat(selectedIndicador.linea_base) || 0;
       const metaGlobal = parseFloat(selectedIndicador.logro) || 0;
       const logradoAcumulado = sumaLogrado; // Already includes linea base
+      const logradoSinLB = sumaLogradoSinLB; // Without linea base
       const porcLogroGlobal = metaGlobal > 0 ? ((logradoAcumulado / metaGlobal) * 100).toFixed(2) : '0.00';
       const logroGlobalColor = parseFloat(porcLogroGlobal) >= 100 ? '#009933' : (parseFloat(porcLogroGlobal) >= 50 ? '#cc6600' : '#cc0000');
       
@@ -510,21 +511,21 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
           
           <!-- Contexto y Selección de Indicador -->
           <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-            <!-- Contexto del Usuario -->
+            <!-- Contexto del Indicador -->
             <div style="flex: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
-              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">CONTEXTO DEL USUARIO</div>
+              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">CONTEXTO DEL INDICADOR</div>
               <div style="background: #fff; padding: 12px;">
                 <div style="margin-bottom: 10px;">
-                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ENTIDAD</div>
-                  <div style="font-size: 11px; font-weight: 500;">${contexto.entidad || '-'}</div>
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">SECTOR</div>
+                  <div style="font-size: 11px; font-weight: 500;">${selectedIndicador.sector || contexto.sector || '-'}</div>
                 </div>
                 <div style="margin-bottom: 10px;">
-                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ÁREA</div>
-                  <div style="font-size: 11px; font-weight: 500;">${contexto.area || '-'}</div>
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ENTIDAD</div>
+                  <div style="font-size: 11px; font-weight: 500;">${selectedIndicador.entidad || contexto.entidad || '-'}</div>
                 </div>
                 <div>
-                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">SECTOR</div>
-                  <div style="font-size: 11px; font-weight: 500;">${contexto.sector || '-'}</div>
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ÁREA</div>
+                  <div style="font-size: 11px; font-weight: 500;">${selectedIndicador.area || contexto.area || '-'}</div>
                 </div>
               </div>
             </div>
