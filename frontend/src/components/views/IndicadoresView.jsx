@@ -292,9 +292,9 @@ function IndicadoresView({ user, readOnly = false }) {
                         style={{ padding: '4px 10px', background: styles.gray600, color: styles.white, border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: '0.7rem' }}
                       >👁 Ver</button>
                       <button 
-                        disabled={readOnly}
+                        disabled={true}
                         data-testid={`btn-edit-disabled-${item.id_indicador}`} 
-                        style={{ padding: '4px 10px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: readOnly ? 'not-allowed' : 'pointer', fontSize: '0.7rem', ...(readOnly ? disabledBtnStyle : {}) }}
+                        style={{ padding: '4px 10px', background: styles.blue, color: styles.white, border: 'none', borderRadius: 4, cursor: 'not-allowed', fontSize: '0.7rem', ...disabledBtnStyle }}
                       >✏️</button>
                     </div>
                   )}
