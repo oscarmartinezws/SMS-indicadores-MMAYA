@@ -540,8 +540,28 @@ function HomeView({ user, siteConfig }) {
           {/* Selected Indicator Details */}
           {selectedIndicador && (
             <div style={{ ...cardStyle, marginBottom: 20 }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', color: styles.gray700 }}>
-                Detalle del Indicador Seleccionado
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: styles.gray700 }}>
+                  Detalle del Indicador Seleccionado
+                </div>
+                <button 
+                  onClick={exportFichaFromDashboard}
+                  style={{ 
+                    padding: '8px 16px', 
+                    background: styles.green, 
+                    color: styles.white, 
+                    border: 'none', 
+                    borderRadius: 6, 
+                    fontWeight: 600, 
+                    cursor: 'pointer', 
+                    fontSize: '0.8rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                >
+                  📋 Descargar Ficha
+                </button>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 20 }}>
                 {/* Info */}
