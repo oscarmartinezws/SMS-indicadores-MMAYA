@@ -405,16 +405,15 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 return `
                   <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8f8f8'};">
                     <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-weight: 600; font-size: 8px; vertical-align: middle;">${indicador.codi || ''}</td>
-                    <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: left; font-size: 8px; line-height: 1.4; word-wrap: break-word; max-width: 120px; vertical-align: middle;">${indicador.indicador_resultado || ''}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; font-size: 7px; font-weight: 600; vertical-align: middle; background: #f5f5f5;">${planesText}</td>
+                    <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: left; font-size: 8px; line-height: 1.4; word-wrap: break-word; max-width: 100px; vertical-align: middle;">${indicador.indicador_resultado || ''}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; font-size: 7px; font-weight: 600; vertical-align: middle; background: #f5f5f5;">${lb.toFixed(2)}</td>
                     ${mesesCortos.map(m => {
                       const val = rendicion['ejecutado_' + m];
                       return '<td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; font-size: 7px; vertical-align: middle;">' + (val ? parseFloat(val).toFixed(2) : '-') + '</td>';
                     }).join('')}
                     <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e3f2fd; font-weight: 600; font-size: 8px; vertical-align: middle;">${programado ? programado.toFixed(2) : '-'}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-weight: 600; font-size: 8px; color: #c00; vertical-align: middle;">${logrado ? logrado.toFixed(2) : '-'}</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e3f2fd; font-size: 8px; vertical-align: middle;">${porcProgramado}%</td>
-                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-size: 8px; color: #c00; vertical-align: middle;">${porcLogrado}%</td>
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #ffebee; font-weight: 600; font-size: 8px; color: #c00; vertical-align: middle;">${sumaLogrado ? sumaLogrado.toFixed(2) : '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #f0f0f0; font-size: 8px; color: #666; vertical-align: middle;">${sumaLogradoSinLB ? sumaLogradoSinLB.toFixed(2) : '-'}</td>
                     <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #e8f5e9; font-weight: 600; font-size: 8px; vertical-align: middle;">${sumaProgramado ? sumaProgramado.toFixed(2) : '-'}</td>
                     <td style="border: 1px solid #ddd; padding: 4px 2px; text-align: center; background: #fff8e1; font-weight: 700; font-size: 8px; color: ${logroGlobalColor}; vertical-align: middle;">${porcLogroGlobal}%</td>
                   </tr>
