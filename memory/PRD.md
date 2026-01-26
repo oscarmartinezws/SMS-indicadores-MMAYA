@@ -153,6 +153,16 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
   - **Suma Programado Anual**: Incluye línea base (etiqueta: "Incluye L.B.")
   - **Logrado Acumulado**: Suma logrado + línea base (etiqueta: "Incluye L.B.")
   - **% Logro Global**: (Línea Base + Suma Logrado) / Meta Global (etiqueta: "Incluye L.B.")
+
+- ✅ **Reporte Ficha de Seguimiento por Indicador (PDF)**:
+  - Diseño basado en modelo proporcionado
+  - Secciones: Contexto del Usuario, Selección de Indicador, Seguimiento Anual, Descripción Cualitativa, Modificaciones
+  - Incluye tabla con años, ejecución, % ejecutado, acumulado
+  - Colores diferenciados: azul (programado), rojo (logrado ejecutado), naranja (% logro global)
+  - Nota al pie indicando que incluye valor de línea base
+  - **Disponible en**:
+    - Seguimiento: Menú "Exportar" > "Ficha del Indicador"
+    - Dashboard Usuario: Botón "Descargar Ficha" en detalle del indicador
   - Cambios en backend:
     - `/routes/rendicion.js`: suma_programado y suma_logrado incluyen linea_base
     - `/routes/dashboard.js`: indicador_progreso y summary_user incluyen linea_base
