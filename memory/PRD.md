@@ -156,13 +156,22 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 
 - ✅ **Reporte Ficha de Seguimiento por Indicador (PDF)**:
   - Diseño basado en modelo proporcionado
-  - Secciones: Contexto del Usuario, Selección de Indicador, Seguimiento Anual, Descripción Cualitativa, Modificaciones
-  - Incluye tabla con años, ejecución, % ejecutado, acumulado
+  - **Contexto del Indicador**: Muestra Sector, Entidad y Área del indicador (no del usuario)
+  - Secciones: Contexto del Indicador, Selección de Indicador, Seguimiento Anual, Descripción Cualitativa, Modificaciones
+  - Incluye **LOGRADO (SIN L.B.)** además del logrado con línea base
   - Colores diferenciados: azul (programado), rojo (logrado ejecutado), naranja (% logro global)
   - Nota al pie indicando que incluye valor de línea base
   - **Disponible en**:
     - Seguimiento: Menú "Exportar" > "Ficha del Indicador"
     - Dashboard Usuario: Botón "Descargar Ficha" en detalle del indicador
+
+- ✅ **Interfaz de Seguimiento actualizada**:
+  - Nuevo campo: **LOGRADO (SIN L.B.)** en la barra de información del indicador
+  - Campos mostrados: Año Base, Línea Base, Año Logro, Meta, Logrado (Sin L.B.), % Logro Global (Con L.B.), Suma Programado (Con L.B.)
+
+- ✅ **Dashboard Usuario actualizado**:
+  - Nuevo campo: **LOGRADO (SIN L.B.)** en el detalle del indicador
+  - Muestra datos del indicador (Sector, Entidad, Área) en vez de contexto global "TODOS"
   - Cambios en backend:
     - `/routes/rendicion.js`: suma_programado y suma_logrado incluyen linea_base
     - `/routes/dashboard.js`: indicador_progreso y summary_user incluyen linea_base
