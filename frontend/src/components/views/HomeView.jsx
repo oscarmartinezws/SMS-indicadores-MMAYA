@@ -134,9 +134,10 @@ function HomeView({ user, siteConfig }) {
     try {
       const lineaBase = parseFloat(selectedIndicador.linea_base) || 0;
       const metaGlobal = parseFloat(selectedIndicador.meta_global) || 0;
-      const logradoAcumulado = indicadorProgreso.suma_logrado || 0;
-      const logradoSinLB = indicadorProgreso.suma_logrado_sin_lb || (logradoAcumulado - lineaBase);
-      const porcLogroGlobal = indicadorProgreso.porc_logro_global || 0;
+      const logradoSinLB = indicadorProgreso.suma_logrado_sin_lb || 0;
+      const tieneAvance = logradoSinLB > 0;
+      const logradoAcumulado = tieneAvance ? indicadorProgreso.suma_logrado : 0;
+      const porcLogroGlobal = tieneAvance ? (indicadorProgreso.porc_logro_global || 0) : 0;
       const logroGlobalColor = porcLogroGlobal >= 100 ? '#009933' : (porcLogroGlobal >= 50 ? '#cc6600' : '#cc0000');
       
       // Build HTML content for PDF - Using indicator's sector/entidad/area
