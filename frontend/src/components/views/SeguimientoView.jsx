@@ -424,12 +424,12 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
           
           <div style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 4px; font-size: 8px;">
             <strong>Leyenda:</strong>
-            <span style="margin-left: 15px;">PROG. = Programado del año</span>
-            <span style="margin-left: 10px;">LOGRADO = Logrado del año</span>
-            <span style="margin-left: 10px;">% PROG = (Prog. Año / Meta Global) × 100</span>
-            <span style="margin-left: 10px;">% LOG = (Logrado / Prog. Año) × 100</span>
-            <span style="margin-left: 10px;">Σ PROG = Suma programados todos los años</span>
-            <span style="margin-left: 10px;">% LOGRO GLOBAL = (Σ Logrado / Meta) × 100</span>
+            <span style="margin-left: 15px;">L.B. = Línea Base</span>
+            <span style="margin-left: 10px;">PROG. = Programado del año</span>
+            <span style="margin-left: 10px;">LOGRADO = Suma logrado + L.B.</span>
+            <span style="margin-left: 10px;">SIN L.B. = Suma logrado sin Línea Base</span>
+            <span style="margin-left: 10px;">Σ PROG = Suma programados + L.B.</span>
+            <span style="margin-left: 10px;">% GLOBAL = (LOGRADO / Meta) × 100</span>
           </div>
           
           <p style="text-align: center; color: #999; margin-top: 15px; font-size: 9px;">
