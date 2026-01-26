@@ -43,15 +43,17 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
     } catch (err) { console.error(err); }
   };
 
-  // Fetch suma logrado for selected indicator (now includes linea base)
+  // Fetch suma logrado for selected indicator (includes linea base only if there's actual progress)
   const fetchSumaLogrado = async (id_indicador) => {
     try {
       const res = await fetch(`${API_URL}/api/sms/rendicion/suma_logrado/${id_indicador}`);
       if (res.ok) {
         const data = await res.json();
-        setSumaLogrado(data.suma_logrado || 0);
+        // Only include linea_base if there's actual progress
+        const tieneAvance = (data.suma_logrado_sin_lb || 0) > 0;
+        setSumaLogrado(tieneAvance ? data.suma_logrado : 0);
         setSumaLogradoSinLB(data.suma_logrado_sin_lb || 0);
-        setLineaBaseData(prev => ({ ...prev, logrado: data.linea_base || 0 }));
+        setLineaBaseData(prev => ({ ...prev, logrado: data.linea_base || 0, tieneAvance }));
       }
     } catch (err) { console.error(err); }
   };
