@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import html2pdf from 'html2pdf.js';
 import { API_URL, getStyles, defaultStyles, getTableStyles } from '../../styles/theme';
 
 function HomeView({ user, siteConfig }) {
