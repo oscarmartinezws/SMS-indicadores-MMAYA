@@ -324,7 +324,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
       const mesesCortos = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
       const mesesHeaders = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
       
-      // Fetch rendicion data and sums for all indicators
+      // Fetch rendicion data and sums for all indicators (includes linea base)
       const allData = await Promise.all(
         indicadores.map(async (ind) => {
           try {
@@ -334,11 +334,18 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
               fetch(`${API_URL}/api/sms/rendicion/suma_logrado/${ind.id_indicador}`)
             ]);
             const rendData = rendRes.ok ? await rendRes.json() : {};
-            const sumaProg = sumaProgramadoRes.ok ? (await sumaProgramadoRes.json()).suma_programado : 0;
-            const sumaLog = sumaLogradoRes.ok ? (await sumaLogradoRes.json()).suma_logrado : 0;
-            return { indicador: ind, rendicion: rendData, sumaProgramado: sumaProg, sumaLogrado: sumaLog };
+            const sumaProgramadoData = sumaProgramadoRes.ok ? await sumaProgramadoRes.json() : {};
+            const sumaLogradoData = sumaLogradoRes.ok ? await sumaLogradoRes.json() : {};
+            return { 
+              indicador: ind, 
+              rendicion: rendData, 
+              sumaProgramado: sumaProgramadoData.suma_programado || 0,
+              sumaLogrado: sumaLogradoData.suma_logrado || 0,
+              sumaLogradoSinLB: sumaLogradoData.suma_logrado_sin_lb || 0,
+              lineaBase: sumaLogradoData.linea_base || 0
+            };
           } catch (e) {
-            return { indicador: ind, rendicion: {}, sumaProgramado: 0, sumaLogrado: 0 };
+            return { indicador: ind, rendicion: {}, sumaProgramado: 0, sumaLogrado: 0, sumaLogradoSinLB: 0, lineaBase: 0 };
           }
         })
       );
@@ -357,26 +364,30 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
             <span><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</span>
           </div>
           
+          <p style="font-size: 9px; color: #666; margin-bottom: 10px; text-align: center;">
+            <strong>Nota:</strong> Los cálculos de Σ PROG (Suma Programado) y % LOGRO GLOBAL incluyen el valor de la Línea Base.
+          </p>
+          
           <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
             <thead>
               <tr>
                 <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; width: 55px; font-size: 8px;">CÓDIGO</th>
-                <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; text-align: left; min-width: 120px; font-size: 8px;">INDICADOR</th>
-                <th style="background: #4a4a4a; color: white; padding: 8px 4px; border: 1px solid #333; width: 60px; font-size: 8px;">PLAN</th>
-                ${mesesHeaders.map(m => `<th style="background: #333; color: white; padding: 6px 2px; border: 1px solid #444; width: 30px; font-size: 7px;">${m}</th>`).join('')}
-                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 42px; font-size: 7px;">PROG.</th>
-                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 42px; font-size: 7px;">LOGRADO</th>
-                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 40px; font-size: 7px;">% PROG</th>
-                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 40px; font-size: 7px;">% LOG</th>
-                <th style="background: #006633; color: white; padding: 6px 3px; border: 1px solid #005522; width: 45px; font-size: 7px;">Σ PROG</th>
-                <th style="background: #993300; color: white; padding: 6px 3px; border: 1px solid #882200; width: 48px; font-size: 7px;">% LOGRO GLOBAL</th>
+                <th style="background: #1a1a1a; color: white; padding: 8px 4px; border: 1px solid #333; text-align: left; min-width: 100px; font-size: 8px;">INDICADOR</th>
+                <th style="background: #4a4a4a; color: white; padding: 8px 4px; border: 1px solid #333; width: 50px; font-size: 7px;">L.B.</th>
+                ${mesesHeaders.map(m => `<th style="background: #333; color: white; padding: 6px 2px; border: 1px solid #444; width: 28px; font-size: 7px;">${m}</th>`).join('')}
+                <th style="background: #0066cc; color: white; padding: 6px 3px; border: 1px solid #0055aa; width: 40px; font-size: 7px;">PROG.</th>
+                <th style="background: #cc0000; color: white; padding: 6px 3px; border: 1px solid #aa0000; width: 40px; font-size: 7px;">LOGRADO</th>
+                <th style="background: #666; color: white; padding: 6px 3px; border: 1px solid #555; width: 40px; font-size: 7px;">SIN L.B.</th>
+                <th style="background: #006633; color: white; padding: 6px 3px; border: 1px solid #005522; width: 42px; font-size: 7px;">Σ PROG</th>
+                <th style="background: #993300; color: white; padding: 6px 3px; border: 1px solid #882200; width: 48px; font-size: 7px;">% GLOBAL</th>
               </tr>
             </thead>
             <tbody>
-              ${allData.map(({ indicador, rendicion, sumaProgramado, sumaLogrado }, idx) => {
+              ${allData.map(({ indicador, rendicion, sumaProgramado, sumaLogrado, sumaLogradoSinLB, lineaBase }, idx) => {
                 const programado = parseFloat(rendicion.programado) || parseFloat(indicador.logro) || 0;
                 const logrado = parseFloat(rendicion.logrado) || 0;
                 const metaGlobal = parseFloat(indicador.logro) || 0;
+                const lb = parseFloat(lineaBase) || parseFloat(indicador.linea_base) || 0;
                 
                 // Calculate percentages
                 const porcProgramado = metaGlobal > 0 ? ((programado / metaGlobal) * 100).toFixed(1) : '0.0';
