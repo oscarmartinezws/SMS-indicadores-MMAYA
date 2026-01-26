@@ -271,6 +271,7 @@ router.get('/summary_user', authenticateToken, async (req, res) => {
     let indicadoresQuery = `
       SELECT 
         mp.id_indicador, mp.indicador_resultado, mp.codi, mp.logro as meta_global, mp.estado,
+        mp.linea_base,
         s.sector, e.entidad, a.area_organizacional as area
       FROM matriz_parametro mp
       LEFT JOIN sector s ON mp.id_sector = s.id_sector
@@ -291,7 +292,7 @@ router.get('/summary_user', authenticateToken, async (req, res) => {
     
     const indicadores = indicadoresResult.rows;
     
-    // For each indicator, get the sum of all logrado values and calculate % logro global
+    // For each indicator, get the sum of all logrado values and calculate % logro global (including linea_base)
     const indicadoresConAvance = await Promise.all(indicadores.map(async (ind) => {
       const sumaResult = await pool.query(`
         SELECT COALESCE(SUM(logrado), 0) as suma_logrado
@@ -300,14 +301,20 @@ router.get('/summary_user', authenticateToken, async (req, res) => {
       `, [ind.id_indicador]);
       
       const sumaLogrado = parseFloat(sumaResult.rows[0]?.suma_logrado) || 0;
+      const lineaBase = parseFloat(ind.linea_base) || 0;
       const metaGlobal = parseFloat(ind.meta_global) || 0;
-      const porcLogroGlobal = metaGlobal > 0 ? ((sumaLogrado / metaGlobal) * 100) : 0;
+      
+      // % Logro Global = (Línea Base + Suma Logrado) / Meta Global * 100
+      const logradoConLineaBase = sumaLogrado + lineaBase;
+      const porcLogroGlobal = metaGlobal > 0 ? ((logradoConLineaBase / metaGlobal) * 100) : 0;
       
       return {
         ...ind,
-        suma_logrado: sumaLogrado,
+        suma_logrado: logradoConLineaBase,
+        suma_logrado_sin_lb: sumaLogrado,
+        linea_base: lineaBase,
         porc_logro_global: porcLogroGlobal,
-        tiene_avance: sumaLogrado > 0
+        tiene_avance: logradoConLineaBase > 0
       };
     }));
     
