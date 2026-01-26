@@ -502,11 +502,12 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
         })
       );
       
-      // Calculate totals
+      // Calculate totals - Only include linea base if there's actual progress
       const lineaBase = parseFloat(selectedIndicador.linea_base) || 0;
       const metaGlobal = parseFloat(selectedIndicador.logro) || 0;
-      const logradoAcumulado = sumaLogrado; // Already includes linea base
       const logradoSinLB = sumaLogradoSinLB; // Without linea base
+      const tieneAvance = logradoSinLB > 0;
+      const logradoAcumulado = tieneAvance ? sumaLogrado : 0; // Only includes linea base if there's progress
       const porcLogroGlobal = metaGlobal > 0 ? ((logradoAcumulado / metaGlobal) * 100).toFixed(2) : '0.00';
       const logroGlobalColor = parseFloat(porcLogroGlobal) >= 100 ? '#009933' : (parseFloat(porcLogroGlobal) >= 50 ? '#cc6600' : '#cc0000');
       
