@@ -207,7 +207,8 @@ router.get('/indicador_progreso/:id_indicador', async (req, res) => {
         r.gestion as year,
         r.programado,
         r.logrado,
-        mp.logro as meta_global
+        mp.logro as meta_global,
+        mp.linea_base
       FROM rendicion r
       INNER JOIN matriz_parametro mp ON r.id_indicador = mp.id_indicador
       WHERE r.id_indicador = $1
@@ -222,23 +223,32 @@ router.get('/indicador_progreso/:id_indicador', async (req, res) => {
     `, [idIndicador]);
     
     const metaResult = await pool.query(`
-      SELECT logro as meta_global FROM matriz_parametro WHERE id_indicador = $1
+      SELECT logro as meta_global, COALESCE(linea_base, 0) as linea_base 
+      FROM matriz_parametro WHERE id_indicador = $1
     `, [idIndicador]);
     
     const sumaLogrado = parseFloat(sumaResult.rows[0]?.suma_logrado) || 0;
     const metaGlobal = parseFloat(metaResult.rows[0]?.meta_global) || 0;
-    const porcLogroGlobal = metaGlobal > 0 ? ((sumaLogrado / metaGlobal) * 100) : 0;
+    const lineaBase = parseFloat(metaResult.rows[0]?.linea_base) || 0;
+    
+    // % Logro Global = (Línea Base + Suma Logrado) / Meta Global * 100
+    const logradoConLineaBase = sumaLogrado + lineaBase;
+    const porcLogroGlobal = metaGlobal > 0 ? ((logradoConLineaBase / metaGlobal) * 100) : 0;
     
     res.json({
       data_por_anio: result.rows.map(r => ({
         year: r.year,
         programado: parseFloat(r.programado) || 0,
         logrado: parseFloat(r.logrado) || 0,
-        meta_global: parseFloat(r.meta_global) || 0
+        meta_global: parseFloat(r.meta_global) || 0,
+        linea_base: parseFloat(r.linea_base) || 0
       })),
-      suma_logrado: sumaLogrado,
+      suma_logrado: logradoConLineaBase,
+      suma_logrado_sin_lb: sumaLogrado,
+      linea_base: lineaBase,
       meta_global: metaGlobal,
-      porc_logro_global: Math.round(porcLogroGlobal * 100) / 100
+      porc_logro_global: Math.round(porcLogroGlobal * 100) / 100,
+      incluye_linea_base: true
     });
   } catch (err) {
     console.error('Error getting indicator progress:', err);
