@@ -253,7 +253,6 @@ router.get('/indicador_progreso/:id_indicador', async (req, res) => {
       porc_logro_global: Math.round(porcLogroGlobal * 100) / 100,
       tiene_avance: tieneAvance,
       incluye_linea_base: tieneAvance
-      incluye_linea_base: true
     });
   } catch (err) {
     console.error('Error getting indicator progress:', err);
