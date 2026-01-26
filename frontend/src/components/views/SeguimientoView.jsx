@@ -22,6 +22,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
   const [programadoTemp, setProgramadoTemp] = useState('');
   const [sumaProgramado, setSumaProgramado] = useState(0);
   const [sumaLogrado, setSumaLogrado] = useState(0);
+  const [sumaLogradoSinLB, setSumaLogradoSinLB] = useState(0);
   const [lineaBaseData, setLineaBaseData] = useState({ programado: 0, logrado: 0 });
 
   const isAdmin = user?.rol === 'ADMINISTRADOR';
@@ -49,6 +50,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
       if (res.ok) {
         const data = await res.json();
         setSumaLogrado(data.suma_logrado || 0);
+        setSumaLogradoSinLB(data.suma_logrado_sin_lb || 0);
         setLineaBaseData(prev => ({ ...prev, logrado: data.linea_base || 0 }));
       }
     } catch (err) { console.error(err); }
