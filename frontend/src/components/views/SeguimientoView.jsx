@@ -793,18 +793,23 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LOGRO PROGRAMADO (META)</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.logro || '-'}</div></div>
               <div>
                 <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LOGRADO (SIN L.B.)</div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: styles.gray600 }}>{sumaLogradoSinLB.toFixed(3)}</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: sumaLogradoSinLB > 0 ? styles.green : styles.gray600 }}>{sumaLogradoSinLB.toFixed(3)}</div>
               </div>
               <div>
-                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL <span style={{ fontSize: '0.5rem', color: styles.blue }}>(Con L.B.)</span></div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>
+                  % LOGRO GLOBAL {sumaLogradoSinLB > 0 && <span style={{ fontSize: '0.5rem', color: styles.blue }}>(Con L.B.)</span>}
+                </div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 600, color: (() => {
                   const meta = parseFloat(selectedIndicador.logro) || 0;
-                  const porcentaje = meta > 0 ? (sumaLogrado / meta) * 100 : 0;
+                  // Only calculate with linea base if there's actual progress
+                  const logradoParaCalculo = sumaLogradoSinLB > 0 ? sumaLogrado : 0;
+                  const porcentaje = meta > 0 ? (logradoParaCalculo / meta) * 100 : 0;
                   return porcentaje >= 100 ? styles.green : (porcentaje >= 50 ? '#F59E0B' : styles.red);
                 })() }}>
                   {(() => {
                     const meta = parseFloat(selectedIndicador.logro) || 0;
-                    const porcentaje = meta > 0 ? (sumaLogrado / meta) * 100 : 0;
+                    const logradoParaCalculo = sumaLogradoSinLB > 0 ? sumaLogrado : 0;
+                    const porcentaje = meta > 0 ? (logradoParaCalculo / meta) * 100 : 0;
                     return `${porcentaje.toFixed(2)}%`;
                   })()}
                 </div>
