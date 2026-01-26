@@ -146,17 +146,19 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 
 ### 2025-01-21
 - ✅ **Rol INVITADO (solo lectura) - UI Completa**:
-  - Botones de acción (+ Adicionar, ✏️ Editar, 💾 Guardar) VISIBLES pero DESHABILITADOS
-  - Estilo aplicado: `opacity: 0.5, cursor: not-allowed`
-  - Implementado en todos los componentes de vista
-  - **INVITADO ve TODOS los indicadores** (71 registros):
-    - Dashboard: Contexto muestra "TODOS" para Sector, Entidad y Área
-    - Banco de Indicadores: Lista completa de 71 indicadores
-    - Seguimiento: Acceso a todos los indicadores para consulta
-  - Modificaciones en backend:
-    - `/backend/routes/indicadores.js`: Excluir INVITADO del filtro por área
-    - `/backend/routes/dashboard.js`: summary y summary_user sin filtro para INVITADO
-  - Testing completo: 100% de pruebas pasadas
+  - Botones de acción VISIBLES pero DESHABILITADOS
+  - INVITADO ve TODOS los indicadores (71 registros)
+
+- ✅ **Cálculos con Línea Base implementados**:
+  - **Suma Programado Anual**: Incluye línea base (etiqueta: "Incluye L.B.")
+  - **Logrado Acumulado**: Suma logrado + línea base (etiqueta: "Incluye L.B.")
+  - **% Logro Global**: (Línea Base + Suma Logrado) / Meta Global (etiqueta: "Incluye L.B.")
+  - Cambios en backend:
+    - `/routes/rendicion.js`: suma_programado y suma_logrado incluyen linea_base
+    - `/routes/dashboard.js`: indicador_progreso y summary_user incluyen linea_base
+  - Cambios en frontend:
+    - `SeguimientoView.jsx`: Etiquetas actualizadas
+    - `HomeView.jsx`: Dashboard de usuario con etiquetas y cálculos actualizados
 
 ### 2025-01-05
 - ✅ **Mejoras de PROGRAMADO en vista Seguimiento**:
