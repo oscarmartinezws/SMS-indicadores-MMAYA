@@ -15,28 +15,60 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
-// Sum of PROGRAMADO across all years
+// Sum of PROGRAMADO across all years + LINEA BASE
 router.get('/suma_programado/:id_indicador', async (req, res) => {
   try {
-    const result = await pool.query(
+    // Get sum of programado from rendicion
+    const sumResult = await pool.query(
       'SELECT COALESCE(SUM(programado), 0) as suma_programado FROM rendicion WHERE id_indicador = $1',
       [req.params.id_indicador]
     );
-    res.json({ suma_programado: parseFloat(result.rows[0].suma_programado) || 0 });
+    
+    // Get linea_base from matriz_parametro
+    const lineaBaseResult = await pool.query(
+      'SELECT COALESCE(linea_base, 0) as linea_base FROM matriz_parametro WHERE id_indicador = $1',
+      [req.params.id_indicador]
+    );
+    
+    const sumaProgramado = parseFloat(sumResult.rows[0].suma_programado) || 0;
+    const lineaBase = parseFloat(lineaBaseResult.rows[0]?.linea_base) || 0;
+    
+    res.json({ 
+      suma_programado: sumaProgramado + lineaBase,
+      suma_programado_sin_lb: sumaProgramado,
+      linea_base: lineaBase,
+      incluye_linea_base: true
+    });
   } catch (err) {
     console.error('Error getting suma programado:', err);
     res.status(500).json({ detail: 'Error al obtener suma programado' });
   }
 });
 
-// Sum of LOGRADO across all years
+// Sum of LOGRADO across all years + LINEA BASE
 router.get('/suma_logrado/:id_indicador', async (req, res) => {
   try {
-    const result = await pool.query(
+    // Get sum of logrado from rendicion
+    const sumResult = await pool.query(
       'SELECT COALESCE(SUM(logrado), 0) as suma_logrado FROM rendicion WHERE id_indicador = $1',
       [req.params.id_indicador]
     );
-    res.json({ suma_logrado: parseFloat(result.rows[0].suma_logrado) || 0 });
+    
+    // Get linea_base from matriz_parametro
+    const lineaBaseResult = await pool.query(
+      'SELECT COALESCE(linea_base, 0) as linea_base FROM matriz_parametro WHERE id_indicador = $1',
+      [req.params.id_indicador]
+    );
+    
+    const sumaLogrado = parseFloat(sumResult.rows[0].suma_logrado) || 0;
+    const lineaBase = parseFloat(lineaBaseResult.rows[0]?.linea_base) || 0;
+    
+    res.json({ 
+      suma_logrado: sumaLogrado + lineaBase,
+      suma_logrado_sin_lb: sumaLogrado,
+      linea_base: lineaBase,
+      incluye_linea_base: true
+    });
   } catch (err) {
     console.error('Error getting suma logrado:', err);
     res.status(500).json({ detail: 'Error al obtener suma logrado' });
