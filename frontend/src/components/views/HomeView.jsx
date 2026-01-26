@@ -135,10 +135,11 @@ function HomeView({ user, siteConfig }) {
       const lineaBase = parseFloat(selectedIndicador.linea_base) || 0;
       const metaGlobal = parseFloat(selectedIndicador.meta_global) || 0;
       const logradoAcumulado = indicadorProgreso.suma_logrado || 0;
+      const logradoSinLB = indicadorProgreso.suma_logrado_sin_lb || (logradoAcumulado - lineaBase);
       const porcLogroGlobal = indicadorProgreso.porc_logro_global || 0;
       const logroGlobalColor = porcLogroGlobal >= 100 ? '#009933' : (porcLogroGlobal >= 50 ? '#cc6600' : '#cc0000');
       
-      // Build HTML content for PDF
+      // Build HTML content for PDF - Using indicator's sector/entidad/area
       const htmlContent = `
         <div id="ficha-pdf" style="font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; width: 100%; box-sizing: border-box;">
           <!-- Header -->
@@ -151,21 +152,21 @@ function HomeView({ user, siteConfig }) {
           
           <!-- Contexto y Selección de Indicador -->
           <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-            <!-- Contexto del Usuario -->
+            <!-- Contexto del Indicador -->
             <div style="flex: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
-              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">CONTEXTO DEL USUARIO</div>
+              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">CONTEXTO DEL INDICADOR</div>
               <div style="background: #fff; padding: 12px;">
                 <div style="margin-bottom: 10px;">
-                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ENTIDAD</div>
-                  <div style="font-size: 11px; font-weight: 500;">${dashboardData?.contexto?.entidad || '-'}</div>
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">SECTOR</div>
+                  <div style="font-size: 11px; font-weight: 500;">${selectedIndicador.sector || '-'}</div>
                 </div>
                 <div style="margin-bottom: 10px;">
-                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ÁREA</div>
-                  <div style="font-size: 11px; font-weight: 500;">${dashboardData?.contexto?.area || '-'}</div>
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ENTIDAD</div>
+                  <div style="font-size: 11px; font-weight: 500;">${selectedIndicador.entidad || '-'}</div>
                 </div>
                 <div>
-                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">SECTOR</div>
-                  <div style="font-size: 11px; font-weight: 500;">${dashboardData?.contexto?.sector || '-'}</div>
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ÁREA</div>
+                  <div style="font-size: 11px; font-weight: 500;">${selectedIndicador.area || '-'}</div>
                 </div>
               </div>
             </div>
@@ -178,7 +179,7 @@ function HomeView({ user, siteConfig }) {
                   <span style="font-weight: 700; color: #1a1a1a; font-size: 12px;">${selectedIndicador.codi}</span>
                   <span style="font-size: 11px; color: #333;"> - ${selectedIndicador.indicador_resultado || ''}</span>
                 </div>
-                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                   <div>
                     <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LÍNEA BASE</div>
                     <div style="font-size: 11px; font-weight: 600;">${lineaBase.toFixed(2)}</div>
@@ -188,11 +189,15 @@ function HomeView({ user, siteConfig }) {
                     <div style="font-size: 11px; font-weight: 600; color: #0066cc;">${metaGlobal.toFixed(2)}</div>
                   </div>
                   <div>
-                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LOGRADO ACUMULADO <span style="color: #0066cc; font-size: 7px;">(Incluye L.B.)</span></div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LOGRADO (SIN L.B.)</div>
+                    <div style="font-size: 11px; font-weight: 600; color: #666;">${logradoSinLB.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LOGRADO ACUMULADO <span style="color: #0066cc; font-size: 7px;">(Con L.B.)</span></div>
                     <div style="font-size: 14px; font-weight: 700; color: #009933;">${logradoAcumulado.toFixed(2)}</div>
                   </div>
                   <div>
-                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">% LOGRO GLOBAL <span style="color: #0066cc; font-size: 7px;">(Incluye L.B.)</span></div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">% LOGRO GLOBAL <span style="color: #0066cc; font-size: 7px;">(Con L.B.)</span></div>
                     <div style="font-size: 14px; font-weight: 700; color: ${logroGlobalColor};">${porcLogroGlobal.toFixed(2)}%</div>
                   </div>
                 </div>
@@ -232,7 +237,7 @@ function HomeView({ user, siteConfig }) {
                 <tr style="background: #f0f0f0; font-weight: 600;">
                   <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">TOTAL</td>
                   <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #bbdefb;">${metaGlobal.toFixed(2)}</td>
-                  <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #c8e6c9;">${logradoAcumulado.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #c8e6c9;">${logradoAcumulado.toFixed(2)} <span style="font-size: 8px; color: #666;">(${logradoSinLB.toFixed(2)} + L.B.)</span></td>
                   <td style="border: 1px solid #ddd; padding: 8px; text-align: center; color: ${logroGlobalColor};">${porcLogroGlobal.toFixed(2)}%</td>
                 </tr>
               </tbody>
@@ -241,7 +246,7 @@ function HomeView({ user, siteConfig }) {
           
           <!-- Footer -->
           <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 8px; color: #666;">
-            <strong>Nota:</strong> Los cálculos de "Logrado Acumulado" y "% Logro Global" incluyen el valor de la Línea Base. | Usuario: ${user?.nombre || user?.username || '-'}
+            <strong>Nota:</strong> Los cálculos de "Logrado Acumulado" y "% Logro Global" incluyen el valor de la Línea Base (${lineaBase.toFixed(2)}). | Usuario: ${user?.nombre || user?.username || '-'}
           </div>
         </div>
       `;
