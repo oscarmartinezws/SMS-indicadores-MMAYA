@@ -124,6 +124,164 @@ function HomeView({ user, siteConfig }) {
     }
   };
 
+  // Export individual indicator tracking sheet (Ficha de Seguimiento) from Dashboard
+  const exportFichaFromDashboard = async () => {
+    if (!selectedIndicador || !indicadorProgreso) {
+      alert('Seleccione un indicador primero');
+      return;
+    }
+    
+    try {
+      const lineaBase = parseFloat(selectedIndicador.linea_base) || 0;
+      const metaGlobal = parseFloat(selectedIndicador.meta_global) || 0;
+      const logradoAcumulado = indicadorProgreso.suma_logrado || 0;
+      const porcLogroGlobal = indicadorProgreso.porc_logro_global || 0;
+      const logroGlobalColor = porcLogroGlobal >= 100 ? '#009933' : (porcLogroGlobal >= 50 ? '#cc6600' : '#cc0000');
+      
+      // Build HTML content for PDF
+      const htmlContent = `
+        <div id="ficha-pdf" style="font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; width: 100%; box-sizing: border-box;">
+          <!-- Header -->
+          <h1 style="font-size: 16px; text-align: center; margin-bottom: 6px; color: #1a1a1a; font-weight: 700; text-transform: uppercase;">
+            Ficha de Seguimiento de Indicador
+          </h1>
+          <p style="text-align: center; color: #666; margin-bottom: 20px; font-size: 10px;">
+            Sistema de Monitoreo Sectorial - Generado: ${new Date().toLocaleString()}
+          </p>
+          
+          <!-- Contexto y Selección de Indicador -->
+          <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+            <!-- Contexto del Usuario -->
+            <div style="flex: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">CONTEXTO DEL USUARIO</div>
+              <div style="background: #fff; padding: 12px;">
+                <div style="margin-bottom: 10px;">
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ENTIDAD</div>
+                  <div style="font-size: 11px; font-weight: 500;">${dashboardData?.contexto?.entidad || '-'}</div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ÁREA</div>
+                  <div style="font-size: 11px; font-weight: 500;">${dashboardData?.contexto?.area || '-'}</div>
+                </div>
+                <div>
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">SECTOR</div>
+                  <div style="font-size: 11px; font-weight: 500;">${dashboardData?.contexto?.sector || '-'}</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Selección de Indicador -->
+            <div style="flex: 2; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">SELECCIÓN DE INDICADOR</div>
+              <div style="background: #fff; padding: 12px;">
+                <div style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; margin-bottom: 10px;">
+                  <span style="font-weight: 700; color: #1a1a1a; font-size: 12px;">${selectedIndicador.codi}</span>
+                  <span style="font-size: 11px; color: #333;"> - ${selectedIndicador.indicador_resultado || ''}</span>
+                </div>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LÍNEA BASE</div>
+                    <div style="font-size: 11px; font-weight: 600;">${lineaBase.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">META GLOBAL</div>
+                    <div style="font-size: 11px; font-weight: 600; color: #0066cc;">${metaGlobal.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LOGRADO ACUMULADO <span style="color: #0066cc; font-size: 7px;">(Incluye L.B.)</span></div>
+                    <div style="font-size: 14px; font-weight: 700; color: #009933;">${logradoAcumulado.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">% LOGRO GLOBAL <span style="color: #0066cc; font-size: 7px;">(Incluye L.B.)</span></div>
+                    <div style="font-size: 14px; font-weight: 700; color: ${logroGlobalColor};">${porcLogroGlobal.toFixed(2)}%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Progreso por Año -->
+          <div style="border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 15px;">
+            <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">PROGRESO POR AÑO</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+              <thead>
+                <tr>
+                  <th style="background: #333; color: white; padding: 8px; border: 1px solid #444;">AÑO</th>
+                  <th style="background: #0066cc; color: white; padding: 8px; border: 1px solid #0055aa;">PROGRAMADO</th>
+                  <th style="background: #009933; color: white; padding: 8px; border: 1px solid #008822;">LOGRADO</th>
+                  <th style="background: #cc6600; color: white; padding: 8px; border: 1px solid #aa5500;">% CUMPLIMIENTO</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${indicadorProgreso.data_por_anio && indicadorProgreso.data_por_anio.length > 0 
+                  ? indicadorProgreso.data_por_anio.map((item, idx) => {
+                      const porc = item.programado > 0 ? ((item.logrado / item.programado) * 100).toFixed(1) : '0.0';
+                      const color = parseFloat(porc) >= 100 ? '#009933' : (parseFloat(porc) >= 50 ? '#cc6600' : '#cc0000');
+                      return `
+                        <tr style="background: ${idx % 2 === 0 ? '#fff' : '#f8f8f8'};">
+                          <td style="border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: 600;">${item.year}</td>
+                          <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #e3f2fd;">${item.programado.toFixed(2)}</td>
+                          <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #e8f5e9;">${item.logrado.toFixed(2)}</td>
+                          <td style="border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: 600; color: ${color};">${porc}%</td>
+                        </tr>
+                      `;
+                    }).join('')
+                  : '<tr><td colspan="4" style="border: 1px solid #ddd; padding: 20px; text-align: center; color: #999;">Sin datos de rendición registrados</td></tr>'
+                }
+                <!-- Total Row -->
+                <tr style="background: #f0f0f0; font-weight: 600;">
+                  <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">TOTAL</td>
+                  <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #bbdefb;">${metaGlobal.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #c8e6c9;">${logradoAcumulado.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px; text-align: center; color: ${logroGlobalColor};">${porcLogroGlobal.toFixed(2)}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Footer -->
+          <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 8px; color: #666;">
+            <strong>Nota:</strong> Los cálculos de "Logrado Acumulado" y "% Logro Global" incluyen el valor de la Línea Base. | Usuario: ${user?.nombre || user?.username || '-'}
+          </div>
+        </div>
+      `;
+      
+      // Create temporary container
+      const container = document.createElement('div');
+      container.innerHTML = htmlContent;
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.width = '210mm';
+      document.body.appendChild(container);
+      
+      const element = container.querySelector('#ficha-pdf');
+      
+      // Configure PDF options
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `Ficha_${selectedIndicador.codi}.pdf`,
+        image: { type: 'jpeg', quality: 1.0 },
+        html2canvas: { 
+          scale: 2.5,
+          useCORS: true, 
+          logging: false,
+          letterRendering: true
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      // Generate and download PDF
+      await html2pdf().set(opt).from(element).save();
+      
+      // Cleanup
+      document.body.removeChild(container);
+      
+    } catch (e) {
+      console.error(e);
+      alert('Error al generar Ficha PDF: ' + e.message);
+    }
+  };
+
   const pieData = dashboardData && dashboardData.general ? [
     { name: 'Con Avance', value: dashboardData.general.con_avance || 0 },
     { name: 'Sin Avance', value: dashboardData.general.sin_avance || 0 }
