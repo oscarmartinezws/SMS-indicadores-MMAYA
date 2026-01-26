@@ -769,13 +769,17 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
           </div>
           
           {selectedIndicador && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, marginTop: 16, paddingTop: 16, borderTop: `1px solid ${styles.gray200}` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 16, marginTop: 16, paddingTop: 16, borderTop: `1px solid ${styles.gray200}` }}>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>AÑO BASE</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.anio_base || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LÍNEA BASE</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.linea_base || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>AÑO LOGRO</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.anio_logro || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LOGRO PROGRAMADO (META)</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.logro || '-'}</div></div>
               <div>
-                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL <span style={{ fontSize: '0.5rem', color: styles.blue }}>(Incluye L.B.)</span></div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LOGRADO (SIN L.B.)</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: styles.gray600 }}>{sumaLogradoSinLB.toFixed(3)}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL <span style={{ fontSize: '0.5rem', color: styles.blue }}>(Con L.B.)</span></div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 600, color: (() => {
                   const meta = parseFloat(selectedIndicador.logro) || 0;
                   const porcentaje = meta > 0 ? (sumaLogrado / meta) * 100 : 0;
@@ -789,7 +793,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>SUMA PROGRAMADO <span style={{ fontSize: '0.5rem', color: styles.blue }}>(Incluye L.B.)</span></div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>SUMA PROGRAMADO <span style={{ fontSize: '0.5rem', color: styles.blue }}>(Con L.B.)</span></div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 600, color: sumaProgramado > (parseFloat(selectedIndicador.logro) || 0) ? styles.red : styles.green }}>
                   {sumaProgramado.toFixed(3)} / {selectedIndicador.logro || '-'}
                 </div>
