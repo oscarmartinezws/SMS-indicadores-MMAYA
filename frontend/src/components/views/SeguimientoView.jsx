@@ -464,6 +464,230 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
     }
   };
 
+  // Export individual indicator tracking sheet (Ficha de Seguimiento)
+  const exportFichaIndicador = async () => {
+    if (!selectedIndicador) {
+      alert('Seleccione un indicador primero');
+      return;
+    }
+    
+    try {
+      const mesesCortos = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      const years = configYears.sort((a, b) => a - b);
+      
+      // Fetch rendition data for all years for this indicator
+      const rendicionesPorAnio = await Promise.all(
+        years.map(async (year) => {
+          try {
+            const res = await fetch(`${API_URL}/api/sms/rendicion/${selectedIndicador.id_indicador}/${year}`);
+            const data = res.ok ? await res.json() : {};
+            return { year, data };
+          } catch (e) {
+            return { year, data: {} };
+          }
+        })
+      );
+      
+      // Calculate totals
+      const lineaBase = parseFloat(selectedIndicador.linea_base) || 0;
+      const metaGlobal = parseFloat(selectedIndicador.logro) || 0;
+      const logradoAcumulado = sumaLogrado; // Already includes linea base
+      const porcLogroGlobal = metaGlobal > 0 ? ((logradoAcumulado / metaGlobal) * 100).toFixed(2) : '0.00';
+      const logroGlobalColor = parseFloat(porcLogroGlobal) >= 100 ? '#009933' : (parseFloat(porcLogroGlobal) >= 50 ? '#cc6600' : '#cc0000');
+      
+      // Build HTML content for PDF - Ficha Individual
+      const htmlContent = `
+        <div id="ficha-pdf" style="font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; width: 100%; box-sizing: border-box;">
+          <!-- Header -->
+          <h1 style="font-size: 16px; text-align: center; margin-bottom: 6px; color: #1a1a1a; font-weight: 700; text-transform: uppercase;">
+            Ficha de Seguimiento de Indicador
+          </h1>
+          <p style="text-align: center; color: #666; margin-bottom: 20px; font-size: 10px;">
+            Sistema de Monitoreo Sectorial - Generado: ${new Date().toLocaleString()}
+          </p>
+          
+          <!-- Contexto y Selección de Indicador -->
+          <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+            <!-- Contexto del Usuario -->
+            <div style="flex: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">CONTEXTO DEL USUARIO</div>
+              <div style="background: #fff; padding: 12px;">
+                <div style="margin-bottom: 10px;">
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ENTIDAD</div>
+                  <div style="font-size: 11px; font-weight: 500;">${contexto.entidad || '-'}</div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">ÁREA</div>
+                  <div style="font-size: 11px; font-weight: 500;">${contexto.area || '-'}</div>
+                </div>
+                <div>
+                  <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">SECTOR</div>
+                  <div style="font-size: 11px; font-weight: 500;">${contexto.sector || '-'}</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Selección de Indicador -->
+            <div style="flex: 2; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">SELECCIÓN DE INDICADOR</div>
+              <div style="background: #fff; padding: 12px;">
+                <div style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; margin-bottom: 10px;">
+                  <span style="font-weight: 700; color: #1a1a1a; font-size: 12px;">${selectedIndicador.codi}</span>
+                  <span style="font-size: 11px; color: #333;"> - ${selectedIndicador.indicador_resultado || ''}</span>
+                </div>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">AÑO BASE</div>
+                    <div style="font-size: 11px; font-weight: 600;">${selectedIndicador.anio_base || '-'}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LÍNEA BASE</div>
+                    <div style="font-size: 11px; font-weight: 600;">${lineaBase.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">AÑO LOGRO</div>
+                    <div style="font-size: 11px; font-weight: 600;">${selectedIndicador.anio_logro || '-'}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">LOGRO PROGRAMADO (META)</div>
+                    <div style="font-size: 11px; font-weight: 600; color: #0066cc;">${metaGlobal.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">% LOGRO GLOBAL <span style="color: #0066cc; font-size: 7px;">(Incluye L.B.)</span></div>
+                    <div style="font-size: 14px; font-weight: 700; color: ${logroGlobalColor};">${porcLogroGlobal}%</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 9px; color: #666; font-weight: 600; margin-bottom: 2px;">SUMA PROGRAMADO <span style="color: #0066cc; font-size: 7px;">(Incluye L.B.)</span></div>
+                    <div style="font-size: 11px; font-weight: 600; color: #009933;">${sumaProgramado.toFixed(2)} / ${metaGlobal.toFixed(2)}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Seguimiento Anual -->
+          <div style="border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 15px;">
+            <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">SEGUIMIENTO ANUAL DE INDICADORES</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
+              <thead>
+                <tr>
+                  <th style="background: #333; color: white; padding: 6px 4px; border: 1px solid #444; width: 70px; font-size: 8px;">#</th>
+                  ${years.map(y => `<th style="background: #333; color: white; padding: 6px 4px; border: 1px solid #444; font-size: 8px;">${y}</th>`).join('')}
+                  <th style="background: #333; color: white; padding: 6px 4px; border: 1px solid #444; font-size: 8px;">LÍNEA BASE</th>
+                  <th style="background: #0066cc; color: white; padding: 6px 4px; border: 1px solid #0055aa; font-size: 8px;">LOGRO PROG.</th>
+                  <th style="background: #cc0000; color: white; padding: 6px 4px; border: 1px solid #aa0000; font-size: 8px;">LOGRO EJEC.</th>
+                  <th style="background: #cc6600; color: white; padding: 6px 4px; border: 1px solid #aa5500; font-size: 8px;">% LOGRO GLOBAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- EJECUCIÓN Row -->
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; font-weight: 600; background: #f5f5f5; font-size: 8px;">EJECUCIÓN</td>
+                  ${years.map(y => {
+                    const rend = rendicionesPorAnio.find(r => r.year === y);
+                    const logrado = parseFloat(rend?.data?.logrado) || 0;
+                    return `<td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 8px;">${logrado > 0 ? logrado.toFixed(2) : '-'}</td>`;
+                  }).join('')}
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 8px;">${lineaBase.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #e3f2fd; font-size: 8px;">${metaGlobal.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #ffebee; font-weight: 600; color: #c00; font-size: 8px;">${logradoAcumulado.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #fff8e1; font-weight: 700; color: ${logroGlobalColor}; font-size: 9px;">${porcLogroGlobal}%</td>
+                </tr>
+                <!-- % EJEC Row -->
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; font-weight: 600; background: #f5f5f5; font-size: 8px;">% EJEC</td>
+                  ${years.map(y => {
+                    const rend = rendicionesPorAnio.find(r => r.year === y);
+                    const programado = parseFloat(rend?.data?.programado) || 0;
+                    const logrado = parseFloat(rend?.data?.logrado) || 0;
+                    const porc = programado > 0 ? ((logrado / programado) * 100).toFixed(1) : '-';
+                    return `<td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 8px;">${porc !== '-' ? porc + '%' : '-'}</td>`;
+                  }).join('')}
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 8px;">-</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #e3f2fd; font-size: 8px;">-</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #ffebee; font-size: 8px;">-</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #fff8e1; font-size: 8px;">-</td>
+                </tr>
+                <!-- ACUMULADO Row -->
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; font-weight: 600; background: #f5f5f5; font-size: 8px;">ACUMULADO</td>
+                  ${(() => {
+                    let acum = lineaBase;
+                    return years.map(y => {
+                      const rend = rendicionesPorAnio.find(r => r.year === y);
+                      const logrado = parseFloat(rend?.data?.logrado) || 0;
+                      acum += logrado;
+                      return `<td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 8px;">${acum.toFixed(2)}</td>`;
+                    }).join('');
+                  })()}
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 8px;">${lineaBase.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #e3f2fd; font-weight: 600; font-size: 8px;">${sumaProgramado.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #ffebee; font-weight: 600; color: #c00; font-size: 8px;">${logradoAcumulado.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #fff8e1; font-weight: 700; color: ${logroGlobalColor}; font-size: 9px;">${porcLogroGlobal}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Descripción Cualitativa y Modificaciones -->
+          <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+            <div style="flex: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">DESCRIPCIÓN CUALITATIVA DEL AVANCE</div>
+              <div style="background: #fff; padding: 12px; min-height: 80px; font-size: 10px; border: 1px solid #eee; border-top: none;">
+                ${rendicion.descripcion_cualitativa || '<span style="color: #999;">Sin descripción registrada</span>'}
+              </div>
+            </div>
+            <div style="flex: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">MODIFICACIONES</div>
+              <div style="background: #fff; padding: 12px; min-height: 80px; font-size: 10px; border: 1px solid #eee; border-top: none;">
+                ${rendicion.modificaciones || '<span style="color: #999;">Sin modificaciones registradas</span>'}
+              </div>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="text-align: center; padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 8px; color: #666;">
+            <strong>Nota:</strong> Los cálculos de "Logro Ejecutado" y "% Logro Global" incluyen el valor de la Línea Base.
+          </div>
+        </div>
+      `;
+      
+      // Create temporary container
+      const container = document.createElement('div');
+      container.innerHTML = htmlContent;
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.width = '297mm';
+      document.body.appendChild(container);
+      
+      const element = container.querySelector('#ficha-pdf');
+      
+      // Configure PDF options
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `Ficha_${selectedIndicador.codi}_${gestion}.pdf`,
+        image: { type: 'jpeg', quality: 1.0 },
+        html2canvas: { 
+          scale: 2.5,
+          useCORS: true, 
+          logging: false,
+          letterRendering: true
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      
+      // Generate and download PDF
+      await html2pdf().set(opt).from(element).save();
+      
+      // Cleanup
+      document.body.removeChild(container);
+      
+    } catch (e) {
+      console.error(e);
+      alert('Error al generar Ficha PDF: ' + e.message);
+    }
+  };
+
   const [showExportMenu, setShowExportMenu] = useState(false);
 
   if (loading) return <div style={{ textAlign: 'center', padding: 40 }}>Cargando...</div>;
