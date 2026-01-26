@@ -22,6 +22,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
   const [programadoTemp, setProgramadoTemp] = useState('');
   const [sumaProgramado, setSumaProgramado] = useState(0);
   const [sumaLogrado, setSumaLogrado] = useState(0);
+  const [lineaBaseData, setLineaBaseData] = useState({ programado: 0, logrado: 0 });
 
   const isAdmin = user?.rol === 'ADMINISTRADOR';
   const canEdit = !readOnly && (isAdmin || user?.rol !== 'INVITADO');
@@ -29,24 +30,26 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
   const mesesCortos = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
   const disabledBtnStyle = { opacity: 0.5, cursor: 'not-allowed' };
 
-  // Fetch suma programado for selected indicator
+  // Fetch suma programado for selected indicator (now includes linea base)
   const fetchSumaProgramado = async (id_indicador) => {
     try {
       const res = await fetch(`${API_URL}/api/sms/rendicion/suma_programado/${id_indicador}`);
       if (res.ok) {
         const data = await res.json();
         setSumaProgramado(data.suma_programado || 0);
+        setLineaBaseData(prev => ({ ...prev, programado: data.linea_base || 0 }));
       }
     } catch (err) { console.error(err); }
   };
 
-  // Fetch suma logrado for selected indicator
+  // Fetch suma logrado for selected indicator (now includes linea base)
   const fetchSumaLogrado = async (id_indicador) => {
     try {
       const res = await fetch(`${API_URL}/api/sms/rendicion/suma_logrado/${id_indicador}`);
       if (res.ok) {
         const data = await res.json();
         setSumaLogrado(data.suma_logrado || 0);
+        setLineaBaseData(prev => ({ ...prev, logrado: data.linea_base || 0 }));
       }
     } catch (err) { console.error(err); }
   };
@@ -541,7 +544,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>AÑO LOGRO</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.anio_logro || '-'}</div></div>
               <div><div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>LOGRO PROGRAMADO (META)</div><div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedIndicador.logro || '-'}</div></div>
               <div>
-                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL</div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL <span style={{ fontSize: '0.5rem', color: styles.blue }}>(Incluye L.B.)</span></div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 600, color: (() => {
                   const meta = parseFloat(selectedIndicador.logro) || 0;
                   const porcentaje = meta > 0 ? (sumaLogrado / meta) * 100 : 0;
@@ -555,7 +558,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>SUMA PROGRAMADO (TODOS LOS AÑOS)</div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: styles.gray500, marginBottom: 4 }}>SUMA PROGRAMADO <span style={{ fontSize: '0.5rem', color: styles.blue }}>(Incluye L.B.)</span></div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 600, color: sumaProgramado > (parseFloat(selectedIndicador.logro) || 0) ? styles.red : styles.green }}>
                   {sumaProgramado.toFixed(3)} / {selectedIndicador.logro || '-'}
                 </div>
