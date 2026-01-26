@@ -396,15 +396,19 @@ function HomeView({ user, siteConfig }) {
                     <div style={{ fontSize: '0.85rem' }}>{selectedIndicador.indicador_resultado}</div>
                   </div>
                   <div style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>LÍNEA BASE</div>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: styles.gray700 }}>{selectedIndicador.linea_base || 0}</div>
+                  </div>
+                  <div style={{ marginBottom: 12 }}>
                     <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>META GLOBAL</div>
                     <div style={{ fontSize: '1.2rem', fontWeight: 700, color: styles.blue }}>{selectedIndicador.meta_global || 0}</div>
                   </div>
                   <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>LOGRADO ACUMULADO</div>
+                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>LOGRADO ACUMULADO <span style={{ fontSize: '0.55rem', color: styles.blue }}>(Incluye L.B.)</span></div>
                     <div style={{ fontSize: '1.2rem', fontWeight: 700, color: styles.green }}>{indicadorProgreso?.suma_logrado?.toFixed(2) || 0}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL</div>
+                    <div style={{ fontSize: '0.7rem', color: styles.gray500, marginBottom: 4 }}>% LOGRO GLOBAL <span style={{ fontSize: '0.55rem', color: styles.blue }}>(Incluye L.B.)</span></div>
                     <div style={{ 
                       fontSize: '1.5rem', 
                       fontWeight: 700, 
