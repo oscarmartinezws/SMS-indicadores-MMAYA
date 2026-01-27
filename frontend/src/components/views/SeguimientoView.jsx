@@ -586,7 +586,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
           </div>
           
           <!-- Seguimiento Anual -->
-          <div style="border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 15px;">
+          <div style="border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 15px; page-break-inside: avoid;">
             <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">SEGUIMIENTO ANUAL DE INDICADORES</div>
             <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
               <thead>
@@ -600,6 +600,19 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 </tr>
               </thead>
               <tbody>
+                <!-- PROGRAMADO Row -->
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; font-weight: 600; background: #e3f2fd; font-size: 8px; color: #0066cc;">PROGRAMADO</td>
+                  ${years.map(y => {
+                    const rend = rendicionesPorAnio.find(r => r.year === y);
+                    const programado = parseFloat(rend?.data?.programado) || 0;
+                    return `<td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 8px; background: #e3f2fd;">${programado > 0 ? programado.toFixed(2) : '-'}</td>`;
+                  }).join('')}
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 8px; background: #e3f2fd;">-</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #bbdefb; font-weight: 600; font-size: 8px;">${sumaProgramado.toFixed(2)}</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #e3f2fd; font-size: 8px;">-</td>
+                  <td style="border: 1px solid #ddd; padding: 6px 4px; text-align: center; background: #e3f2fd; font-size: 8px;">-</td>
+                </tr>
                 <!-- EJECUCIÓN Row -->
                 <tr>
                   <td style="border: 1px solid #ddd; padding: 6px 4px; font-weight: 600; background: #f5f5f5; font-size: 8px;">EJECUCIÓN</td>
@@ -632,7 +645,7 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
                 <tr>
                   <td style="border: 1px solid #ddd; padding: 6px 4px; font-weight: 600; background: #f5f5f5; font-size: 8px;">ACUMULADO</td>
                   ${(() => {
-                    let acum = lineaBase;
+                    let acum = tieneAvance ? lineaBase : 0;
                     return years.map(y => {
                       const rend = rendicionesPorAnio.find(r => r.year === y);
                       const logrado = parseFloat(rend?.data?.logrado) || 0;
@@ -649,19 +662,19 @@ function SeguimientoView({ user, siteConfig, readOnly = false }) {
             </table>
           </div>
           
-          <!-- Descripción Cualitativa y Modificaciones -->
-          <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-            <div style="flex: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
-              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">DESCRIPCIÓN CUALITATIVA DEL AVANCE</div>
-              <div style="background: #fff; padding: 12px; min-height: 80px; font-size: 10px; border: 1px solid #eee; border-top: none;">
-                ${rendicion.descripcion_cualitativa || '<span style="color: #999;">Sin descripción registrada</span>'}
-              </div>
+          <!-- Descripción Cualitativa del Avance - Full width -->
+          <div style="border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 15px; page-break-inside: avoid;">
+            <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">DESCRIPCIÓN CUALITATIVA DEL AVANCE</div>
+            <div style="background: #fff; padding: 12px; min-height: 60px; font-size: 10px; border: 1px solid #eee; border-top: none; white-space: pre-wrap; word-wrap: break-word;">
+              ${rendicion.descripcion_cualitativa || '<span style="color: #999;">Sin descripción registrada</span>'}
             </div>
-            <div style="flex: 1; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
-              <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">MODIFICACIONES</div>
-              <div style="background: #fff; padding: 12px; min-height: 80px; font-size: 10px; border: 1px solid #eee; border-top: none;">
-                ${rendicion.modificaciones || '<span style="color: #999;">Sin modificaciones registradas</span>'}
-              </div>
+          </div>
+          
+          <!-- Modificaciones - Full width -->
+          <div style="border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 15px; page-break-inside: avoid;">
+            <div style="background: #1a1a1a; color: white; padding: 8px 12px; font-size: 10px; font-weight: 600;">MODIFICACIONES</div>
+            <div style="background: #fff; padding: 12px; min-height: 60px; font-size: 10px; border: 1px solid #eee; border-top: none; white-space: pre-wrap; word-wrap: break-word;">
+              ${rendicion.modificaciones || '<span style="color: #999;">Sin modificaciones registradas</span>'}
             </div>
           </div>
           
