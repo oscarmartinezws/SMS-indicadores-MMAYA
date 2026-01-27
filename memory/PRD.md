@@ -144,6 +144,15 @@ Sistema de gestión y monitoreo de indicadores sectoriales con dashboard analít
 
 ## Tareas Completadas (Enero 2025)
 
+### 2025-01-27
+- ✅ **Verificación y Testing del PDF "Ficha de Seguimiento"**:
+  - Fila "PROGRAMADO" presente en tabla de seguimiento anual
+  - Secciones "Descripción Cualitativa" y "Modificaciones" de ancho completo
+  - CSS `page-break-inside: avoid` aplicado para evitar cortes de texto
+  - Testing agent confirmó 100% éxito (6/6 pruebas)
+  - Dropdown de exportar muestra: "Ficha del Indicador", "Reporte Detallado (PDF)", "Exportar a CSV"
+  - Rol INVITADO correctamente restringido (botones visibles pero deshabilitados)
+
 ### 2025-01-21
 - ✅ **Rol INVITADO (solo lectura) - UI Completa**:
   - Botones de acción VISIBLES pero DESHABILITADOS
